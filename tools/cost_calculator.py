@@ -9,14 +9,14 @@ CAG-primary vs RAG 월 비용과 G1 판정(3배 상한)을 출력한다.
 """
 
 # ── 측정값 입력 (SQL 결과) ────────────────────────────────
-CORPUS_TOKENS = 0        # [M1] tokens_est_high (사규 active 전체)
-DAILY_QUERIES = 0.0      # [M3] avg_per_day
-CRITICAL_PCT = 0.0       # [M4] critical_pct (%)
-RAG_CTX_TOKENS = 0       # [M5] avg_rag_context_tokens (질의당 컨텍스트)
+CORPUS_TOKENS = 284_849  # [M1] tokens_est_high (사규 active 전체) — 2026-07-21 실측
+DAILY_QUERIES = 24.1     # [M3] avg_per_day (90일 평균, peak_day 602)
+CRITICAL_PCT = 13.0      # [M4] critical_pct (%)
+RAG_CTX_TOKENS = 6_809   # [M5] avg_rag_context_tokens (p95 12,335)
 
 # ── 단가 입력 ($ / 1M tokens) — 실행 시점 공식 가격으로 갱신 ──
 PRICE_INPUT = 0.30       # 비캐시 입력 단가
-PRICE_CACHED = 0.075     # 캐시 적중 입력 단가 (통상 1/4)
+PRICE_CACHED = 0.03      # 캐시 적중 입력 단가 — 2026-07 Gemini 공식가 갱신(측정 시점)
 PRICE_STORAGE_PER_M_HOUR = 1.00  # explicit cache storage, $/1M tok/hour
 CACHE_HOURS_PER_DAY = 12  # 캐시 활성 유지 시간/일 (업무시간만이면 ~10-12)
 
