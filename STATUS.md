@@ -27,6 +27,21 @@
       16/16 실행 (12 pass — 더미 기준, 품질 주장 아님)
 - 기록 정책(ADR-8): query_traces·eval_runs DB 기록은 당분간 로컬 파일/로그로
       대체 (eval 결과 = eval/results/*.json). **DB 쓰기 금지**
+      (예외 = ADR-8a 백필의 ctx_* 2컬럼)
+
+### ADR-8a 완화 후속 (2026-07-21 지시)
+- [x] ① small-to-big 근사 — compass_engine/neighbors.py: hit 청크에 chunk_idx
+      ±2 이웃 런타임 결합(DB 변경 없음), V1RpcRetriever 기본 on.
+      오프라인 테스트 4개(창 결합·경계·타문서 비오염·fail-open) 통과
+- [x] ② additive SQL 작성 — db/additive/20260721_ctx_columns_and_v4.sql
+      (ctx_prefix·ctx_embedding + HNSW + v4 RPC, 1파일 1회 실행).
+      v1 무영향 전수 grep 증거 → docs/v1-schema-reflection.md 기록
+- [ ] [사용자 액션] 위 SQL 을 기존 v1 프로젝트 SQL Editor 에서 1회 실행 → 결과 회신
+- [x] ③ 백필 스크립트 — tools/ctx_backfill.py (문서별 맥락 1~2문장 생성 +
+      ctx_embedding 기록, ctx_* 2컬럼만 쓰기·이어하기·실패 요약).
+      실행은 컬럼 추가 후 [사용자 액션 또는 creds 제공 시 Claude 실행]
+- [x] ④ eval A/B — eval/run.py --v4-ctx·--ab (v1 vs contextual, 개선폭 Δ 출력).
+      숫자 보고는 ②실행+③백필 완료 후 라이브 러닝으로
 - [x] [사용자 액션] tools/gate1-measurement-kit.sql 실행 → 숫자 4개를 아래 G1 표에 기입 (2026-07-21 사용자 회신)
 - [x] tools/cost_calculator.py에 실측값 반영 → G1 판정 기록 (계산기 실행 출력으로 51.4x 재현 확인)
 
@@ -67,6 +82,7 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 ADR-8a(완화): 이웃 결합(즉시)+additive SQL/v4 RPC 작성+백필 스크립트+eval A/B 하니스. 남은 것=[사용자 액션] SQL 실행→백필→A/B 숫자.
 - 2026-07-21 전략 변경(사용자): DB 재설계 취소 → ADR-8(DB 불변·SELECT 전용). schema.sql/마이그레이션/rls_verify 폐기, 스키마 리플렉션 킷 + 파생 원장 빌더 + v1 RPC 래퍼 리트리버로 대체.
 - 2026-07-21 Phase 0 항목 2·3(작성분)·4 완료: schema.sql+마이그레이션 0001, rls_verify.py(canary), eval 하니스 이식(더미 완주 EXIT=0). 남은 것 = [사용자 액션] 마이그레이션 실행→RLS 통과.
 - 2026-07-21 Phase 0 항목 1 완료: compass_engine 뼈대 + articles.py (pytest 19 passed).

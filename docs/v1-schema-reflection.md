@@ -36,6 +36,21 @@ returns: id uuid, document_id uuid, text text, article_no text,
 근거: v1 db/migrations/20260513_nexus_hybrid_search_v3_pgroonga.sql +
 core/retriever.py 호출부(payload 미러). 리플렉션 [R2] 로 확정 예정.
 
+## additive 컬럼 v1 무영향 증거 (ADR-8a, 2026-07-21 전수 grep)
+
+`ctx_prefix TEXT` / `ctx_embedding VECTOR(768)` (nullable) 추가가 v1 동작에
+영향 없음을 v1 레포 전수 grep 으로 확인:
+
+1. **SELECT**: `table("nexus_chunks")` 접근 21곳(core/retriever 10 · core/auto 7 ·
+   core/nexus_cag_manager 1 · pages/admin 3) 전부 **명시 컬럼** select.
+   `select("*")`·무인자 select **0건** → 신규 컬럼이 응답에 실리지 않는다.
+2. **쓰기**: `update(dict)` 2곳(auto/chunk_meta_filler:133, auto/auto_fixer:303)·
+   `insert(dict rows)` 1곳(parser/ingest.py:145) — 전부 명명 컬럼 dict.
+   신규 nullable 컬럼은 미지정 시 NULL → 기존 경로 불변.
+3. **RPC**: v3(nexus_hybrid_search_v3_pgroonga)는 `c.embedding`·`c.text` 등
+   기존 컬럼만 참조 — `ctx_embedding` 미참조.
+→ v1=embedding, v2=ctx_embedding 을 읽으므로 같은 테이블에서 무간섭 공존.
+
 ## 리플렉션 결과 (붙여넣기 영역)
 
 ### [R1] nexus_* 컬럼 덤프

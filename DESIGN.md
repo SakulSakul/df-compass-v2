@@ -36,6 +36,7 @@
 | ADR-6 | **eval-first**: 하니스가 첫 검색 코드보다 먼저. 모든 retrieval·prompt·규칙 변경은 eval diff 게이트 통과 후 반영 | v1은 eval이 phase 두 자릿수에 등장 — 그 전의 모든 튜닝이 미계측이었음 |
 | ADR-7 | **CAG 채택 명분 = "솔로 빌더의 튜닝 표면적 축소"** (검색실패 0 아님) | council: 실패는 소멸이 아니라 이동(청크 누락→장문 주의 실패). 후자는 검출이 어려우므로 §5 검증기가 전제조건 |
 | ADR-8 | **DB 불변 — v1 스키마(nexus_*)를 그대로 사용, 컷오버 전까지 v2는 SELECT 전용(anon 키만). Section 계층·contextual 재적재·boost_rules 테이블은 보류(추후 additive 컬럼으로 재검토)** | 2026-07-21 사용자 결정: v2 = "v1 Supabase 를 그대로 쓰는 엔진 리라이트". 신규 프로젝트·마이그레이션 없음. §3 신규 스키마·§5 원장 테이블은 이 ADR 로 대체 — 조항 원장은 기동 시 nexus_chunks.text 재추출로 메모리 파생(§5), traces/eval 기록은 당분간 로컬 파일/로그 |
+| ADR-8a | **ADR-8 완화 (2026-07-21): 신규 테이블·신규 프로젝트 금지는 유지, nexus_chunks additive 컬럼(ctx_prefix, ctx_embedding)만 허용.** small-to-big 은 이웃(chunk_idx ±2) 런타임 결합으로 근사, contextual retrieval 은 ctx_embedding 백필 + v4 RPC(nexus_hybrid_search_v4_ctx)로 복원 | v1 무영향 근거: nexus_chunks SELECT 21곳 전수 grep — 전부 명시 컬럼(select("*") 0건), 쓰기는 명명 dict, v3 RPC 는 c.embedding 만 참조 → nullable additive 컬럼은 v1 에 관측 불가. v1=embedding·v2=ctx_embedding 으로 같은 테이블 무간섭 공존. 채택은 eval A/B 숫자(ADR-6) 확인 후 |
 
 ---
 
