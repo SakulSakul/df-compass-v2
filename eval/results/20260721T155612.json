@@ -1,0 +1,354 @@
+{
+  "timestamp": "2026-07-21T15:56:12.940621",
+  "fixtures_path": "/workspace/df-compass-v2/eval/fixtures.yaml",
+  "provider": "v1-rpc:nexus_hybrid_search_v4_ctx",
+  "total": 16,
+  "passed": 8,
+  "failed": 8,
+  "avg_precision": 0.3541666666666666,
+  "avg_recall": 0.59375,
+  "score_min": 0.0163934426229508,
+  "score_max": 0.0163934426229508,
+  "score_avg": 0.016393442622950803,
+  "by_category": {
+    "general": {
+      "total": 4,
+      "passed": 2,
+      "avg_precision": 0.41666666666666663,
+      "avg_recall": 0.5,
+      "score_avg": 0.0163934426229508
+    },
+    "critical": {
+      "total": 3,
+      "passed": 2,
+      "avg_precision": 0.6666666666666666,
+      "avg_recall": 0.6666666666666666,
+      "score_avg": 0.0163934426229508
+    },
+    "multi-domain": {
+      "total": 1,
+      "passed": 1,
+      "avg_precision": 1.0,
+      "avg_recall": 0.5,
+      "score_avg": 0.0163934426229508
+    },
+    "negative": {
+      "total": 2,
+      "passed": 0,
+      "avg_precision": 0.0,
+      "avg_recall": 1.0,
+      "score_avg": 0.0163934426229508
+    },
+    "paraphrase": {
+      "total": 6,
+      "passed": 3,
+      "avg_precision": 0.16666666666666666,
+      "avg_recall": 0.5,
+      "score_avg": 0.0163934426229508
+    }
+  },
+  "fixtures": [
+    {
+      "id": "q01",
+      "category": "general",
+      "question": "법인카드로 동료에게 줄 선물 사도 됨?",
+      "expected": [
+        "(재무) 법인카드"
+      ],
+      "hit_titles": [
+        "(공통) 신세계그룹 CREDO",
+        "(재무) 법인카드 관리 지침",
+        "(재무) 법인카드 관리 지침"
+      ],
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q02",
+      "category": "general",
+      "question": "출장 갔을 때 식사비 한도가 어떻게 돼요?",
+      "expected": [
+        "출장"
+      ],
+      "hit_titles": [
+        "(재무) 해외출장비 관리 지침",
+        "(재무) 국내출장비 관리 지침",
+        "(재무) 해외출장비 관리 지침"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q03",
+      "category": "general",
+      "question": "거래처에서 명절 선물 받았는데 어떻게 처리해야 하나요?",
+      "expected": [
+        "윤리"
+      ],
+      "hit_titles": [
+        "(공통) 신세계그룹 CREDO",
+        "(공통) 신세계그룹 CREDO",
+        "(CSR) 클린뱅크 운영 지침"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q04",
+      "category": "general",
+      "question": "협력사 직원 접대 가능한 한도가 있나요?",
+      "expected": [
+        "윤리",
+        "공정거래"
+      ],
+      "hit_titles": [
+        "(공통) 신세계그룹 CREDO",
+        "(공통) 임직원 징계기준",
+        "(공통) 신세계그룹 CREDO"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q05",
+      "category": "critical",
+      "question": "직장 내에서 괴롭힘을 당했어요. 어떻게 신고하나요?",
+      "expected": [
+        "직장 내 괴롭힘"
+      ],
+      "hit_titles": [
+        "(인사) 직장 내 괴롭힘 예방·대응지침",
+        "(인사) 직장 내 괴롭힘 예방·대응지침",
+        "(인사) 직장 내 괴롭힘 예방·대응지침"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q06",
+      "category": "critical",
+      "question": "성희롱 피해를 당했을 때 회사 절차가 어떻게 되나요?",
+      "expected": [
+        "성희롱"
+      ],
+      "hit_titles": [
+        "(인사) 성희롱 예방 지침",
+        "(인사) 성희롱 예방 지침",
+        "(인사) 성희롱 예방 지침"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q07",
+      "category": "critical",
+      "question": "익명으로 비위 행위를 신고할 수 있는 채널이 있나요?",
+      "expected": [
+        "신고"
+      ],
+      "hit_titles": [
+        "(재무) 내부회계관리제도 업무지침",
+        "(인사) 성희롱 예방 지침",
+        "(공통) 임직원 징계기준"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q08",
+      "category": "multi-domain",
+      "question": "회사 공금을 개인 용도로 쓴 경우 징계 수위는 어떻게 되나요?",
+      "expected": [
+        "징계",
+        "윤리"
+      ],
+      "hit_titles": [
+        "(공통) 임직원 징계기준",
+        "(공통) 임직원 징계기준",
+        "(공통) 임직원 징계기준"
+      ],
+      "precision": 1.0,
+      "recall": 0.5,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q09",
+      "category": "negative",
+      "question": "오늘 점심 메뉴 추천해줘",
+      "expected": [],
+      "hit_titles": [
+        "(안전) 물류 안전보건관리 지침",
+        "(인사) 건전한 조직문화 조성을 위한 자율준수 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.0,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": "negative case — hit 0건 expected"
+    },
+    {
+      "id": "q10",
+      "category": "negative",
+      "question": "주말에 영화 뭐 볼지 추천해줘",
+      "expected": [],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 정보보호 정책서",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.0,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": "negative case — hit 0건 expected"
+    },
+    {
+      "id": "q11",
+      "category": "paraphrase",
+      "question": "중국 리서치 회사에서 링크드인으로 인터뷰 요청이 접수 됨. 사례는 시간당 50만원 정도",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(CSR) 대외출강 운영 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q12",
+      "category": "paraphrase",
+      "question": "중국 리서치 회사에서 링크드인으로 인터뷰 요청이 옴. 사례는 시간당 50만원 정도 준다고 함",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(CSR) 대외출강 운영 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    },
+    {
+      "id": "q13",
+      "category": "paraphrase",
+      "question": "중국 리서치 회사에서 인터뷰 요청이 접수 됨. 사례는 시간당 50만원 정도 준다고 함.",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q14",
+      "category": "paraphrase",
+      "question": "중국 리서치 회사에서 인터뷰에 응해주면 시간당 50만원 정도 준다고 함.",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q15",
+      "category": "paraphrase",
+      "question": "중국 리서치 업체가 인터뷰에 응해주면 시간당 50만원 정도 준다고 함.",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.0,
+      "recall": 0.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": false,
+      "note": ""
+    },
+    {
+      "id": "q16",
+      "category": "paraphrase",
+      "question": "중국 리서치 업체가 인터뷰에 응해주면 시간당 50만원 정도 사례 하겠다고 함.",
+      "expected": [
+        "대외출강"
+      ],
+      "hit_titles": [
+        "(정보보안) 개인정보보호 지침",
+        "(CSR) 대외출강 운영 지침",
+        "(정보보안) 개인정보보호 지침"
+      ],
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "best_score": 0.0163934426229508,
+      "hit_count": 3,
+      "passed": true,
+      "note": ""
+    }
+  ]
+}

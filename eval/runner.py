@@ -202,7 +202,9 @@ def write_results_json(summary: RunSummary, *,
                        results_dir: Path | str = RESULTS_DIR) -> Path:
     d = Path(results_dir)
     d.mkdir(parents=True, exist_ok=True)
-    out = d / f"{datetime.now().strftime('%Y%m%dT%H%M%S')}.json"
+    # provider 를 파일명에 포함 — A/B 처럼 같은 초에 2회 쓰면 덮어쓰는 충돌 방지
+    tag = "".join(ch if ch.isalnum() else "-" for ch in (summary.provider or "run"))[:40]
+    out = d / f"{datetime.now().strftime('%Y%m%dT%H%M%S')}_{tag}.json"
     with out.open("w", encoding="utf-8") as f:
         json.dump(asdict(summary), f, ensure_ascii=False, indent=2)
     return out

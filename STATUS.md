@@ -40,8 +40,22 @@
 - [x] ③ 백필 스크립트 — tools/ctx_backfill.py (문서별 맥락 1~2문장 생성 +
       ctx_embedding 기록, ctx_* 2컬럼만 쓰기·이어하기·실패 요약).
       실행은 컬럼 추가 후 [사용자 액션 또는 creds 제공 시 Claude 실행]
-- [x] ④ eval A/B — eval/run.py --v4-ctx·--ab (v1 vs contextual, 개선폭 Δ 출력).
-      숫자 보고는 ②실행+③백필 완료 후 라이브 러닝으로
+- [x] ④ eval A/B — eval/run.py --v4-ctx·--ab (v1 vs contextual, 개선폭 Δ 출력)
+- [x] [사용자 액션] additive SQL v1 프로젝트 실행 완료 ("Success. No rows returned")
+- [x] ③실행 — 백필 라이브 완료: **성공 628 / 실패 0 / 대상 628** (active 문서 101개)
+- [x] ④실행 — A/B 라이브 (fixtures 16, top_k=3, 2026-07-21):
+      **v3(A) 4/16 pass → v4-ctx(B) 8/16 pass (Δ+4)** ·
+      avg P 0.208→0.354 (Δ+0.146) · avg R 0.281→0.594 (Δ+0.312) ·
+      flips: q05·q06·q11·q12·q16 ❌→✅, q10 ✅→❌
+      ⚠️ 해석 한계(계측 조건):
+      ① 두 백엔드 모두 keyword leg 무효 — 원문을 pgroonga OR 쿼리로 변환하는
+        v1 의 nexus_build_pgroonga_query 미이식(양쪽 best=0.0164=vector 단일 leg).
+        따라서 **A 는 v1 운영 성능을 대표하지 않는다** — 이 Δ 는 "동일 래퍼에서
+        embedding vs ctx_embedding 컬럼 비교"로만 유효 (쿼리 빌더 이식은 Phase 1)
+      ② q09·q10 negative 실패는 임계치 없는 하니스 아티팩트(v4 는 항상 top-3 반환,
+        점수 컷 없음) — contextual 회귀가 아니라 negative 판정 설계 보완 필요
+      결론: 동일 조건 비교에서 ctx_embedding 명확 우위 → contextual 백필 유지 근거.
+      "v1 대비 개선"으로 확대해석 금지
 - [x] [사용자 액션] tools/gate1-measurement-kit.sql 실행 → 숫자 4개를 아래 G1 표에 기입 (2026-07-21 사용자 회신)
 - [x] tools/cost_calculator.py에 실측값 반영 → G1 판정 기록 (계산기 실행 출력으로 51.4x 재현 확인)
 
@@ -82,6 +96,7 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 백필 628/628 성공(실패 0) + A/B 라이브: v3 4/16 → v4-ctx 8/16 (Δ+4, R +0.312). 캐비앗: keyword leg 미이식·negative 임계치 — Phase 1 과제.
 - 2026-07-21 ADR-8a(완화): 이웃 결합(즉시)+additive SQL/v4 RPC 작성+백필 스크립트+eval A/B 하니스. 남은 것=[사용자 액션] SQL 실행→백필→A/B 숫자.
 - 2026-07-21 전략 변경(사용자): DB 재설계 취소 → ADR-8(DB 불변·SELECT 전용). schema.sql/마이그레이션/rls_verify 폐기, 스키마 리플렉션 킷 + 파생 원장 빌더 + v1 RPC 래퍼 리트리버로 대체.
 - 2026-07-21 Phase 0 항목 2·3(작성분)·4 완료: schema.sql+마이그레이션 0001, rls_verify.py(canary), eval 하니스 이식(더미 완주 EXIT=0). 남은 것 = [사용자 액션] 마이그레이션 실행→RLS 통과.
