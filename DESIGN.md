@@ -35,6 +35,7 @@
 | ADR-5 | **규칙의 데이터화**: 부스트·고정 인용은 코드 상수가 아닌 DB 테이블 + eval 게이트 후 활성화(shadow→active) | v1 EMERGENCY_KEYWORDS·force-include 하드코딩의 두더지잡기 교훈. 단 DB 이전만으로는 두더지잡기가 장소만 바뀜 — eval 게이트가 본질 |
 | ADR-6 | **eval-first**: 하니스가 첫 검색 코드보다 먼저. 모든 retrieval·prompt·규칙 변경은 eval diff 게이트 통과 후 반영 | v1은 eval이 phase 두 자릿수에 등장 — 그 전의 모든 튜닝이 미계측이었음 |
 | ADR-7 | **CAG 채택 명분 = "솔로 빌더의 튜닝 표면적 축소"** (검색실패 0 아님) | council: 실패는 소멸이 아니라 이동(청크 누락→장문 주의 실패). 후자는 검출이 어려우므로 §5 검증기가 전제조건 |
+| ADR-8 | **DB 불변 — v1 스키마(nexus_*)를 그대로 사용, 컷오버 전까지 v2는 SELECT 전용(anon 키만). Section 계층·contextual 재적재·boost_rules 테이블은 보류(추후 additive 컬럼으로 재검토)** | 2026-07-21 사용자 결정: v2 = "v1 Supabase 를 그대로 쓰는 엔진 리라이트". 신규 프로젝트·마이그레이션 없음. §3 신규 스키마·§5 원장 테이블은 이 ADR 로 대체 — 조항 원장은 기동 시 nexus_chunks.text 재추출로 메모리 파생(§5), traces/eval 기록은 당분간 로컬 파일/로그 |
 
 ---
 

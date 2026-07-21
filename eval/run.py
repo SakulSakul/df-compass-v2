@@ -1,11 +1,12 @@
 """DF COMPASS v2 · 검색 수준 eval CLI (v1 eval/run.py 이식).
 
 사용법:
-    python eval/run.py --dummy [--fixtures eval/fixtures.yaml] [--top-k 3] [--no-write]
+    python eval/run.py --dummy                    # 하니스 완주 검증 (오프라인)
+    python eval/run.py --v1-rpc                   # v1 RPC 실검색 (ADR-8)
+        (env: SUPABASE_URL, SUPABASE_ANON_KEY, GEMINI_API_KEY 필요)
+    공통 옵션: [--fixtures eval/fixtures.yaml] [--top-k 3] [--no-write]
 
-Phase 0 에는 --dummy (하니스 완주 검증) 만 있다.
-실 RAG retriever 는 Phase 1 에서 같은 Retriever 프로토콜로 꽂힌다 —
-그 전에 검색 품질을 '좋다/나쁘다' 주장하지 않는다 (CLAUDE.md Part 2-B).
+두 백엔드 모두 같은 Retriever 프로토콜 — eval A/B 의 구조적 전제.
 """
 from __future__ import annotations
 
@@ -54,13 +55,15 @@ def main() -> int:
     ap.add_argument("--fixtures", default=str(DEFAULT_FIXTURES))
     ap.add_argument("--top-k", type=int, default=3)
     ap.add_argument("--dummy", action="store_true",
-                    help="더미 retriever 로 하니스 완주 검증 (Phase 0 유일 백엔드)")
+                    help="더미 retriever 로 하니스 완주 검증 (오프라인)")
+    ap.add_argument("--v1-rpc", action="store_true",
+                    help="v1 nexus_hybrid_search_v3_pgroonga RPC 실검색 (ADR-8)")
     ap.add_argument("--no-write", action="store_true")
     args = ap.parse_args()
 
-    if not args.dummy:
-        print("ERROR: 실 RAG retriever 는 Phase 1 에서 연결됩니다. "
-              "지금은 --dummy 로 하니스 완주만 검증 가능합니다.", file=sys.stderr)
+    if args.dummy == args.v1_rpc:
+        print("ERROR: --dummy 또는 --v1-rpc 중 정확히 하나를 지정하세요.",
+              file=sys.stderr)
         return 2
 
     fixtures_path = Path(args.fixtures)
@@ -68,11 +71,32 @@ def main() -> int:
         print(f"ERROR: fixtures 파일 없음: {fixtures_path}", file=sys.stderr)
         return 2
 
-    from eval.dummy_retriever import DummyRetriever
-    retriever = DummyRetriever(top_k=args.top_k)
+    if args.dummy:
+        from eval.dummy_retriever import DummyRetriever
+        retriever = DummyRetriever(top_k=args.top_k)
+        backend = "dummy"
+    else:
+        import os
+        url = os.environ.get("SUPABASE_URL") or ""
+        key = os.environ.get("SUPABASE_ANON_KEY") or ""
+        if not url or not key:
+            print("ERROR: --v1-rpc 는 SUPABASE_URL / SUPABASE_ANON_KEY 필요 "
+                  "(ADR-8: anon 키 SELECT 전용).", file=sys.stderr)
+            return 2
+        try:
+            from supabase import create_client
+        except ImportError:
+            print("ERROR: supabase-py 미설치 — `pip install supabase`.",
+                  file=sys.stderr)
+            return 2
+        from compass_engine.v1_retriever import V1RpcRetriever, gemini_embed_fn
+        retriever = V1RpcRetriever(
+            create_client(url, key), gemini_embed_fn(), top_k=args.top_k,
+        )
+        backend = "v1-rpc"
 
     print(f"Loaded fixtures from {fixtures_path}")
-    print(f"Running retrieval (top_k={args.top_k}, backend=dummy) ...")
+    print(f"Running retrieval (top_k={args.top_k}, backend={backend}) ...")
     print()
     summary = run_all(retriever, fixtures_path=fixtures_path, top_k=args.top_k)
     _print_table(summary.fixtures)

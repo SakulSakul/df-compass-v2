@@ -9,20 +9,24 @@
 
 - [x] compass_engine/ 패키지 뼈대 — stages.py: 5스테이지 TypedDict + TraceRecord + Retriever 프로토콜(유일 교체형, 상한 준수). CAG 구현 없음(G1 미통과 반영)
 - [x] compass_engine/articles.py — 조항 정규화 단일 함수(제N조/조의M/부칙/별표/삭제) + 단위 테스트 19/19 통과 (조의2 붕괴 회귀 테스트 포함, 실행 출력 커밋 메시지 첨부)
-- [x] db/schema.sql + 마이그레이션 파일 작성 (DESIGN.md §3 전체) — 3계층+registry+
-      eval_runs+boost/pin(active⇒passed run 트리거)+traces+v1 이식 4종+source_type RLS
-      +canary seed. 마이그레이션 0001 은 schema.sql 전문 실행 지시(단일 정본)
-- [ ] [사용자 액션] 마이그레이션을 Supabase SQL Editor에서 실행 → 결과 회신
-      (db/schema.sql 전문을 **v2 전용 신규 프로젝트** SQL Editor 에 붙여넣어 1회 실행.
-      ⚠️ **v1 운영 프로젝트 실행 금지** — v1 이 무접두어 critical_keywords/hotline_config
-      를 운영 중(critical_mode.py). schema.sql 최상단 v1 감지 가드가 오실행을 즉시 중단)
-- [ ] RLS 검증 스크립트 작성·통과 (anon 빈 배열 함정 탐지) — **작성 완료**
-      (tools/rls_verify.py, canary 기반 결정론·의존성 없음). **통과는 마이그레이션
-      실행 후**: `SUPABASE_URL=… SUPABASE_ANON_KEY=… python tools/rls_verify.py`
-- [x] 검색 수준 eval 하니스 이식 (더미 데이터 1회 완주 출력 첨부) — v1 runner 를
-      Retriever 프로토콜 기반으로 이식(eval/runner.py·run.py·dummy_retriever.py,
-      fixtures 16개 이식). 더미 완주: EXIT=0, 16/16 실행 (12 pass — 더미 기준,
-      품질 주장 아님). 실 RAG retriever 는 Phase 1 에서 동일 프로토콜로 연결
+- [~] ~~db/schema.sql + 마이그레이션 + RLS 검증~~ — **ADR-8(DB 불변)로 폐기**
+      (2026-07-21 사용자 결정: 신규 프로젝트·마이그레이션·SQL Editor 작업 없음.
+      산출물은 커밋 이력에만 남김). 대체 항목 ↓
+- [ ] [사용자 액션] v1 스키마 리플렉션: tools/schema_reflect.sql (R1·R2) 을
+      **v1** SQL Editor 에서 실행 → 결과 회신 → docs/v1-schema-reflection.md 확정
+      (실행 전까지 v2 는 문서의 "잠정 계약(코드 근거)" 컬럼만 사용)
+- [x] §5 파생 원장 빌더 — compass_engine/registry.py: nexus_chunks.text 를
+      articles.py 로 재추출해 (document_id, canonical) 메모리 원장 구축.
+      v1 article_no 컬럼 사용 금지(조의N 붕괴) 준수 — 컬럼 붕괴값이 있어도
+      text 재추출로 조의2 보존되는 회귀 테스트 포함. tests 3개 통과
+- [x] v1 RPC 래퍼 리트리버 — compass_engine/v1_retriever.py:
+      nexus_hybrid_search_v3_pgroonga 호출(payload 는 v1 호출부 미러),
+      Retriever 프로토콜 구현. eval/run.py --v1-rpc 로 연결 (SELECT/RPC 전용)
+- [x] 검색 수준 eval 하니스 이식 + 더미 1회 완주 — Retriever 프로토콜 기반
+      (eval/runner.py·run.py·dummy_retriever.py, fixtures 16개). EXIT=0,
+      16/16 실행 (12 pass — 더미 기준, 품질 주장 아님)
+- 기록 정책(ADR-8): query_traces·eval_runs DB 기록은 당분간 로컬 파일/로그로
+      대체 (eval 결과 = eval/results/*.json). **DB 쓰기 금지**
 - [x] [사용자 액션] tools/gate1-measurement-kit.sql 실행 → 숫자 4개를 아래 G1 표에 기입 (2026-07-21 사용자 회신)
 - [x] tools/cost_calculator.py에 실측값 반영 → G1 판정 기록 (계산기 실행 출력으로 51.4x 재현 확인)
 
@@ -43,14 +47,17 @@
 - 단 §2 엔진 계약의 retrieve 스테이지 교체형 인터페이스는 **유지** —
   미래 재심의 대비 롤백 구조이자 eval A/B 의 전제 (사용자 지시).
 
-### Phase 0 종료 판정
-- 판정: **미완 — [사용자 액션] 1건에 블록** (Claude 측 작업은 전부 완료)
-- 근거: 종료 조건 4개 중 3개 충족 —
-  ① articles.py 단위 테스트 19 passed ✅ (재실행 확인)
-  ② 검색 eval 하니스 더미 1회 완주 ✅ (EXIT=0, 16 fixtures)
-  ③ G1 판정 기록 ✅ (미통과 51.4x → RAG 확정)
-  ④ 스키마 Supabase 적용 + RLS 검증 통과 ⏸ — **사용자가 db/schema.sql 실행 후
-    tools/rls_verify.py 통과 출력이 나와야 충족**
+### Phase 0 종료 판정 (ADR-8 기준으로 교체: 스키마 리플렉션 문서 +
+### 파생 원장 빌더 + RPC 래퍼 리트리버 + eval 완주)
+- 판정: **미완 — [사용자 액션] 1건(스키마 리플렉션 덤프)에 블록**
+  (Claude 측 작업은 전부 완료)
+- 근거:
+  ① 파생 원장 빌더 ✅ (tests/test_registry.py 3 passed — 조의2 보존·3분기 verify)
+  ② RPC 래퍼 리트리버 ✅ (V1RpcRetriever, eval --v1-rpc 연결. 라이브 호출은
+    creds 필요 — 코드·프로토콜 정합은 오프라인 검증)
+  ③ eval 완주 ✅ (더미 EXIT=0, 16 fixtures)
+  ④ v1 스키마 리플렉션 문서 ⏸ — **[사용자 액션] schema_reflect.sql 덤프 회신
+    → docs/v1-schema-reflection.md 확정 시 충족** (잠정 계약은 기록됨)
 - 사용자 승인: _대기 (④ 완료 후 판정 확정 요청 예정)_
 
 ---
@@ -60,6 +67,7 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 전략 변경(사용자): DB 재설계 취소 → ADR-8(DB 불변·SELECT 전용). schema.sql/마이그레이션/rls_verify 폐기, 스키마 리플렉션 킷 + 파생 원장 빌더 + v1 RPC 래퍼 리트리버로 대체.
 - 2026-07-21 Phase 0 항목 2·3(작성분)·4 완료: schema.sql+마이그레이션 0001, rls_verify.py(canary), eval 하니스 이식(더미 완주 EXIT=0). 남은 것 = [사용자 액션] 마이그레이션 실행→RLS 통과.
 - 2026-07-21 Phase 0 항목 1 완료: compass_engine 뼈대 + articles.py (pytest 19 passed).
 - 2026-07-21 G1 실측값 기입(사용자 회신) + cost_calculator 재현 실행 → 51.4x 미통과 확인. rule 트랙 RAG 확정.
