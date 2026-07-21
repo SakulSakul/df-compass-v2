@@ -13,7 +13,9 @@
       eval_runs+boost/pin(active⇒passed run 트리거)+traces+v1 이식 4종+source_type RLS
       +canary seed. 마이그레이션 0001 은 schema.sql 전문 실행 지시(단일 정본)
 - [ ] [사용자 액션] 마이그레이션을 Supabase SQL Editor에서 실행 → 결과 회신
-      (db/schema.sql 전문을 v2 프로젝트 SQL Editor 에 붙여넣어 1회 실행)
+      (db/schema.sql 전문을 **v2 전용 신규 프로젝트** SQL Editor 에 붙여넣어 1회 실행.
+      ⚠️ **v1 운영 프로젝트 실행 금지** — v1 이 무접두어 critical_keywords/hotline_config
+      를 운영 중(critical_mode.py). schema.sql 최상단 v1 감지 가드가 오실행을 즉시 중단)
 - [ ] RLS 검증 스크립트 작성·통과 (anon 빈 배열 함정 탐지) — **작성 완료**
       (tools/rls_verify.py, canary 기반 결정론·의존성 없음). **통과는 마이그레이션
       실행 후**: `SUPABASE_URL=… SUPABASE_ANON_KEY=… python tools/rls_verify.py`

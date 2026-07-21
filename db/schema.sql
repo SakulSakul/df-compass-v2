@@ -2,7 +2,15 @@
 -- DF COMPASS v2 · 정본 스키마 (DESIGN.md §3 전체)
 -- Phase 0 초기 상태 = db/migrations/0001_phase0_init.sql 적용 결과.
 --
--- [사용자 액션] Supabase SQL Editor 에 이 파일 전문을 붙여넣어 1회 실행.
+-- ⚠️ 실행 전제: 반드시 **v2 전용 신규 Supabase 프로젝트**에서 실행.
+--    v1 운영 프로젝트 실행 금지 — v1 의 01_schema.sql 이 무접두어
+--    critical_keywords / hotline_config 를 이미 생성했고(운영 중
+--    critical_mode.py 가 읽는 실테이블), 같은 프로젝트에서 실행하면
+--    CREATE IF NOT EXISTS 는 스킵되지만 ENABLE RLS 가 v1 운영 테이블에
+--    적용되어 critical 감지가 silent fail 한다. 아래 v1 감지 가드가
+--    이 경우 실행을 즉시 중단시킨다 (안전벨트).
+--
+-- [사용자 액션] 신규 v2 프로젝트의 SQL Editor 에 이 파일 전문을 붙여넣어 1회 실행.
 --   (이후 스키마 변경은 migrations/ 에 번호 파일로 추가되고,
 --    이 스냅샷은 각 마이그레이션 반영 시 함께 갱신된다)
 --
@@ -19,6 +27,15 @@
 -- ============================================================
 
 BEGIN;
+
+-- ── v1 감지 가드 (안전벨트) — v1 프로젝트에서 실행 시 즉시 중단 ──
+DO $$
+BEGIN
+  IF to_regclass('public.nexus_documents') IS NOT NULL THEN
+    RAISE EXCEPTION
+      '이 프로젝트는 v1(DF COMPASS) 운영 프로젝트입니다. v2 스키마는 반드시 신규 전용 프로젝트에서 실행하세요 — 여기서 실행하면 v1 운영 테이블(critical_keywords/hotline_config)에 RLS 가 걸려 critical 감지가 중단됩니다.';
+  END IF;
+END $$;
 
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pgroonga;

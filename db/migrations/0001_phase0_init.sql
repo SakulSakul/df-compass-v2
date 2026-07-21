@@ -4,10 +4,12 @@
 -- 실행 내용 = ../schema.sql v1 전문과 동일 (단일 정본 원칙 — 중복 유지보수 방지).
 --
 -- [사용자 액션]
---   1. Supabase SQL Editor 를 연다 (v2 프로젝트).
+--   1. **v2 전용 신규 Supabase 프로젝트**의 SQL Editor 를 연다.
+--      ⚠️ v1 운영 프로젝트 실행 금지 — v1 이 무접두어 critical_keywords/
+--      hotline_config 를 운영 중이라 RLS 활성화가 v1 critical 감지를
+--      silent fail 시킨다. (schema.sql 최상단 v1 감지 가드가 오실행을 차단)
 --   2. db/schema.sql 파일 전문을 붙여넣어 실행한다 (이 파일이 아님).
 --   3. 결과(성공/에러 메시지)를 회신한다.
---   ※ v1 테이블(nexus_*)과 이름이 겹치지 않으므로 같은 프로젝트에서 안전.
 --
 -- 이후 마이그레이션(0002~)은 각 파일이 자체 실행본이 되고,
 -- db/schema.sql 스냅샷은 해당 변경을 반영해 함께 갱신된다.
