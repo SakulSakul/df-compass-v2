@@ -7,8 +7,8 @@
 
 ## Phase 0 체크리스트 (지시서: docs/phases/phase-0.md · 타임박스 2주)
 
-- [ ] compass_engine/ 패키지 뼈대 (스테이지 typed dict + trace 계약, 상한 준수)
-- [ ] compass_engine/articles.py — 조항 정규화 단일 함수 + 단위 테스트 통과
+- [x] compass_engine/ 패키지 뼈대 — stages.py: 5스테이지 TypedDict + TraceRecord + Retriever 프로토콜(유일 교체형, 상한 준수). CAG 구현 없음(G1 미통과 반영)
+- [x] compass_engine/articles.py — 조항 정규화 단일 함수(제N조/조의M/부칙/별표/삭제) + 단위 테스트 19/19 통과 (조의2 붕괴 회귀 테스트 포함, 실행 출력 커밋 메시지 첨부)
 - [ ] db/schema.sql + 마이그레이션 파일 작성 (DESIGN.md §3 전체)
 - [ ] [사용자 액션] 마이그레이션을 Supabase SQL Editor에서 실행 → 결과 회신
 - [ ] RLS 검증 스크립트 작성·통과 (anon 빈 배열 함정 탐지)
@@ -45,5 +45,6 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 Phase 0 항목 1 완료: compass_engine 뼈대 + articles.py (pytest 19 passed).
 - 2026-07-21 G1 실측값 기입(사용자 회신) + cost_calculator 재현 실행 → 51.4x 미통과 확인. rule 트랙 RAG 확정.
 - 2026-07-21 스타터 번들 생성. Phase 0 대기.
