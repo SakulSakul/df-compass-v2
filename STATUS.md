@@ -9,10 +9,18 @@
 
 - [x] compass_engine/ 패키지 뼈대 — stages.py: 5스테이지 TypedDict + TraceRecord + Retriever 프로토콜(유일 교체형, 상한 준수). CAG 구현 없음(G1 미통과 반영)
 - [x] compass_engine/articles.py — 조항 정규화 단일 함수(제N조/조의M/부칙/별표/삭제) + 단위 테스트 19/19 통과 (조의2 붕괴 회귀 테스트 포함, 실행 출력 커밋 메시지 첨부)
-- [ ] db/schema.sql + 마이그레이션 파일 작성 (DESIGN.md §3 전체)
+- [x] db/schema.sql + 마이그레이션 파일 작성 (DESIGN.md §3 전체) — 3계층+registry+
+      eval_runs+boost/pin(active⇒passed run 트리거)+traces+v1 이식 4종+source_type RLS
+      +canary seed. 마이그레이션 0001 은 schema.sql 전문 실행 지시(단일 정본)
 - [ ] [사용자 액션] 마이그레이션을 Supabase SQL Editor에서 실행 → 결과 회신
-- [ ] RLS 검증 스크립트 작성·통과 (anon 빈 배열 함정 탐지)
-- [ ] 검색 수준 eval 하니스 이식 (더미 데이터 1회 완주 출력 첨부)
+      (db/schema.sql 전문을 v2 프로젝트 SQL Editor 에 붙여넣어 1회 실행)
+- [ ] RLS 검증 스크립트 작성·통과 (anon 빈 배열 함정 탐지) — **작성 완료**
+      (tools/rls_verify.py, canary 기반 결정론·의존성 없음). **통과는 마이그레이션
+      실행 후**: `SUPABASE_URL=… SUPABASE_ANON_KEY=… python tools/rls_verify.py`
+- [x] 검색 수준 eval 하니스 이식 (더미 데이터 1회 완주 출력 첨부) — v1 runner 를
+      Retriever 프로토콜 기반으로 이식(eval/runner.py·run.py·dummy_retriever.py,
+      fixtures 16개 이식). 더미 완주: EXIT=0, 16/16 실행 (12 pass — 더미 기준,
+      품질 주장 아님). 실 RAG retriever 는 Phase 1 에서 동일 프로토콜로 연결
 - [x] [사용자 액션] tools/gate1-measurement-kit.sql 실행 → 숫자 4개를 아래 G1 표에 기입 (2026-07-21 사용자 회신)
 - [x] tools/cost_calculator.py에 실측값 반영 → G1 판정 기록 (계산기 실행 출력으로 51.4x 재현 확인)
 
@@ -34,9 +42,14 @@
   미래 재심의 대비 롤백 구조이자 eval A/B 의 전제 (사용자 지시).
 
 ### Phase 0 종료 판정
-- 판정: _미완_
-- 근거: _(완료 시 Claude Code가 기입)_
-- 사용자 승인: _대기_
+- 판정: **미완 — [사용자 액션] 1건에 블록** (Claude 측 작업은 전부 완료)
+- 근거: 종료 조건 4개 중 3개 충족 —
+  ① articles.py 단위 테스트 19 passed ✅ (재실행 확인)
+  ② 검색 eval 하니스 더미 1회 완주 ✅ (EXIT=0, 16 fixtures)
+  ③ G1 판정 기록 ✅ (미통과 51.4x → RAG 확정)
+  ④ 스키마 Supabase 적용 + RLS 검증 통과 ⏸ — **사용자가 db/schema.sql 실행 후
+    tools/rls_verify.py 통과 출력이 나와야 충족**
+- 사용자 승인: _대기 (④ 완료 후 판정 확정 요청 예정)_
 
 ---
 
@@ -45,6 +58,7 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 Phase 0 항목 2·3(작성분)·4 완료: schema.sql+마이그레이션 0001, rls_verify.py(canary), eval 하니스 이식(더미 완주 EXIT=0). 남은 것 = [사용자 액션] 마이그레이션 실행→RLS 통과.
 - 2026-07-21 Phase 0 항목 1 완료: compass_engine 뼈대 + articles.py (pytest 19 passed).
 - 2026-07-21 G1 실측값 기입(사용자 회신) + cost_calculator 재현 실행 → 51.4x 미통과 확인. rule 트랙 RAG 확정.
 - 2026-07-21 스타터 번들 생성. Phase 0 대기.
