@@ -12,9 +12,9 @@
 - [~] ~~db/schema.sql + 마이그레이션 + RLS 검증~~ — **ADR-8(DB 불변)로 폐기**
       (2026-07-21 사용자 결정: 신규 프로젝트·마이그레이션·SQL Editor 작업 없음.
       산출물은 커밋 이력에만 남김). 대체 항목 ↓
-- [ ] [사용자 액션] v1 스키마 리플렉션: tools/schema_reflect.sql (R1·R2) 을
-      **v1** SQL Editor 에서 실행 → 결과 회신 → docs/v1-schema-reflection.md 확정
-      (실행 전까지 v2 는 문서의 "잠정 계약(코드 근거)" 컬럼만 사용)
+- [~] [사용자 액션] v1 스키마 리플렉션 — **R2(RPC) 회신·확정 완료** (2026-07-22):
+      v3 시그니처 잠정 계약과 완전 일치, v4_ctx 실재 확인(additive 반영 증거).
+      **R1(nexus_* 컬럼 덤프) 회신 대기** — R1 까지 반영돼야 이 항목 완결
 - [x] §5 파생 원장 빌더 — compass_engine/registry.py: nexus_chunks.text 를
       articles.py 로 재추출해 (document_id, canonical) 메모리 원장 구축.
       v1 article_no 컬럼 사용 금지(조의N 붕괴) 준수 — 컬럼 붕괴값이 있어도
@@ -143,6 +143,7 @@
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 리플렉션 R2(RPC) 회신 반영: v3 계약 일치·v4_ctx 실재 확정. R1(컬럼 덤프) 대기.
 - 2026-07-22 3.6 Flash 선행 벤치(유효 3차): 토큰 −18.4%·총생성 p50 −42% — 광고 재현. 답변 전문 저장(소급 채점용). 1·2차는 thinking 예산 절단으로 무효 폐기(SSE 유실 가설 철회). Phase 1 은 인용 스코어러 앞순위로 조정.
 - 2026-07-21 Gemini 신모델 검토: ID 실확인(3.5-flash-lite·3.6-flash), 리랭커 A/B → 3.5-flash-lite(minimal) 우위(pass 9→11, R +0.125, 지연 +55ms) → v2 기본값 확정(Phase 1 적용). 합성 A/B 는 Phase 1 후 예약, Flash Cyber 기각.
 - 2026-07-21 백필 628/628 성공(실패 0) + A/B 라이브: v3 4/16 → v4-ctx 8/16 (Δ+4, R +0.312). 캐비앗: keyword leg 미이식·negative 임계치 — Phase 1 과제.

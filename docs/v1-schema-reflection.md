@@ -56,5 +56,22 @@ core/retriever.py 호출부(payload 미러). 리플렉션 [R2] 로 확정 예정
 ### [R1] nexus_* 컬럼 덤프
 _(미실행)_
 
-### [R2] RPC 시그니처 덤프
-_(미실행)_
+### [R2] RPC 시그니처 덤프 (2026-07-22 사용자 회신 — 확정)
+
+| function_name | args | returns |
+|---|---|---|
+| nexus_chunks_tsv_trigger | | trigger |
+| nexus_diagnose_incident_node_matching | p_nodes text[] | TABLE(doc_id uuid, doc_title text, doc_status text, doc_incident_nodes jsonb, matched_nodes text[], total_chunks integer) |
+| nexus_diagnose_role | | TABLE(curr_user text, curr_role text, sess_user text, curr_schema text, curr_database text) |
+| nexus_force_include_chunks_by_incident_nodes | p_nodes text[] | TABLE(id uuid, document_id uuid, chunk_idx integer, article_no text, text text, doc_title text, doc_incident_nodes jsonb, matched_node_count integer) |
+| nexus_hybrid_search | query_text text, query_embed vector, filter_categories nexus_category[] DEFAULT NULL, filter_doc_kinds nexus_doc_kind[] DEFAULT NULL, top_k integer DEFAULT 3, fanout integer DEFAULT 30, rrf_k integer DEFAULT 60, fallback_to_common boolean DEFAULT true, as_of_date date DEFAULT CURRENT_DATE | TABLE(chunk_id uuid, document_id uuid, doc_title text, doc_kind nexus_doc_kind, article_no text, case_no text, text text, score double precision, owning_department text, categories nexus_category[]) |
+| nexus_hybrid_search_v2 | query_embedding vector, query_text text, match_count integer DEFAULT 5, rrf_k integer DEFAULT 60, pool_size integer DEFAULT 30 | TABLE(id uuid, document_id uuid, text text, article_no text, categories nexus_category[], doc_title text, doc_kind nexus_doc_kind, rrf_score double precision) |
+| nexus_hybrid_search_v3_pgroonga | (v2 와 동일 args) | (v2 와 동일 returns) |
+| nexus_hybrid_search_v4_ctx | (v2 와 동일 args) | (v2 와 동일 returns) |
+
+**대조 판정 (v2 잠정 계약 대비):**
+- `v3_pgroonga` — 잠정 계약과 **완전 일치** → V1RpcRetriever payload 확정.
+- `v4_ctx` — **실재 확인** (additive SQL 의 DB 반영 독립 증거), v3 와 시그니처
+  동일 → 래퍼 rpc_name 교체 방식 유효 확정.
+- v2 는 v1/v2(구) RPC·diagnose·force_include RPC 를 호출하지 않는다 —
+  목록은 참고용 전수 기록.
