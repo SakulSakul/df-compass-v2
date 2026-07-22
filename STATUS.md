@@ -84,7 +84,13 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       · 오프라인 회귀 5개(floor·benign·incident override·4단·intake) —
         전체 48 passed. LLM fallback(classifier)은 양 레포 동일 조건 동일
         거동(키 부재 시 fail-open) — v1 과 등가
-- [ ] ⑨ 최소 UI
+- [x] ⑨ 최소 UI (2026-07-22) — app.py: Streamlit 빌더 전용 프리뷰
+      (V2 BUILDER PREVIEW 배지 명시), Warm Editorial 팔레트 축약 이식.
+      정본 파이프라인 배선: intake→retrieve(v4-ctx+rerank+이웃)→synthesize→
+      verify — **verify block 시 답변 미표출**(서열 1위), degrade 시 강등 칩,
+      critical 시 배너+enforce_structure(4단+핫라인). trace 는 로컬 stderr
+      (ADR-8 DB 쓰기 금지). 검증: AppTest 헤드리스 — 초기 렌더 + 라이브
+      1문항 end-to-end(섹션 계약 답변·verify 칩 렌더·예외 0, action=pass)
 - [ ] ⑩ eval 베이스라인 확정 (검색+인용)
 
 ### 등재 안건 (구현 금지 — 심의 후 착수)
@@ -267,6 +273,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 ⑨ 최소 UI 완료(AppTest 초기+라이브 검증) + critical 커버리지 안건 등재(H 심의·컷오버 후·구현 금지). 잔여 = ⑩ 베이스라인 확정 + ③ 잔여.
 - 2026-07-22 ⑧ critical 이식 완료: 3모듈 byte-identical + 동등성 8/8 + 경로 순서 증적(판정→검색→합성→4단핫라인). IntakeResult.critical_kind additive. 48 passed.
 - 2026-07-22 ⑤ 통과(재현율 76.5%·위조 2·negative 6/6) + ⑥ §5 검증기 완성(소급: 위조 2건 정확 강등). 다음 = ⑧ critical 이식(H 보충 기준: 무수정 이식 → 착수 플래그).
 - 2026-07-22 v1 3.6 교체 실행 확인(사용자): 4문항 정상·critical 무손상·합성 −65%/−34%. 3일 관찰 시작(~7/25). lru_cache 배포 교훈 → docs/deploy-notes.md.
