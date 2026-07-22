@@ -38,6 +38,7 @@ class EngineQuery(TypedDict):
 class IntakeResult(TypedDict):
     masked_text: str                  # PII 마스킹 적용 후
     is_critical: bool                 # critical 게이트 — True 면 핫라인 연결 최우선
+    critical_kind: str | None         # 'safety' | 'harassment' | None (핫라인 분기)
     critical_matches: list[str]
     oos: bool                         # out-of-scope 라우팅
     faq_hit_id: str | None            # FAQ 캐시 적중 (verify 이전 유일한 답변 경로)

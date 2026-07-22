@@ -62,7 +62,28 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       섹션 계약 검사 통합. 테스트 5개(전체 43 passed).
       **3차 러닝 52답변 소급: pass 50 / degrade 2 / block 0 — 위조 2건
       (g04·g10)을 정확히 강등 포착** (서열 1위의 코드 보증 실측)
-- [ ] ⑧ critical 게이트 + pii_filter + 핫라인 이식 (사용자 노출 전 필수)
+- [x] ⑧ critical 게이트 + pii_filter + 핫라인 이식 (2026-07-22 — H 보충 기준
+      '무수정 이식' 경로, 착수 플래그 후 진행):
+      · compass_engine/v1port/: pii_filter·critical_mode·nexus_critical_classifier
+        **3개 모듈 byte-identical 복사** (diff 무출력 증명). shim 2개만 신규
+        (config 발췌 복사·_gen_claude anthropic 재현 — 동작 보존 글루)
+      · compass_engine/intake.py: v1 ask() 실측 순서 미러
+        (mask_pii → load_keywords → detect(원문)→detect(masked))
+      · **결과 동등성: golden critical 8문항 v1 원본 vs v2 이식본 —
+        (triggered, kind, matched) 8/8 완전 일치** (동일 live keywords).
+        미발동 4건(g03·g04·g06·g07)도 v1 과 동일 미발동 = 충실 이식
+      · **경로 동일 증적(사용자 요구)**: 실행 타임스탬프 로그 —
+        ① intake critical 판정(1.6s 시점) → ② retrieve → ③ synthesize →
+        ④ enforce_structure(4단+핫라인 박스). **판정이 검색·합성 이전 발동.**
+        v1 실체 명시: v1 도 critical 시 검색·합성을 생략하지 않고(안전 카테고리
+        확장+critical 프롬프트) 판정만 선행 — v2 동일. v1 의 FAQ/OOS/askback
+        fast-path 차단(not triggered 가드)은 해당 fast-path 가 생기는 Phase 3
+        에서 같은 가드로 이식 (현 v2 엔 차단할 fast-path 없음)
+      · IntakeResult 에 critical_kind 필드 추가(additive — 핫라인 safety/
+        harassment 분기 운반용, DESIGN §2 intake 판정 스펙 내)
+      · 오프라인 회귀 5개(floor·benign·incident override·4단·intake) —
+        전체 48 passed. LLM fallback(classifier)은 양 레포 동일 조건 동일
+        거동(키 부재 시 fail-open) — v1 과 등가
 - [ ] ⑨ 최소 UI
 - [ ] ⑩ eval 베이스라인 확정 (검색+인용)
 
@@ -236,6 +257,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 ⑧ critical 이식 완료: 3모듈 byte-identical + 동등성 8/8 + 경로 순서 증적(판정→검색→합성→4단핫라인). IntakeResult.critical_kind additive. 48 passed.
 - 2026-07-22 ⑤ 통과(재현율 76.5%·위조 2·negative 6/6) + ⑥ §5 검증기 완성(소급: 위조 2건 정확 강등). 다음 = ⑧ critical 이식(H 보충 기준: 무수정 이식 → 착수 플래그).
 - 2026-07-22 v1 3.6 교체 실행 확인(사용자): 4문항 정상·critical 무손상·합성 −65%/−34%. 3일 관찰 시작(~7/25). lru_cache 배포 교훈 → docs/deploy-notes.md.
 - 2026-07-22 ④ 리랭커 이식(확정 모델) + golden 측정: P +0.141·R +0.029·pass 42/52. 검색 수준 현행 최고 구성 = v4-ctx+OR쿼리+rerank.
