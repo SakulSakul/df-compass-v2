@@ -1,0 +1,309 @@
+# ============================================================
+#  DF COMPASS v2 · Golden Testset (Phase 1 ⑦ — eval-first 의 자)
+#  2026-07-22 구축. 카테고리 층화 52문항. 기존 16 fixtures 흡수(중복 제거).
+#
+#  스키마:
+#    id / category / question
+#    expected_sources:   검색 수준 채점용 문서 제목 substring (runner 호환)
+#    expected_citations: 답변 수준 기대 인용 [{doc, article}] —
+#                        article 은 **원장 실재 표기까지만** 지정.
+#
+#  ⚠️ 원칙 (2026-07-22 벤치 교훈):
+#  - 코퍼스 다수 문서가 조(條) 구조가 아님(부칙만/무조항) → 그런 문서는
+#    기대 인용도 문서 단위(article: null). "(문서명, 제N조)" 형식을 프롬프트로
+#    강제하면 모델이 조번호를 지어낸다 — 합성 프롬프트 인용 지시도 동일 원칙:
+#    "조항 번호가 발췌에 명시된 경우에만 (문서명, 제N조), 아니면 문서명만".
+#  - 파생 원장의 제N조 다수가 문서가 인용한 **법조문**(산안법 제79조 등)임 —
+#    article 지정은 그 표기가 문서 본문에 실재함을 뜻할 뿐, "사규 자체 조항"
+#    보장이 아님 (표기 수준 원칙).
+#  - 기대 인용 실재성은 tools/validate_golden.py 가 파생 원장으로 자동 검증.
+#
+#  negative 판정 기준 (설계):
+#  - 검색 수준: hit 0건이면 pass (기존 규칙 유지). 단 v4 RPC 는 항상 top-k 를
+#    반환하므로 검색 수준 negative 는 참고 지표.
+#  - 답변 수준(정본): 답변이 무응답 표명(“확인 필요/사규에 없” 류) AND
+#    검증 인용 ok=0 AND 위조 인용 0 이면 pass. (score CLI 가 구현)
+# ============================================================
+
+# ── critical (8) — 핫라인 우선 경로 필수 케이스 ──
+- id: g01
+  category: critical
+  question: "성희롱 피해를 당했을 때 회사 절차가 어떻게 되나요?"
+  expected_sources: ["(인사) 성희롱 예방 지침"]
+  expected_citations: [{doc: "(인사) 성희롱 예방 지침", article: null}]
+- id: g02
+  category: critical
+  question: "직장 내에서 괴롭힘을 당했어요. 어떻게 신고하나요?"
+  expected_sources: ["(인사) 직장 내 괴롭힘 예방·대응지침"]
+  expected_citations: [{doc: "(인사) 직장 내 괴롭힘 예방·대응지침", article: null}]
+- id: g03
+  category: critical
+  question: "익명으로 비위 행위를 신고할 수 있는 채널이 있나요?"
+  expected_sources: ["(영업) CSR경영방침", "(재무) 내부회계관리제도 업무지침"]
+  expected_citations:
+    - {doc: "(영업) CSR경영방침", article: null}
+    - {doc: "(재무) 내부회계관리제도 업무지침", article: null}
+- id: g04
+  category: critical
+  question: "매장에서 고객이 갑자기 쓰러졌어요. 어떻게 보고하나요?"
+  expected_sources: ["사건사고 보고지침"]
+  expected_citations:
+    - {doc: "(공통) 중대 사건사고 보고지침", article: null}
+    - {doc: "(공통) 일반 사건사고 보고지침", article: null}
+- id: g05
+  category: critical
+  question: "작업 중 중대재해가 발생하면 어떤 절차로 대응하나요?"
+  expected_sources: ["(안전) 중대재해 대응 지침"]
+  expected_citations: [{doc: "(안전) 중대재해 대응 지침", article: null}]
+- id: g06
+  category: critical
+  question: "고객 개인정보가 유출된 것 같습니다. 어떻게 해야 하나요?"
+  expected_sources: ["(정보보안) 개인정보보호 지침"]
+  expected_citations: [{doc: "(정보보안) 개인정보보호 지침", article: null}]
+- id: g07
+  category: critical
+  question: "매장에서 어린 아이가 실종됐다는 신고를 받았습니다."
+  expected_sources: ["(안전) 실종아동 등 조기발견 지침"]
+  expected_citations: [{doc: "(안전) 실종아동 등 조기발견 지침", article: null}]
+- id: g08
+  category: critical
+  question: "직원끼리 폭행 사건이 벌어진 걸 목격했어요. 보고 절차는?"
+  expected_sources: ["(공통) 중대 사건사고 보고지침"]
+  expected_citations: [{doc: "(공통) 중대 사건사고 보고지침", article: null}]
+
+# ── standard (14) — 일반 사규 조회 (기존 q01~q04·q08 흡수) ──
+- id: g09
+  category: standard
+  question: "법인카드로 동료에게 줄 선물 사도 됨?"
+  expected_sources: ["(재무) 법인카드 관리 지침"]
+  expected_citations: [{doc: "(재무) 법인카드 관리 지침", article: null}]
+- id: g10
+  category: standard
+  question: "국내 출장 갔을 때 식사비 한도가 어떻게 돼요?"
+  expected_sources: ["(재무) 국내출장비 관리 지침"]
+  expected_citations: [{doc: "(재무) 국내출장비 관리 지침", article: null}]
+- id: g11
+  category: standard
+  question: "해외 출장 중에 부모님이 돌아가시면 일시 귀국이 되나요?"
+  expected_sources: ["(재무) 해외출장비 관리 지침"]
+  expected_citations: [{doc: "(재무) 해외출장비 관리 지침", article: null}]
+- id: g12
+  category: standard
+  question: "거래처에서 명절 선물 받았는데 어떻게 처리해야 하나요?"
+  expected_sources: ["(CSR) 클린뱅크 운영 지침"]
+  expected_citations: [{doc: "(CSR) 클린뱅크 운영 지침", article: null}]
+- id: g13
+  category: standard
+  question: "협력사 직원 접대 가능한 한도가 있나요?"
+  expected_sources: ["(영업) CSR경영방침", "(CSR) 클린뱅크 운영 지침"]
+  expected_citations:
+    - {doc: "(영업) CSR경영방침", article: null}
+- id: g14
+  category: standard
+  question: "회사 공금을 개인 용도로 쓴 경우 징계 수위는 어떻게 되나요?"
+  expected_sources: ["(공통) 임직원 징계기준"]
+  expected_citations: [{doc: "(공통) 임직원 징계기준", article: null}]  # 조 구조 없음 — 문서 단위만
+- id: g15
+  category: standard
+  question: "시내에서 업무로 이동한 교통비는 어떻게 정산하나요?"
+  expected_sources: ["(재무) 시내교통비 관리 지침"]
+  expected_citations: [{doc: "(재무) 시내교통비 관리 지침", article: null}]
+- id: g16
+  category: standard
+  question: "납품받은 상품을 반품할 수 있는 정당한 사유는 뭔가요?"
+  expected_sources: ["(공정거래) 반품관리 지침"]
+  expected_citations: [{doc: "(공정거래) 반품관리 지침", article: null}]
+- id: g17
+  category: standard
+  question: "협력회사와 판촉행사 비용은 어떻게 나누나요?"
+  expected_sources: ["(공정거래) 협력회사 판촉비용 분담 지침"]
+  expected_citations: [{doc: "(공정거래) 협력회사 판촉비용 분담 지침", article: null}]
+- id: g18
+  category: standard
+  question: "협력회사 판촉사원을 매장에 파견받을 때 조건이 있나요?"
+  expected_sources: ["(공정거래) 협력회사 판촉사원 파견 지침"]
+  expected_citations: [{doc: "(공정거래) 협력회사 판촉사원 파견 지침", article: null}]
+- id: g19
+  category: standard
+  question: "새 브랜드가 입점하려면 어떤 기준과 절차를 거치나요?"
+  expected_sources: ["(공정거래) 협력회사 입점 및 퇴점 지침"]
+  expected_citations: [{doc: "(공정거래) 협력회사 입점 및 퇴점 지침", article: null}]
+- id: g20
+  category: standard
+  question: "회사 이름으로 기부금을 낼 때 절차가 어떻게 되나요?"
+  expected_sources: ["(공통) 기부금 집행 관리지침"]
+  expected_citations: [{doc: "(공통) 기부금 집행 관리지침", article: null}]
+- id: g21
+  category: standard
+  question: "사규를 새로 만들거나 고칠 때는 어떤 절차를 따르나요?"
+  expected_sources: ["(공통) 사규 관리지침"]
+  expected_citations: [{doc: "(공통) 사규 관리지침", article: null}]
+- id: g22
+  category: standard
+  question: "계약서에 회사 인감을 날인받으려면 어떻게 신청하나요?"
+  expected_sources: ["(총무) 인감 관리지침"]
+  expected_citations: [{doc: "(총무) 인감 관리지침", article: null}]
+
+# ── confusion (6) — 유사 조항 혼동쌍 (동일문서 근접번호 · 문서간 동일번호) ──
+- id: g23
+  category: confusion
+  question: "영상정보기기 지침에서 개인정보보호법 제25조와 제25조의2는 각각 어떤 경우를 다루나요?"
+  expected_sources: ["(총무) 영상정보기기 설치운영 지침"]
+  expected_citations:
+    - {doc: "(총무) 영상정보기기 설치운영 지침", article: "제25조"}
+    - {doc: "(총무) 영상정보기기 설치운영 지침", article: "제25조의2"}
+- id: g24
+  category: confusion
+  question: "매장 CCTV 영상을 열람하고 싶다는 요청은 어떤 지침에 따라 처리하나요?"
+  expected_sources: ["(총무) 영상정보기기 설치운영 지침"]
+  expected_citations: [{doc: "(총무) 영상정보기기 설치운영 지침", article: null}]
+- id: g25
+  category: confusion
+  question: "중대 사건사고 보고지침에 나오는 제8조와 제12조는 무엇에 관한 조항인가요?"
+  expected_sources: ["(공통) 중대 사건사고 보고지침"]
+  expected_citations:
+    - {doc: "(공통) 중대 사건사고 보고지침", article: "제8조"}
+    - {doc: "(공통) 중대 사건사고 보고지침", article: "제12조"}
+- id: g26
+  category: confusion
+  question: "내부회계관리제도 업무지침 제12조에는 어떤 내용이 있나요?"
+  expected_sources: ["(재무) 내부회계관리제도 업무지침"]
+  expected_citations: [{doc: "(재무) 내부회계관리제도 업무지침", article: "제12조"}]
+- id: g27
+  category: confusion
+  question: "휴게시설 관리지침이 근거로 삼는 산업안전보건법 조항은 몇 조인가요?"
+  expected_sources: ["(안전) 휴게시설 관리지침"]
+  expected_citations: [{doc: "(안전) 휴게시설 관리지침", article: "제79조"}]
+- id: g28
+  category: confusion
+  question: "판촉비용 분담 지침의 제11조와 부당한 경영활동 간섭 금지 지침의 제11조는 서로 다른 내용인가요?"
+  expected_sources: ["(공정거래) 협력회사 판촉비용 분담 지침", "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침"]
+  expected_citations:
+    - {doc: "(공정거래) 협력회사 판촉비용 분담 지침", article: "제11조"}
+    - {doc: "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침", article: "제11조"}
+
+# ── mid_corpus (8) — 제목 정렬 중간부 문서 (검색 편향 탐지) ──
+- id: g29
+  category: mid_corpus
+  question: "매장 공기질은 어떤 기준으로 관리하나요?"
+  expected_sources: ["(안전) 공기질 유지관리 지침"]
+  expected_citations: [{doc: "(안전) 공기질 유지관리 지침", article: null}]
+- id: g30
+  category: mid_corpus
+  question: "안전보건 사항에 근로자가 참여하고 의견을 내는 절차가 있나요?"
+  expected_sources: ["(안전) 참여, 협의 및 의사소통지침"]
+  expected_citations: [{doc: "(안전) 참여, 협의 및 의사소통지침", article: null}]
+- id: g31
+  category: mid_corpus
+  question: "위험성평가는 언제, 어떻게 실시하나요?"
+  expected_sources: ["(안전) 위험성평가 지침"]
+  expected_citations: [{doc: "(안전) 위험성평가 지침", article: null}]
+- id: g32
+  category: mid_corpus
+  question: "매장에서 손님이 두고 간 물건을 주웠을 때 처리 절차는?"
+  expected_sources: ["(영업) 매장 습득물 처리지침"]
+  expected_citations: [{doc: "(영업) 매장 습득물 처리지침", article: null}]
+- id: g33
+  category: mid_corpus
+  question: "사내 동호회를 만들면 회사 지원을 받을 수 있나요?"
+  expected_sources: ["(인사) 사내 동호회 운영지침"]
+  expected_citations: [{doc: "(인사) 사내 동호회 운영지침", article: null}]
+- id: g34
+  category: mid_corpus
+  question: "부서를 옮길 때 업무 인수인계는 어떻게 해야 하나요?"
+  expected_sources: ["(인사) 업무 인수인계 지침"]
+  expected_citations: [{doc: "(인사) 업무 인수인계 지침", article: null}]
+- id: g35
+  category: mid_corpus
+  question: "회사 자산 실사는 얼마나 자주 하나요?"
+  expected_sources: ["(재무) 자산 실사 지침"]
+  expected_citations: [{doc: "(재무) 자산 실사 지침", article: null}]
+- id: g36
+  category: mid_corpus
+  question: "보세구역 출입증은 어떻게 발급받고 관리되나요?"
+  expected_sources: ["(영업) AEO 출입통제 및 시설관리 절차서"]
+  expected_citations: [{doc: "(영업) AEO 출입통제 및 시설관리 절차서", article: null}]
+
+# ── paraphrase (10) — 사규 용어와 다른 생활 표현 (q11~q16 흡수 + 4 신규) ──
+- id: g37
+  category: paraphrase
+  question: "중국 리서치 회사에서 링크드인으로 인터뷰 요청이 접수 됨. 사례는 시간당 50만원 정도"
+  expected_sources: ["(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 대외출강 운영 지침", article: null}]
+- id: g38
+  category: paraphrase
+  question: "중국 리서치 회사에서 링크드인으로 인터뷰 요청이 옴. 사례는 시간당 50만원 정도 준다고 함"
+  expected_sources: ["(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 대외출강 운영 지침", article: null}]
+- id: g39
+  category: paraphrase
+  question: "중국 리서치 회사에서 인터뷰 요청이 접수 됨. 사례는 시간당 50만원 정도 준다고 함."
+  expected_sources: ["(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 대외출강 운영 지침", article: null}]
+- id: g40
+  category: paraphrase
+  question: "중국 리서치 회사에서 인터뷰에 응해주면 시간당 50만원 정도 준다고 함."
+  expected_sources: ["(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 대외출강 운영 지침", article: null}]
+- id: g41
+  category: paraphrase
+  question: "중국 리서치 업체가 인터뷰에 응해주면 시간당 50만원 정도 사례 하겠다고 함."
+  expected_sources: ["(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 대외출강 운영 지침", article: null}]
+- id: g42
+  category: paraphrase
+  question: "협력사 사장님이 만날 때마다 밥값을 계속 내주시는데 이거 괜찮은 건가요?"
+  expected_sources: ["(영업) CSR경영방침", "(CSR) 클린뱅크 운영 지침"]
+  expected_citations: [{doc: "(영업) CSR경영방침", article: null}]
+- id: g43
+  category: paraphrase
+  question: "경찰서에서 우리 매장 CCTV 영상을 달라고 연락이 왔어요."
+  expected_sources: ["(공통) 대외 민감정보 요구 대응 지침", "(총무) 영상정보기기 설치운영 지침"]
+  expected_citations: [{doc: "(공통) 대외 민감정보 요구 대응 지침", article: null}]
+- id: g44
+  category: paraphrase
+  question: "발신인을 모르는 상품권이 사무실로 택배 왔는데 어떻게 하죠?"
+  expected_sources: ["(CSR) 클린뱅크 운영 지침"]
+  expected_citations: [{doc: "(CSR) 클린뱅크 운영 지침", article: "제4조"}]  # 반환불가 금품 — 원문 확인
+- id: g45
+  category: paraphrase
+  question: "유튜버한테 협찬 주고 우리 상품 소개 영상 찍게 하려는데 표시 문구 규정이 있나요?"
+  expected_sources: ["(공정거래) SNS 인플루언서 표시광고 지침"]
+  expected_citations: [{doc: "(공정거래) SNS 인플루언서 표시광고 지침", article: null}]
+- id: g46
+  category: paraphrase
+  question: "강연하고 받은 강사료는 다 가져도 되는 건가요?"
+  expected_sources: ["(CSR) 클린뱅크 운영 지침", "(CSR) 대외출강 운영 지침"]
+  expected_citations: [{doc: "(CSR) 클린뱅크 운영 지침", article: "제3조"}]  # 강사료 50% 기부 — 원문 확인
+
+# ── negative (6) — 사규에 없는 질문 (q09·q10 흡수 + 4 신규) ──
+- id: g47
+  category: negative
+  question: "오늘 점심 메뉴 추천해줘"
+  expected_sources: []
+  expected_citations: []
+- id: g48
+  category: negative
+  question: "주말에 영화 뭐 볼지 추천해줘"
+  expected_sources: []
+  expected_citations: []
+- id: g49
+  category: negative
+  question: "내 연차 휴가 며칠 남았는지 알려줘"
+  expected_sources: []
+  expected_citations: []
+- id: g50
+  category: negative
+  question: "회사 주차장 등록은 어떻게 하나요"
+  expected_sources: []
+  expected_citations: []
+- id: g51
+  category: negative
+  question: "업무용 노트북 새로 지급받으려면 어디에 신청하나요"
+  expected_sources: []
+  expected_citations: []
+- id: g52
+  category: negative
+  question: "오늘 원달러 환율 알려줘"
+  expected_sources: []
+  expected_citations: []

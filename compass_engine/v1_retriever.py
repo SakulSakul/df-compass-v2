@@ -69,9 +69,12 @@ class V1RpcRetriever:
     def retrieve(self, intake: IntakeResult, route: RouteResult) -> RetrieveResult:
         q = intake["masked_text"]
         embedding = self._embed(q)
+        # Phase 1 ③: 원문을 그대로 넣으면 &@~ 가 AND 해석 → keyword leg 사망
+        # (2026-07-21 A/B 에서 실측). v1 과 동일하게 OR 쿼리로 변환해 전달.
+        from .pgroonga_query import build_pgroonga_query
         payload = {
             "query_embedding": embedding,
-            "query_text": q,
+            "query_text": build_pgroonga_query(q),
             "match_count": self.top_k,
             "rrf_k": 60,
             "pool_size": max(30, self.top_k * 6),
