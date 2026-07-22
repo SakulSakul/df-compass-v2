@@ -1,7 +1,31 @@
 # STATUS.md — 진행 상태 (Claude Code가 갱신)
 
-**현재 Phase: 0**
+**현재 Phase: 1** (2026-07-22 사용자 승인으로 Phase 0 → 1 전환)
 (Phase 전환은 종료 판정 + 사용자 승인 후에만. CLAUDE.md Part 0 참조)
+
+---
+
+## Phase 1 체크리스트 (지시서: docs/phases/phase-1.md · 순서 조정: 스코어러 앞순위)
+
+조정 근거(2026-07-22 사용자 지시): 인용 스코어러(원 7번)를 최선두로 —
+3.6 Flash 품질 판정(synth_bench 소급 채점)을 Phase 1 초반에 확정.
+ADR-8/8a 반영: article_registry 테이블 없음 → 파생 원장(registry.py) 대조,
+contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
+
+- [ ] ⓪ 답변 수준 인용 스코어러 (원 7번 앞당김): §5 추출기(articles.py 재사용)
+      + 파생 원장 대조. retrieve 비경유 경로도 채점 가능. → 완성 즉시
+      synth_bench 저장본 소급 채점 = 3.6 Flash 품질 판정 (첫 보고)
+- [ ] ① 어댑터 2종 (rule docx 개량 + report markdown) — ADR-8 범위 재확인 필요
+- [ ] ② contextual 적재 — ADR-8a 백필로 대체 완료(628/628). 재적재 훅만 잔여
+- [ ] ③ hybrid 검색 — v4-ctx RPC 확보. 잔여: pgroonga 쿼리 빌더 이식(keyword
+      leg 복원) + 병렬 multi-query + negative 임계치
+- [ ] ④ 리랭커 이식 — 모델 확정분(3.5-flash-lite + thinking_level minimal) 적용
+- [ ] ⑤ 섹션 계약 합성 (Gemini primary / Claude fallback)
+- [ ] ⑥ §5 조항 검증기 (스코어러와 추출기·원장 공유 — ⓪에서 사실상 선구현)
+- [ ] ⑦ golden testset 구축 (카테고리 층화 50문항+)
+- [ ] ⑧ critical 게이트 + pii_filter + 핫라인 이식 (사용자 노출 전 필수)
+- [ ] ⑨ 최소 UI
+- [ ] ⑩ eval 베이스라인 확정 (검색+인용)
 
 ---
 
@@ -130,8 +154,7 @@
   ④ v1 스키마 리플렉션 문서 ✅ (R1·R2 확정 — v2 사용 전 컬럼 물리 실재,
     v3 시그니처 일치, ctx_* 물리 확인)
   (+) 타임박스 2주 내 완료. Phase 밖 선구현 없음(CAG 0줄).
-- 사용자 승인: **⏸ 대기 — 승인 시 현재 Phase 를 1 로 올리고 phase-1.md 착수
-  (순서 조정 반영: 인용 스코어러 앞순위)**
+- 사용자 승인: **✅ 승인 (2026-07-22)** — Phase 1 전환 완료
 
 ---
 
@@ -146,6 +169,7 @@
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 Phase 0 종료 승인(사용자) → Phase 1 전환. 체크리스트 생성(스코어러 ⓪ 앞순위). 착수: 인용 스코어러.
 - 2026-07-22 리플렉션 R1 회신 반영 → 리플렉션 확정. Phase 0 종료 조건 4/4 충족 — 판정 작성, 사용자 승인 대기. (부수: chunk_incident_nodes 물리 부재 + v1 retriever.py:1595 잔존 select 관찰 보고)
 - 2026-07-22 리플렉션 R2(RPC) 회신 반영: v3 계약 일치·v4_ctx 실재 확정. R1(컬럼 덤프) 대기.
 - 2026-07-22 3.6 Flash 선행 벤치(유효 3차): 토큰 −18.4%·총생성 p50 −42% — 광고 재현. 답변 전문 저장(소급 채점용). 1·2차는 thinking 예산 절단으로 무효 폐기(SSE 유실 가설 철회). Phase 1 은 인용 스코어러 앞순위로 조정.
