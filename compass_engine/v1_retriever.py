@@ -58,13 +58,18 @@ class V1RpcRetriever:
 
     def __init__(self, supabase: Any, embed_fn: EmbedFn, *, top_k: int = 3,
                  rpc_name: str = _RPC_NAME,
-                 expand_neighbors: bool = True, neighbor_radius: int = 2):
+                 expand_neighbors: bool = True, neighbor_radius: int = 2,
+                 reranker: Any = None, rerank_pool: int = 15):
         self._sb = supabase
         self._embed = embed_fn
         self.top_k = top_k
         self.rpc_name = rpc_name
         self.expand_neighbors = expand_neighbors
         self.neighbor_radius = neighbor_radius
+        # Phase 1 ④: reranker(question, chunks)->chunks 주입 시 RRF pool 을
+        # rerank_pool 로 확장해 재정렬 후 top_k 컷 (v1 top-15 선례).
+        self.reranker = reranker
+        self.rerank_pool = rerank_pool
 
     def retrieve(self, intake: IntakeResult, route: RouteResult) -> RetrieveResult:
         q = intake["masked_text"]
@@ -72,12 +77,13 @@ class V1RpcRetriever:
         # Phase 1 ③: 원문을 그대로 넣으면 &@~ 가 AND 해석 → keyword leg 사망
         # (2026-07-21 A/B 에서 실측). v1 과 동일하게 OR 쿼리로 변환해 전달.
         from .pgroonga_query import build_pgroonga_query
+        fetch_k = max(self.top_k, self.rerank_pool) if self.reranker else self.top_k
         payload = {
             "query_embedding": embedding,
             "query_text": build_pgroonga_query(q),
-            "match_count": self.top_k,
+            "match_count": fetch_k,
             "rrf_k": 60,
-            "pool_size": max(30, self.top_k * 6),
+            "pool_size": max(30, fetch_k * 6),
         }
         rows = self._sb.rpc(self.rpc_name, payload).execute().data or []
         chunks: list[RetrievedChunk] = []
@@ -95,12 +101,14 @@ class V1RpcRetriever:
                 text=str(r.get("text") or ""),
                 score=float(r.get("rrf_score") or 0.0),
             ))
+        if self.reranker is not None and chunks:
+            chunks = list(self.reranker(q, chunks))[: self.top_k]
         if self.expand_neighbors and chunks:
             from .neighbors import expand_with_neighbors
             chunks = expand_with_neighbors(
                 self._sb, chunks, radius=self.neighbor_radius,
             )
         provider = f"v1-rpc:{self.rpc_name}" + (
-            "+neighbors" if self.expand_neighbors else ""
-        )
+            "+rerank" if self.reranker is not None else ""
+        ) + ("+neighbors" if self.expand_neighbors else "")
         return RetrieveResult(chunks=chunks, query_set=[q], provider=provider)

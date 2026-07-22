@@ -41,12 +41,14 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       doc-level 채점 수정(제목 출현 기준 — 조항 앵커 아티팩트 교정)
 - [~] ① 어댑터 2종 + ② 재적재 훅 — **ADR-8 로 보류** (컷오버 전 v2 는
       SELECT 전용, 적재는 v1 parser/ingest 가 계속 담당. 컷오버 국면에서 재개)
-- [ ] ③ hybrid 검색 — v4-ctx RPC 확보. 잔여: pgroonga 쿼리 빌더 이식(keyword
-      leg 복원) + 병렬 multi-query + negative 임계치
-- [ ] ④ 리랭커 이식 — 모델 확정분(3.5-flash-lite + thinking_level minimal) 적용
+- [x] ④ 리랭커 이식 (2026-07-22) — compass_engine/reranker.py (listwise·JSON,
+      env NEXUS_RERANK_MODEL 기본 3.5-flash-lite + thinking_level minimal 확정분,
+      fail-open+지연 계측) + V1RpcRetriever 주입 배선(pool 15→top3).
+      **golden 52 측정: 41/52 → 42/52, avg P 0.449→0.590(+0.141),
+      avg R 0.875→0.904** (confusion P 0.56→0.89·R 1.00, paraphrase 7→8/10).
+      rerank 지연 p50 667ms·실패 0/53. 오프라인 배선 테스트 2개(전체 34 passed)
 - [ ] ⑤ 섹션 계약 합성 (Gemini primary=gemini-3.6-flash 확정 / Claude fallback)
 - [ ] ⑥ §5 조항 검증기 (스코어러와 추출기·원장 공유 — ⓪에서 사실상 선구현)
-- [ ] ⑦ golden testset 구축 (카테고리 층화 50문항+)
 - [ ] ⑧ critical 게이트 + pii_filter + 핫라인 이식 (사용자 노출 전 필수)
 - [ ] ⑨ 최소 UI
 - [ ] ⑩ eval 베이스라인 확정 (검색+인용)
@@ -218,6 +220,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 ④ 리랭커 이식(확정 모델) + golden 측정: P +0.141·R +0.029·pass 42/52. 검색 수준 현행 최고 구성 = v4-ctx+OR쿼리+rerank.
 - 2026-07-22 ① v1 핫픽스 3층 검증 마감(사용자 실행 확인: 4문항 정상·L1_RPC 136·42703 없음·critical 무손상) — 종결. ② 3.6-flash 채택 확정: v2 즉시(베이스라인 동결), v1 조건부([사용자 액션]+3일 관찰). ①②적재는 ADR-8 보류 → 다음 = ④ 리랭커 이식.
 - 2026-07-22 3.6 정식 A/B(golden 52): 재현율 70.6%↔68.6%(non-inferior)·위조 6→3·지연 −14%·finish 안정 → 채택 권고. 1차 채점 아티팩트(조항 앵커) 수정 이력 명기.
 - 2026-07-22 Phase 1 ⓪ 완료: 인용 스코어러(citations.py+score CLI, 32 passed) → 3.6 품질 판정 = non-inferiority 우위(검증률 19.4%→33.3%, dm·un 0). 절대치는 벤치 프롬프트 유도 한계 명기. 스코어러 결함 2건(직접 인용형 우선순위·접두어 제목) 표본 점검으로 발견·수정.
