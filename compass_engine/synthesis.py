@@ -50,7 +50,7 @@ SYSTEM_CONTRACT = """당신은 신세계디에프 사규 안내 챗봇 DF COMPAS
 
 # 섹션 계약 검사(결정론) — verify 스테이지의 section_contract_ok 가 소비.
 _REQUIRED_MARKERS = ("핵심 결론", "권장 행동", "[참조:")
-_OOS_MARKERS = ("사규에서 확인되지 않", "확인되지 않는")
+_OOS_MARKERS = ("사규에서 확인되지 않", "확인되지 않는", "확인할 수 없")
 
 
 def check_section_contract(answer: str) -> bool:

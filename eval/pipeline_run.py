@@ -28,13 +28,29 @@ entries = load_fixtures(_ROOT / "eval" / "golden.yaml")
 records, agg = [], {"tok_na": 0, "exp_hit": 0, "exp_total": 0, "fab": 0,
                     "neg_pass": 0, "neg_total": 0, "contract_ng": 0,
                     "fallback": 0, "elapsed": []}
+failed_ids = []
 for i, e in enumerate(entries, 1):
     q = e["question"]
-    res = retr.retrieve({"masked_text": q, "is_critical": False,
-                         "critical_matches": [], "oos": False,
-                         "faq_hit_id": None, "ambiguity": None},
-                        {"tracks": ["rule"], "intent": "pipeline"})
-    syn = synthesize(q, res["chunks"])
+    # 일시 네트워크 오류 내성 — 1회 재시도 후에도 실패면 기록하고 계속
+    # (단건 ConnectError 가 52문항 러닝 전체를 무효화하지 않도록)
+    for attempt in (1, 2):
+        try:
+            res = retr.retrieve({"masked_text": q, "is_critical": False,
+                                 "critical_matches": [], "oos": False,
+                                 "faq_hit_id": None, "ambiguity": None},
+                                {"tracks": ["rule"], "intent": "pipeline"})
+            syn = synthesize(q, res["chunks"])
+            break
+        except Exception as ex:
+            print(f"[pipeline] {e['id']} attempt{attempt} FAILED: "
+                  f"{type(ex).__name__}: {ex}", file=sys.stderr, flush=True)
+            if attempt == 2:
+                syn = None
+            else:
+                time.sleep(5)
+    if syn is None:
+        failed_ids.append(e["id"])
+        continue
     sc = _score(syn.answer_md, e, ledger)
     agg["exp_hit"] += sc["expected_hit"]; agg["exp_total"] += sc["expected_total"]
     agg["fab"] += 1 if sc["has_fabrication"] else 0
@@ -60,5 +76,5 @@ print(f"위조 인용 답변  {agg['fab']}/52")
 print(f"negative pass   {agg['neg_pass']}/{agg['neg_total']}")
 print(f"섹션 계약 위반  {agg['contract_ng']}/52  |  fallback 사용 {agg['fallback']}")
 print(f"합성 지연 p50 {_pct(agg['elapsed'], .5):.0f}ms  p95 {_pct(agg['elapsed'], .95):.0f}ms")
-print(f"rerank 실패 {rr.failures}")
+print(f"rerank 실패 {rr.failures}  |  문항 실패 {len(failed_ids)}: {failed_ids}")
 print(f"Wrote {path}")
