@@ -76,6 +76,28 @@
 - 단 §2 엔진 계약의 retrieve 스테이지 교체형 인터페이스는 **유지** —
   미래 재심의 대비 롤백 구조이자 eval A/B 의 전제 (사용자 지시).
 
+### Gemini 신모델(2026-07-21 발표) 적용 검토 — 지시 4건 처리
+1. **model ID 확인 (API 실조회, 56종)**: `gemini-3.5-flash-lite` ✅ ·
+   `gemini-3.6-flash` ✅ · `gemini-2.5-flash-lite`(현행) ✅ 실재.
+   ⚠️ 3.5 계열은 구식 `thinking_budget` 파라미터를 400 으로 거부 —
+   **`thinking_level`("minimal") 사용** (단건 프로브 4종으로 확정).
+2. **리랭커 A/B (eval/rerank_ab.py — pool 15 v4-ctx → listwise → top3,
+   fixtures 16, 양쪽 17콜 실패 0)**:
+   | | pass | avg P | avg R | p50 | p95 |
+   |---|---|---|---|---|---|
+   | A 2.5-flash-lite | 9/16 | 0.333 | 0.656 | 567ms | 676ms |
+   | B 3.5-flash-lite(minimal) | **11/16** | **0.396** | **0.781** | 622ms | 693ms |
+   Δ pass +2 (q11·q12 ❌→✅, 회귀 0) · R +0.125 · 지연 +55ms(p50)/+17ms(p95).
+   **판정: B 우위 → v2 리랭커 기본값 = gemini-3.5-flash-lite + thinking_level
+   minimal 로 확정** (적용 = Phase 1 리랭커 이식 시 env NEXUS_RERANK_MODEL —
+   코드 무수정 원칙, v1 은 불변).
+   ※ 첫 실행은 B 17콜 전패(400)로 무효 판정 → 원인 특정 후 재실행한 결과임.
+3. **[예약 — Phase 1 종료 후] 합성 모델 A/B**: 현행 vs `gemini-3.6-flash` —
+   답변 수준 인용 스코어러 완성 후 품질·출력토큰·지연 3축 비교.
+   **그 전까지 v1·v2 합성 모델 교체 금지** (계측기 없는 교체 금지 규율).
+4. **Flash Cyber 기각**: 용도 불일치(보안 특화)·접근 제한 — API 모델 리스트
+   56종에 cyber 계열 부재로 방증. 재검토 계획 없음.
+
 ### Phase 0 종료 판정 (ADR-8 기준으로 교체: 스키마 리플렉션 문서 +
 ### 파생 원장 빌더 + RPC 래퍼 리트리버 + eval 완주)
 - 판정: **미완 — [사용자 액션] 1건(스키마 리플렉션 덤프)에 블록**
@@ -96,6 +118,7 @@
 이 파일에 체크리스트를 생성한다.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-21 Gemini 신모델 검토: ID 실확인(3.5-flash-lite·3.6-flash), 리랭커 A/B → 3.5-flash-lite(minimal) 우위(pass 9→11, R +0.125, 지연 +55ms) → v2 기본값 확정(Phase 1 적용). 합성 A/B 는 Phase 1 후 예약, Flash Cyber 기각.
 - 2026-07-21 백필 628/628 성공(실패 0) + A/B 라이브: v3 4/16 → v4-ctx 8/16 (Δ+4, R +0.312). 캐비앗: keyword leg 미이식·negative 임계치 — Phase 1 과제.
 - 2026-07-21 ADR-8a(완화): 이웃 결합(즉시)+additive SQL/v4 RPC 작성+백필 스크립트+eval A/B 하니스. 남은 것=[사용자 액션] SQL 실행→백필→A/B 숫자.
 - 2026-07-21 전략 변경(사용자): DB 재설계 취소 → ADR-8(DB 불변·SELECT 전용). schema.sql/마이그레이션/rls_verify 폐기, 스키마 리플렉션 킷 + 파생 원장 빌더 + v1 RPC 래퍼 리트리버로 대체.
