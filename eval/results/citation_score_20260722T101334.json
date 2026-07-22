@@ -1,0 +1,363 @@
+{
+  "scored_file": "/workspace/df-compass-v2/eval/results/synth_bench_20260722T015757.json",
+  "aggregate": {
+    "gemini-3.5-flash": {
+      "answers": 16,
+      "total": 62,
+      "ok": 12,
+      "article_missing": 42,
+      "document_missing": 3,
+      "unattributed": 5,
+      "fabricated_answers": 9,
+      "cited_answers": 5
+    },
+    "gemini-3.6-flash": {
+      "answers": 16,
+      "total": 45,
+      "ok": 15,
+      "article_missing": 30,
+      "document_missing": 0,
+      "unattributed": 0,
+      "fabricated_answers": 9,
+      "cited_answers": 6
+    }
+  },
+  "per_fixture": [
+    {
+      "id": "q01",
+      "gemini-3.5-flash": {
+        "total": 3,
+        "ok": 2,
+        "article_missing": 1,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.6667,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 2,
+        "ok": 1,
+        "article_missing": 1,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.5,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q02",
+      "gemini-3.5-flash": {
+        "total": 9,
+        "ok": 2,
+        "article_missing": 7,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.2222,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 5,
+        "ok": 2,
+        "article_missing": 3,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.4,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q03",
+      "gemini-3.5-flash": {
+        "total": 6,
+        "ok": 5,
+        "article_missing": 1,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.8333,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 8,
+        "ok": 6,
+        "article_missing": 2,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.75,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q04",
+      "gemini-3.5-flash": {
+        "total": 2,
+        "ok": 2,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 1.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 3,
+        "ok": 3,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 1.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q05",
+      "gemini-3.5-flash": {
+        "total": 11,
+        "ok": 0,
+        "article_missing": 4,
+        "document_missing": 3,
+        "unattributed": 4,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 4,
+        "ok": 0,
+        "article_missing": 4,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q06",
+      "gemini-3.5-flash": {
+        "total": 6,
+        "ok": 0,
+        "article_missing": 5,
+        "document_missing": 0,
+        "unattributed": 1,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 1,
+        "ok": 0,
+        "article_missing": 1,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q07",
+      "gemini-3.5-flash": {
+        "total": 1,
+        "ok": 1,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 1.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 2,
+        "ok": 2,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 1.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q08",
+      "gemini-3.5-flash": {
+        "total": 2,
+        "ok": 0,
+        "article_missing": 2,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 2,
+        "ok": 0,
+        "article_missing": 2,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q09",
+      "gemini-3.5-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q10",
+      "gemini-3.5-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q11",
+      "gemini-3.5-flash": {
+        "total": 8,
+        "ok": 0,
+        "article_missing": 8,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 10,
+        "ok": 1,
+        "article_missing": 9,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.1,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q12",
+      "gemini-3.5-flash": {
+        "total": 7,
+        "ok": 0,
+        "article_missing": 7,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 2,
+        "ok": 0,
+        "article_missing": 2,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      }
+    },
+    {
+      "id": "q13",
+      "gemini-3.5-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q14",
+      "gemini-3.5-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q15",
+      "gemini-3.5-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      },
+      "gemini-3.6-flash": {
+        "total": 0,
+        "ok": 0,
+        "article_missing": 0,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": false
+      }
+    },
+    {
+      "id": "q16",
+      "gemini-3.5-flash": {
+        "total": 7,
+        "ok": 0,
+        "article_missing": 7,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      },
+      "gemini-3.6-flash": {
+        "total": 6,
+        "ok": 0,
+        "article_missing": 6,
+        "document_missing": 0,
+        "unattributed": 0,
+        "verified_rate": 0.0,
+        "has_fabrication": true
+      }
+    }
+  ]
+}

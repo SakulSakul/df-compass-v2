@@ -12,9 +12,24 @@
 ADR-8/8a 반영: article_registry 테이블 없음 → 파생 원장(registry.py) 대조,
 contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 
-- [ ] ⓪ 답변 수준 인용 스코어러 (원 7번 앞당김): §5 추출기(articles.py 재사용)
-      + 파생 원장 대조. retrieve 비경유 경로도 채점 가능. → 완성 즉시
-      synth_bench 저장본 소급 채점 = 3.6 Flash 품질 판정 (첫 보고)
+- [x] ⓪ 답변 수준 인용 스코어러 완성 + 3.6 Flash 품질 판정 (2026-07-22):
+      compass_engine/citations.py (§5 추출·대조 코어 — articles.find_article_refs
+      신설 재사용, 파생 원장 verify, 접두어 생략 제목 해석기) + eval/
+      score_synth_bench.py. 오프라인 테스트 6개 포함 전체 32 passed.
+      **소급 채점 결과 (fixtures 16, 동일 조건)**:
+      | | 인용쌍 | ok(검증) | article_missing | doc_missing | unattributed | 위조 포함 답변 |
+      |---|---|---|---|---|---|---|
+      | A 3.5-flash | 62 | 12 (19.4%) | 42 | 3 | 5 | 9/16 |
+      | B 3.6-flash | 45 | **15 (33.3%)** | 30 | **0** | **0** | 9/16 |
+      **판정: 3.6 Flash 인용 무결성 non-inferiority 성립 — 오히려 우위**
+      (검증률 +13.9pp·문서 위조 0·미귀속 0·인용 더 선별적). 효율 우위(토큰
+      −18.4%·지연 −42% p50)와 결합 시 합성 모델 교체 후보로 적격. 교체 확정은
+      사용자 결정 + 정식 합성 A/B(골든셋) 후.
+      ⚠️ 절대 수치 해석 한계: ① 벤치 프롬프트가 "(문서명, 제N조)" 형식을
+      강제 — 조 구조가 아닌 문서(예: 대외출강 지침, 청크에 제3조·부칙만)에
+      제N조 인용을 유도 → 양쪽 공통의 article_missing 폭증(표본 점검 확인).
+      상대 비교만 유효. ② 원장 재현율 = G2 인간 표본 감사 필요 재확인
+      (docs_with_articles 98/101, 조 표기 희박 문서 존재)
 - [ ] ① 어댑터 2종 (rule docx 개량 + report markdown) — ADR-8 범위 재확인 필요
 - [ ] ② contextual 적재 — ADR-8a 백필로 대체 완료(628/628). 재적재 훅만 잔여
 - [ ] ③ hybrid 검색 — v4-ctx RPC 확보. 잔여: pgroonga 쿼리 빌더 이식(keyword
@@ -169,6 +184,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 Phase 1 ⓪ 완료: 인용 스코어러(citations.py+score CLI, 32 passed) → 3.6 품질 판정 = non-inferiority 우위(검증률 19.4%→33.3%, dm·un 0). 절대치는 벤치 프롬프트 유도 한계 명기. 스코어러 결함 2건(직접 인용형 우선순위·접두어 제목) 표본 점검으로 발견·수정.
 - 2026-07-22 Phase 0 종료 승인(사용자) → Phase 1 전환. 체크리스트 생성(스코어러 ⓪ 앞순위). 착수: 인용 스코어러.
 - 2026-07-22 리플렉션 R1 회신 반영 → 리플렉션 확정. Phase 0 종료 조건 4/4 충족 — 판정 작성, 사용자 승인 대기. (부수: chunk_incident_nodes 물리 부재 + v1 retriever.py:1595 잔존 select 관찰 보고)
 - 2026-07-22 리플렉션 R2(RPC) 회신 반영: v3 계약 일치·v4_ctx 실재 확정. R1(컬럼 덤프) 대기.

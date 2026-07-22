@@ -110,6 +110,30 @@ def _iter_refs(text: str) -> Iterator[ArticleRef]:
         yield ArticleRef("annex", int(m.group(1)) if m.group(1) else None)
 
 
+def find_article_refs(text: str) -> list[tuple[ArticleRef, int, int]]:
+    """조항 참조를 (ref, start, end) 위치와 함께 — §5 인용 추출기용.
+
+    부칙 근접 규칙은 _iter_refs 와 동일. 정규식은 이 모듈의 것만 사용
+    (CLAUDE.md Part 2-C: 단일 정규화 모듈)."""
+    if not text:
+        return []
+    addendum_spans = [(m.start(), m.end()) for m in _ADDENDUM.finditer(text)]
+
+    def in_addendum(pos: int) -> bool:
+        return any(end <= pos <= end + 40 for _, end in addendum_spans)
+
+    out: list[tuple[ArticleRef, int, int]] = []
+    for m in _ARTICLE.finditer(text):
+        deleted = bool(_DELETED_AFTER.match(text[m.end():m.end() + 8]))
+        kind: Kind = "addendum" if in_addendum(m.start()) else "article"
+        out.append((
+            ArticleRef(kind, int(m.group(1)),
+                       int(m.group(2)) if m.group(2) else None, deleted),
+            m.start(), m.end(),
+        ))
+    return out
+
+
 def extract_article_refs(text: str) -> list[ArticleRef]:
     """자유 텍스트(답변·사규 원문)에서 조항 참조를 전부 추출 — 중복 제거·정렬.
 
