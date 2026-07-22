@@ -8,9 +8,11 @@
 
 ## 상태
 
-- 최종 리플렉션: **미실행** — [사용자 액션] 대기.
-- 리플렉션 전까지 v2 코드는 아래 "잠정 계약(코드 근거)"의 컬럼만 사용한다 —
-  전부 v1 운영 코드가 실제로 SELECT/RPC 로 쓰고 있는 검증된 표면이다.
+- 최종 리플렉션: **확정** — R1(컬럼)·R2(RPC) 모두 2026-07-22 사용자 실행·회신 완료.
+- v2 가 사용하는 전 컬럼이 물리 실재로 확정됨. "잠정 계약" 절은 확정 근거로 유지.
+- ⚠️ 리플렉션이 드러낸 v1 측 관찰(수정 금지 — 보고만): `chunk_incident_nodes` 는
+  **물리 컬럼이 아님**(R1 전수에 부재)에도 v1 core/retriever.py:1595 의
+  `.select()` 에 포함되어 있음 — 해당 경로 42703 소지 (v1 17시간 사고와 동일 클래스).
 
 ## 잠정 계약 (v1 운영 코드 근거 — 리플렉션으로 확정 예정)
 
@@ -53,8 +55,165 @@ core/retriever.py 호출부(payload 미러). 리플렉션 [R2] 로 확정 예정
 
 ## 리플렉션 결과 (붙여넣기 영역)
 
-### [R1] nexus_* 컬럼 덤프
-_(미실행)_
+### [R1] nexus_* 컬럼 덤프 (2026-07-22 사용자 회신 — 확정)
+
+10개 테이블 전수. **핵심 확정 사항:**
+- `nexus_chunks` (15컬럼): id·document_id·chunk_idx·article_no·case_no·
+  categories·text·text_tsv·embedding·token_count·created_at·
+  embed_model_version·auto_keywords·**ctx_prefix·ctx_embedding** —
+  additive 2컬럼 물리 실재 확인. **`chunk_incident_nodes` 부재**
+  (RPC 계산 키 ≠ 물리 컬럼 — v1 17시간 사고 재확인).
+- `nexus_documents` (16컬럼): id·title·doc_kind·source_filename·version·
+  effective_date·superseded_by·status·uploaded_by·uploaded_at·meta·
+  owning_department·source_storage_path·auto_keywords·auto_summary·
+  auto_query_examples. (`department` 아님 — `owning_department`.)
+- 기타 테이블: nexus_audit_logs(18) · nexus_classification_cache(7) ·
+  nexus_critical_hotlines(6) · nexus_faq_cache(18) · nexus_golden_cache(8) ·
+  nexus_synonym_dictionary(15) · nexus_validation_queries(8) ·
+  nexus_validation_results(14) · nexus_validation_runs(10).
+- token_count nullable (G1 측정 시 미기입 상태였던 것과 정합).
+
+<details><summary>원본 덤프 전문 (140행)</summary>
+
+| table_name | pos | column_name | data_type | nullable |
+|---|---|---|---|---|
+| nexus_audit_logs | 1 | id | uuid | NO |
+| nexus_audit_logs | 2 | created_at | timestamptz | NO |
+| nexus_audit_logs | 3 | source | text | NO |
+| nexus_audit_logs | 4 | query | text | NO |
+| nexus_audit_logs | 5 | rewritten_query | text | YES |
+| nexus_audit_logs | 6 | incident_nodes | jsonb | YES |
+| nexus_audit_logs | 7 | retrieved_chunk_ids | jsonb | YES |
+| nexus_audit_logs | 8 | retrieved_chunk_count | integer | YES |
+| nexus_audit_logs | 9 | gemini_model_id | text | YES |
+| nexus_audit_logs | 10 | gemini_answer | text | YES |
+| nexus_audit_logs | 11 | gemini_latency_ms | integer | YES |
+| nexus_audit_logs | 12 | claude_model_id | text | YES |
+| nexus_audit_logs | 13 | claude_verdict | text | YES |
+| nexus_audit_logs | 14 | claude_score | numeric | YES |
+| nexus_audit_logs | 15 | claude_report | jsonb | YES |
+| nexus_audit_logs | 16 | claude_latency_ms | integer | YES |
+| nexus_audit_logs | 17 | total_latency_ms | integer | YES |
+| nexus_audit_logs | 18 | notes | text | YES |
+| nexus_chunks | 1 | id | uuid | NO |
+| nexus_chunks | 2 | document_id | uuid | NO |
+| nexus_chunks | 3 | chunk_idx | integer | NO |
+| nexus_chunks | 4 | article_no | text | YES |
+| nexus_chunks | 5 | case_no | text | YES |
+| nexus_chunks | 6 | categories | ARRAY | NO |
+| nexus_chunks | 7 | text | text | NO |
+| nexus_chunks | 8 | text_tsv | tsvector | YES |
+| nexus_chunks | 9 | embedding | USER-DEFINED(vector) | YES |
+| nexus_chunks | 10 | token_count | integer | YES |
+| nexus_chunks | 11 | created_at | timestamptz | NO |
+| nexus_chunks | 12 | embed_model_version | text | YES |
+| nexus_chunks | 13 | auto_keywords | jsonb | YES |
+| nexus_chunks | 14 | ctx_prefix | text | YES |
+| nexus_chunks | 15 | ctx_embedding | USER-DEFINED(vector) | YES |
+| nexus_classification_cache | 1 | id | uuid | NO |
+| nexus_classification_cache | 2 | query_normalized | text | NO |
+| nexus_classification_cache | 3 | incident_nodes | jsonb | NO |
+| nexus_classification_cache | 4 | model_id | text | NO |
+| nexus_classification_cache | 5 | hit_count | integer | YES |
+| nexus_classification_cache | 6 | created_at | timestamptz | NO |
+| nexus_classification_cache | 7 | last_used_at | timestamptz | NO |
+| nexus_critical_hotlines | 1 | kind | text | NO |
+| nexus_critical_hotlines | 2 | title | text | NO |
+| nexus_critical_hotlines | 3 | message | text | NO |
+| nexus_critical_hotlines | 4 | contact | text | NO |
+| nexus_critical_hotlines | 5 | updated_at | timestamptz | NO |
+| nexus_critical_hotlines | 6 | updated_by | text | YES |
+| nexus_documents | 1 | id | uuid | NO |
+| nexus_documents | 2 | title | text | NO |
+| nexus_documents | 3 | doc_kind | USER-DEFINED | NO |
+| nexus_documents | 4 | source_filename | text | YES |
+| nexus_documents | 5 | version | text | NO |
+| nexus_documents | 6 | effective_date | date | YES |
+| nexus_documents | 7 | superseded_by | uuid | YES |
+| nexus_documents | 8 | status | USER-DEFINED | NO |
+| nexus_documents | 9 | uploaded_by | text | YES |
+| nexus_documents | 10 | uploaded_at | timestamptz | NO |
+| nexus_documents | 11 | meta | jsonb | NO |
+| nexus_documents | 12 | owning_department | text | YES |
+| nexus_documents | 13 | source_storage_path | text | YES |
+| nexus_documents | 14 | auto_keywords | jsonb | YES |
+| nexus_documents | 15 | auto_summary | text | YES |
+| nexus_documents | 16 | auto_query_examples | jsonb | YES |
+| nexus_faq_cache | 1 | id | uuid | NO |
+| nexus_faq_cache | 2 | query_normalized | text | NO |
+| nexus_faq_cache | 3 | query_display | text | NO |
+| nexus_faq_cache | 4 | answer_text | text | NO |
+| nexus_faq_cache | 5 | category | USER-DEFINED | YES |
+| nexus_faq_cache | 6 | is_critical | boolean | NO |
+| nexus_faq_cache | 7 | incident_nodes | jsonb | YES |
+| nexus_faq_cache | 8 | source | text | NO |
+| nexus_faq_cache | 9 | approved | boolean | NO |
+| nexus_faq_cache | 10 | approved_by | text | YES |
+| nexus_faq_cache | 11 | approved_at | timestamptz | YES |
+| nexus_faq_cache | 12 | hit_count | integer | YES |
+| nexus_faq_cache | 13 | last_hit_at | timestamptz | YES |
+| nexus_faq_cache | 14 | created_at | timestamptz | NO |
+| nexus_faq_cache | 15 | updated_at | timestamptz | NO |
+| nexus_faq_cache | 16 | show_on_home | boolean | NO |
+| nexus_faq_cache | 17 | home_label | text | YES |
+| nexus_faq_cache | 18 | home_order | integer | NO |
+| nexus_golden_cache | 1 | id | uuid | NO |
+| nexus_golden_cache | 2 | incident_signature | text | NO |
+| nexus_golden_cache | 3 | expected_clauses | jsonb | NO |
+| nexus_golden_cache | 4 | required_docs | jsonb | YES |
+| nexus_golden_cache | 5 | model_id | text | NO |
+| nexus_golden_cache | 6 | hit_count | integer | YES |
+| nexus_golden_cache | 7 | created_at | timestamptz | NO |
+| nexus_golden_cache | 8 | last_used_at | timestamptz | NO |
+| nexus_synonym_dictionary | 1 | id | uuid | NO |
+| nexus_synonym_dictionary | 2 | primary_term | text | NO |
+| nexus_synonym_dictionary | 3 | synonym_term | text | NO |
+| nexus_synonym_dictionary | 4 | source_doc_id | uuid | YES |
+| nexus_synonym_dictionary | 5 | source_chunk_id | uuid | YES |
+| nexus_synonym_dictionary | 6 | evidence_text | text | YES |
+| nexus_synonym_dictionary | 7 | extraction_method | text | NO |
+| nexus_synonym_dictionary | 8 | confidence | double precision | YES |
+| nexus_synonym_dictionary | 9 | approved | boolean | NO |
+| nexus_synonym_dictionary | 10 | approved_by | text | YES |
+| nexus_synonym_dictionary | 11 | approved_at | timestamptz | YES |
+| nexus_synonym_dictionary | 12 | rejected | boolean | NO |
+| nexus_synonym_dictionary | 13 | rejected_at | timestamptz | YES |
+| nexus_synonym_dictionary | 14 | created_at | timestamptz | NO |
+| nexus_synonym_dictionary | 15 | updated_at | timestamptz | NO |
+| nexus_validation_queries | 1 | id | bigint | NO |
+| nexus_validation_queries | 2 | query_text | text | NO |
+| nexus_validation_queries | 3 | category | text | YES |
+| nexus_validation_queries | 4 | expected_button | text | YES |
+| nexus_validation_queries | 5 | note | text | YES |
+| nexus_validation_queries | 6 | is_active | boolean | YES |
+| nexus_validation_queries | 7 | created_at | timestamptz | YES |
+| nexus_validation_queries | 8 | updated_at | timestamptz | YES |
+| nexus_validation_results | 1 | id | bigint | NO |
+| nexus_validation_results | 2 | run_id | bigint | NO |
+| nexus_validation_results | 3 | query_idx | integer | NO |
+| nexus_validation_results | 4 | query_text | text | NO |
+| nexus_validation_results | 5 | answer_text | text | YES |
+| nexus_validation_results | 6 | answer_chars | integer | YES |
+| nexus_validation_results | 7 | elapsed_seconds | real | YES |
+| nexus_validation_results | 8 | is_critical | boolean | YES |
+| nexus_validation_results | 9 | confidence | text | YES |
+| nexus_validation_results | 10 | matched_doc_count | integer | YES |
+| nexus_validation_results | 11 | cited_docs | jsonb | YES |
+| nexus_validation_results | 12 | button_type | text | YES |
+| nexus_validation_results | 13 | error | text | YES |
+| nexus_validation_results | 14 | created_at | timestamptz | NO |
+| nexus_validation_runs | 1 | id | bigint | NO |
+| nexus_validation_runs | 2 | started_at | timestamptz | NO |
+| nexus_validation_runs | 3 | completed_at | timestamptz | YES |
+| nexus_validation_runs | 4 | total_queries | integer | NO |
+| nexus_validation_runs | 5 | completed_queries | integer | NO |
+| nexus_validation_runs | 6 | status | text | NO |
+| nexus_validation_runs | 7 | note | text | YES |
+| nexus_validation_runs | 8 | created_at | timestamptz | NO |
+| nexus_validation_runs | 9 | model_id | text | YES |
+| nexus_validation_runs | 10 | provider | text | YES |
+
+</details>
 
 ### [R2] RPC 시그니처 덤프 (2026-07-22 사용자 회신 — 확정)
 

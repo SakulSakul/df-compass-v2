@@ -12,9 +12,11 @@
 - [~] ~~db/schema.sql + 마이그레이션 + RLS 검증~~ — **ADR-8(DB 불변)로 폐기**
       (2026-07-21 사용자 결정: 신규 프로젝트·마이그레이션·SQL Editor 작업 없음.
       산출물은 커밋 이력에만 남김). 대체 항목 ↓
-- [~] [사용자 액션] v1 스키마 리플렉션 — **R2(RPC) 회신·확정 완료** (2026-07-22):
-      v3 시그니처 잠정 계약과 완전 일치, v4_ctx 실재 확인(additive 반영 증거).
-      **R1(nexus_* 컬럼 덤프) 회신 대기** — R1 까지 반영돼야 이 항목 완결
+- [x] [사용자 액션] v1 스키마 리플렉션 — **R1·R2 회신·확정 완료** (2026-07-22):
+      R2 = v3 시그니처 잠정 계약 완전 일치·v4_ctx 실재. R1 = 10테이블 전수 —
+      v2 사용 전 컬럼 물리 실재 + ctx_prefix/ctx_embedding 물리 확인.
+      부수 발견: chunk_incident_nodes 물리 부재인데 v1 retriever.py:1595
+      .select() 에 잔존(42703 소지) — v1 수정 금지, 보고만
 - [x] §5 파생 원장 빌더 — compass_engine/registry.py: nexus_chunks.text 를
       articles.py 로 재추출해 (document_id, canonical) 메모리 원장 구축.
       v1 article_no 컬럼 사용 금지(조의N 붕괴) 준수 — 컬럼 붕괴값이 있어도
@@ -36,7 +38,7 @@
 - [x] ② additive SQL 작성 — db/additive/20260721_ctx_columns_and_v4.sql
       (ctx_prefix·ctx_embedding + HNSW + v4 RPC, 1파일 1회 실행).
       v1 무영향 전수 grep 증거 → docs/v1-schema-reflection.md 기록
-- [ ] [사용자 액션] 위 SQL 을 기존 v1 프로젝트 SQL Editor 에서 1회 실행 → 결과 회신
+- [x] [사용자 액션] 위 SQL 실행 완료 — 아래 별도 항목 및 R1 물리 컬럼 확인으로 이중 확증
 - [x] ③ 백필 스크립트 — tools/ctx_backfill.py (문서별 맥락 1~2문장 생성 +
       ctx_embedding 기록, ctx_* 2컬럼만 쓰기·이어하기·실패 요약).
       실행은 컬럼 추가 후 [사용자 액션 또는 creds 제공 시 Claude 실행]
@@ -119,16 +121,17 @@
 
 ### Phase 0 종료 판정 (ADR-8 기준으로 교체: 스키마 리플렉션 문서 +
 ### 파생 원장 빌더 + RPC 래퍼 리트리버 + eval 완주)
-- 판정: **미완 — [사용자 액션] 1건(스키마 리플렉션 덤프)에 블록**
-  (Claude 측 작업은 전부 완료)
+- 판정: **완료 — 종료 조건 4/4 충족. 사용자 승인 대기**
 - 근거:
   ① 파생 원장 빌더 ✅ (tests/test_registry.py 3 passed — 조의2 보존·3분기 verify)
-  ② RPC 래퍼 리트리버 ✅ (V1RpcRetriever, eval --v1-rpc 연결. 라이브 호출은
-    creds 필요 — 코드·프로토콜 정합은 오프라인 검증)
-  ③ eval 완주 ✅ (더미 EXIT=0, 16 fixtures)
-  ④ v1 스키마 리플렉션 문서 ⏸ — **[사용자 액션] schema_reflect.sql 덤프 회신
-    → docs/v1-schema-reflection.md 확정 시 충족** (잠정 계약은 기록됨)
-- 사용자 승인: _대기 (④ 완료 후 판정 확정 요청 예정)_
+  ② RPC 래퍼 리트리버 ✅ (V1RpcRetriever — 라이브 검증까지 완료: v4-ctx A/B·
+    리랭커 A/B·synth 벤치가 전부 이 래퍼로 실측됨)
+  ③ eval 완주 ✅ (더미 EXIT=0 + 라이브 --ab 실측 2종)
+  ④ v1 스키마 리플렉션 문서 ✅ (R1·R2 확정 — v2 사용 전 컬럼 물리 실재,
+    v3 시그니처 일치, ctx_* 물리 확인)
+  (+) 타임박스 2주 내 완료. Phase 밖 선구현 없음(CAG 0줄).
+- 사용자 승인: **⏸ 대기 — 승인 시 현재 Phase 를 1 로 올리고 phase-1.md 착수
+  (순서 조정 반영: 인용 스코어러 앞순위)**
 
 ---
 
@@ -143,6 +146,7 @@
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 리플렉션 R1 회신 반영 → 리플렉션 확정. Phase 0 종료 조건 4/4 충족 — 판정 작성, 사용자 승인 대기. (부수: chunk_incident_nodes 물리 부재 + v1 retriever.py:1595 잔존 select 관찰 보고)
 - 2026-07-22 리플렉션 R2(RPC) 회신 반영: v3 계약 일치·v4_ctx 실재 확정. R1(컬럼 덤프) 대기.
 - 2026-07-22 3.6 Flash 선행 벤치(유효 3차): 토큰 −18.4%·총생성 p50 −42% — 광고 재현. 답변 전문 저장(소급 채점용). 1·2차는 thinking 예산 절단으로 무효 폐기(SSE 유실 가설 철회). Phase 1 은 인용 스코어러 앞순위로 조정.
 - 2026-07-21 Gemini 신모델 검토: ID 실확인(3.5-flash-lite·3.6-flash), 리랭커 A/B → 3.5-flash-lite(minimal) 우위(pass 9→11, R +0.125, 지연 +55ms) → v2 기본값 확정(Phase 1 적용). 합성 A/B 는 Phase 1 후 예약, Flash Cyber 기각.
