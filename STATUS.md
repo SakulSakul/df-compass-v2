@@ -39,12 +39,12 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       잔여: 병렬 multi-query·synonym 확장·negative 임계
 - [x] 3.6 Flash 정식 A/B (golden 52, 채택 판정 — 아래 표) + 스코어러
       doc-level 채점 수정(제목 출현 기준 — 조항 앵커 아티팩트 교정)
-- [ ] ① 어댑터 2종 (rule docx 개량 + report markdown) — ADR-8 범위 재확인 필요
-- [ ] ② contextual 적재 — ADR-8a 백필로 대체 완료(628/628). 재적재 훅만 잔여
+- [~] ① 어댑터 2종 + ② 재적재 훅 — **ADR-8 로 보류** (컷오버 전 v2 는
+      SELECT 전용, 적재는 v1 parser/ingest 가 계속 담당. 컷오버 국면에서 재개)
 - [ ] ③ hybrid 검색 — v4-ctx RPC 확보. 잔여: pgroonga 쿼리 빌더 이식(keyword
       leg 복원) + 병렬 multi-query + negative 임계치
 - [ ] ④ 리랭커 이식 — 모델 확정분(3.5-flash-lite + thinking_level minimal) 적용
-- [ ] ⑤ 섹션 계약 합성 (Gemini primary / Claude fallback)
+- [ ] ⑤ 섹션 계약 합성 (Gemini primary=gemini-3.6-flash 확정 / Claude fallback)
 - [ ] ⑥ §5 조항 검증기 (스코어러와 추출기·원장 공유 — ⓪에서 사실상 선구현)
 - [ ] ⑦ golden testset 구축 (카테고리 층화 50문항+)
 - [ ] ⑧ critical 게이트 + pii_filter + 핫라인 이식 (사용자 노출 전 필수)
@@ -196,9 +196,17 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 | 출력 토큰 평균 | 304 | 307 (동등) |
 | TTFT p50 | 8085ms | **6778ms (−16%)** |
 | 총생성 p50 / p95 | 9445 / 15428ms | **8137 / 13487ms (−14%/−13%)** |
-**판정(권고): gemini-3.6-flash 채택** — 재현율 non-inferior(Δ −1문항/51),
-위조 절반(품질 서열 1위 우위), 지연·안정성 우위. 최종 확정·적용 시점은
-사용자 결정 (적용 = NEXUS_CHAT_MODEL env, v1/v2 각각 별도 결정).
+**판정: gemini-3.6-flash 채택 — 2026-07-22 사용자 확정.**
+- **v2**: 합성 기본값 = gemini-3.6-flash 즉시 확정. **답변 수준 베이스라인은
+  golden_ab_20260722T105320.json 의 B(3.6) 열로 동결** — 이후 합성·프롬프트·
+  검색 변경은 이 베이스라인 대비 Δ 로 판정.
+- **v1**: 조건부 교체 — A/B 는 v2 파이프라인 기준이라 v1 프롬프트 조합은
+  미측정. [사용자 액션] Streamlit secrets `NEXUS_CHAT_MODEL = "gemini-3.6-flash"`
+  → 재기동 → 확인 문항 4종(징계/응급환자/비권한자/괴롭힘) 정상 확인.
+  이후 **3일간 query_logs 의 elapsed_ms·confidence 분포를 교체 전과 비교
+  관찰**, 이상 신호 시 env 1줄 롤백(`gemini-3.5-flash`).
+- 비용 기록: 3.6-flash 출력 단가 3배 — 당사 규모(일 ~24질의)에선 월 수천 원
+  수준 증가. 채택 판단에 영향 없음 (기록만).
 ※ 계측 정직 기록: 1차 채점은 doc-level 기대를 조항 앵커 추출기로 채점해
 7.8%/5.9% 로 붕괴 — 표본 점검으로 아티팩트 확인 후 제목 출현 기준으로
 수정·재채점한 값이 위 표. 저장본: eval/results/golden_ab_20260722T105320.json
@@ -210,6 +218,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 ① v1 핫픽스 3층 검증 마감(사용자 실행 확인: 4문항 정상·L1_RPC 136·42703 없음·critical 무손상) — 종결. ② 3.6-flash 채택 확정: v2 즉시(베이스라인 동결), v1 조건부([사용자 액션]+3일 관찰). ①②적재는 ADR-8 보류 → 다음 = ④ 리랭커 이식.
 - 2026-07-22 3.6 정식 A/B(golden 52): 재현율 70.6%↔68.6%(non-inferior)·위조 6→3·지연 −14%·finish 안정 → 채택 권고. 1차 채점 아티팩트(조항 앵커) 수정 이력 명기.
 - 2026-07-22 Phase 1 ⓪ 완료: 인용 스코어러(citations.py+score CLI, 32 passed) → 3.6 품질 판정 = non-inferiority 우위(검증률 19.4%→33.3%, dm·un 0). 절대치는 벤치 프롬프트 유도 한계 명기. 스코어러 결함 2건(직접 인용형 우선순위·접두어 제목) 표본 점검으로 발견·수정.
 - 2026-07-22 Phase 0 종료 승인(사용자) → Phase 1 전환. 체크리스트 생성(스코어러 ⓪ 앞순위). 착수: 인용 스코어러.
