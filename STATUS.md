@@ -30,6 +30,15 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       제N조 인용을 유도 → 양쪽 공통의 article_missing 폭증(표본 점검 확인).
       상대 비교만 유효. ② 원장 재현율 = G2 인간 표본 감사 필요 재확인
       (docs_with_articles 98/101, 조 표기 희박 문서 존재)
+- [x] ⑦ golden testset 52문항 구축·검증 (별도 항목 ⓪ 아래 2026-07-22 완료 —
+      eval/golden.yaml + tools/validate_golden.py PASS 52/52. 층화: critical 8/
+      standard 14/confusion 6/mid_corpus 8/paraphrase 10/negative 6.
+      기대 인용은 원장 실재 표기 수준, negative 는 답변 수준 판정 기준 명시)
+- [~] ③ (부분) keyword leg 복원 — pgroonga_query.py 이식(토큰+조사+OR),
+      golden 검색 베이스라인 41/52·R 0.875·양 leg 융합(0.0328) 확인.
+      잔여: 병렬 multi-query·synonym 확장·negative 임계
+- [x] 3.6 Flash 정식 A/B (golden 52, 채택 판정 — 아래 표) + 스코어러
+      doc-level 채점 수정(제목 출현 기준 — 조항 앵커 아티팩트 교정)
 - [ ] ① 어댑터 2종 (rule docx 개량 + report markdown) — ADR-8 범위 재확인 필요
 - [ ] ② contextual 적재 — ADR-8a 백필로 대체 완료(628/628). 재적재 훅만 잔여
 - [ ] ③ hybrid 검색 — v4-ctx RPC 확보. 잔여: pgroonga 쿼리 빌더 이식(keyword
@@ -177,6 +186,23 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 각 Phase 진입 시 Claude Code가 해당 지시서(docs/phases/)를 기준으로
 이 파일에 체크리스트를 생성한다.
 
+### 3.6 Flash 정식 A/B — 합성 모델 채택 판정 (golden 52, 2026-07-22)
+| | A gemini-3.5-flash(현행) | B gemini-3.6-flash |
+|---|---|---|
+| 기대 인용 재현율 | 36/51 (70.6%) | 35/51 (68.6%) |
+| **위조 인용 답변** | 6/52 | **3/52 (절반)** |
+| negative pass | 6/6 | 6/6 |
+| 비정상 finish | 4 | **1** |
+| 출력 토큰 평균 | 304 | 307 (동등) |
+| TTFT p50 | 8085ms | **6778ms (−16%)** |
+| 총생성 p50 / p95 | 9445 / 15428ms | **8137 / 13487ms (−14%/−13%)** |
+**판정(권고): gemini-3.6-flash 채택** — 재현율 non-inferior(Δ −1문항/51),
+위조 절반(품질 서열 1위 우위), 지연·안정성 우위. 최종 확정·적용 시점은
+사용자 결정 (적용 = NEXUS_CHAT_MODEL env, v1/v2 각각 별도 결정).
+※ 계측 정직 기록: 1차 채점은 doc-level 기대를 조항 앵커 추출기로 채점해
+7.8%/5.9% 로 붕괴 — 표본 점검으로 아티팩트 확인 후 제목 출현 기준으로
+수정·재채점한 값이 위 표. 저장본: eval/results/golden_ab_20260722T105320.json
+
 **Phase 1 순서 조정 (2026-07-22 사용자 지시)**: 착수 시 **답변 수준 인용
 스코어러를 앞순위로 당긴다** (DESIGN §8 원 순서에서는 후반부) — 목적:
 3.6 Flash 품질 판정(저장된 synth_bench 소급 채점)을 Phase 1 초반에 확정하고,
@@ -184,6 +210,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 3.6 정식 A/B(golden 52): 재현율 70.6%↔68.6%(non-inferior)·위조 6→3·지연 −14%·finish 안정 → 채택 권고. 1차 채점 아티팩트(조항 앵커) 수정 이력 명기.
 - 2026-07-22 Phase 1 ⓪ 완료: 인용 스코어러(citations.py+score CLI, 32 passed) → 3.6 품질 판정 = non-inferiority 우위(검증률 19.4%→33.3%, dm·un 0). 절대치는 벤치 프롬프트 유도 한계 명기. 스코어러 결함 2건(직접 인용형 우선순위·접두어 제목) 표본 점검으로 발견·수정.
 - 2026-07-22 Phase 0 종료 승인(사용자) → Phase 1 전환. 체크리스트 생성(스코어러 ⓪ 앞순위). 착수: 인용 스코어러.
 - 2026-07-22 리플렉션 R1 회신 반영 → 리플렉션 확정. Phase 0 종료 조건 4/4 충족 — 판정 작성, 사용자 승인 대기. (부수: chunk_incident_nodes 물리 부재 + v1 retriever.py:1595 잔존 select 관찰 보고)
