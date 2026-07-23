@@ -34,9 +34,10 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       eval/golden.yaml + tools/validate_golden.py PASS 52/52. 층화: critical 8/
       standard 14/confusion 6/mid_corpus 8/paraphrase 10/negative 6.
       기대 인용은 원장 실재 표기 수준, negative 는 답변 수준 판정 기준 명시)
-- [~] ③ (부분) keyword leg 복원 — pgroonga_query.py 이식(토큰+조사+OR),
-      golden 검색 베이스라인 41/52·R 0.875·양 leg 융합(0.0328) 확인.
-      잔여: 병렬 multi-query·synonym 확장·negative 임계
+- [x] ③ keyword leg 복원 — pgroonga_query.py 이식(토큰+조사+OR),
+      양 leg 융합(0.0328) 확인. **잔여 3건(병렬 multi-query·synonym 확장·
+      negative 임계)은 2026-07-22 사용자 지시로 Phase 1 제외 →
+      Phase 2 백로그 이관** (각각 동결 베이스라인 대비 Δ 개별 측정)
 - [x] 3.6 Flash 정식 A/B (golden 52, 채택 판정 — 아래 표) + 스코어러
       doc-level 채점 수정(제목 출현 기준 — 조항 앵커 아티팩트 교정)
 - [~] ① 어댑터 2종 + ② 재적재 훅 — **ADR-8 로 보류** (컷오버 전 v2 는
@@ -91,7 +92,45 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
       critical 시 배너+enforce_structure(4단+핫라인). trace 는 로컬 stderr
       (ADR-8 DB 쓰기 금지). 검증: AppTest 헤드리스 — 초기 렌더 + 라이브
       1문항 end-to-end(섹션 계약 답변·verify 칩 렌더·예외 0, action=pass)
-- [ ] ⑩ eval 베이스라인 확정 (검색+인용)
+- [x] ⑩ eval 베이스라인 확정·동결 (2026-07-22 사용자 지시) — **Phase 2 G3
+      비교 기준. 이후 모든 변경은 이 수치 대비 Δ 로만 판정.**
+      동결 구성(v2 정본): v4-ctx RPC + keyword leg(OR쿼리) + 리랭커
+      (3.5-flash-lite·minimal, pool15→top3) + 이웃결합(±2) + 합성
+      (3.6-flash·섹션 계약) + §5 검증기
+      · 검색 수준 (golden 52): **pass 42/52 · avg P 0.590 · avg R 0.904**
+      · 인용 수준 (golden 52 e2e): **기대 재현율 39/51 (76.5%) · 위조 2/52 ·
+        negative 6/6 · 섹션 계약 위반 0 · verify pass 50/degrade 2/block 0**
+      · 동결 파일: eval/results/pipeline_golden_20260722T121419.json (인용) ·
+        골든셋 eval/golden.yaml (52문항, 검증 PASS)
+
+### Phase 1 종료 판정 (2026-07-22 작성 — 사용자 승인 대기)
+
+**판정: 완료 — Phase 1 목표(RAG 코어) 전 항목 종결.**
+(①②적재 = ADR-8 보류 이관 / ③잔여 3건 = Phase 2 백로그 이관 / 나머지 전부 [x])
+
+**착수 시점 대비 확보된 것 (v2 배포 준비 완료 선언의 근거):**
+1. **검색**: fixtures 16 기준 v3 4/16 → v4-ctx(contextual 백필 628) 8/16 →
+   golden 52 기준 keyword leg 복원 41/52 → **리랭커 완성 42/52 (P 0.590 ·
+   R 0.904)**. 전 단계가 eval 숫자로 계측된 여정.
+2. **답변(end-to-end)**: 기대 인용 재현율 **76.5%** (동결 베이스라인 대비
+   +7.9pp) · **위조 인용 2/52** · **negative 6/6** · 섹션 계약 위반 0 —
+   v2 가 검색부터 답변까지 완주한 공식 성적표.
+3. **안전(critical)**: v1 모듈 3종 **byte-identical 이식** + 동등성 **8/8** +
+   경로 증적(판정→검색→합성→4단 핫라인). §5 검증기가 위조 인용을 코드로
+   차단/강등 (소급 실측: 위조 2건 정확 포착).
+4. **모델 스택 확정 (전부 A/B 근거)**: 합성 gemini-3.6-flash (v1 도 교체 완료,
+   3일 관측 중) · 리랭커 gemini-3.5-flash-lite(minimal) · 임베딩 ctx_embedding.
+5. **UI**: 빌더 전용 프리뷰 — 정본 파이프라인 배선 + verify block 미표출,
+   AppTest 라이브 검증.
+6. **인프라**: golden 52 (자가 검증 PASS) · 인용 스코어러 · 파생 원장 ·
+   재시도 내성 러닝 하니스 · trace 로컬 기록 · 테스트 48 passed.
+
+**미포함(정직 기재)**: FAQ/OOS/모호성 fast-path(Phase 3) · 적재 어댑터(ADR-8
+보류) · ③잔여 3건(Phase 2 백로그) · critical 커버리지 개선(등재 안건, 심의 대기)
+· G2 인간 표본 감사(Phase 2 국면 [사용자 액션]).
+
+- 사용자 승인: **⏸ 대기 — 승인 시 Phase 2 로 전환** (phase-2.md 진입 조건에
+  따라 "rule 트랙 RAG 확정" 기록 + Phase 2 백로그 정리로 개시)
 
 ### 등재 안건 (구현 금지 — 심의 후 착수)
 - **critical 검출 커버리지 개선 (키워드 사전 확장 또는 분류기 활성화)**
@@ -273,6 +312,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 ⑩ 베이스라인 확정·동결(검색 42/52·인용 76.5%/위조2/neg6) + ③잔여 Phase 2 이관 + Phase 1 종료 판정 작성 — 사용자 승인 대기.
 - 2026-07-22 ⑨ 최소 UI 완료(AppTest 초기+라이브 검증) + critical 커버리지 안건 등재(H 심의·컷오버 후·구현 금지). 잔여 = ⑩ 베이스라인 확정 + ③ 잔여.
 - 2026-07-22 ⑧ critical 이식 완료: 3모듈 byte-identical + 동등성 8/8 + 경로 순서 증적(판정→검색→합성→4단핫라인). IntakeResult.critical_kind additive. 48 passed.
 - 2026-07-22 ⑤ 통과(재현율 76.5%·위조 2·negative 6/6) + ⑥ §5 검증기 완성(소급: 위조 2건 정확 강등). 다음 = ⑧ critical 이식(H 보충 기준: 무수정 이식 → 착수 플래그).
