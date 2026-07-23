@@ -1,7 +1,39 @@
 # STATUS.md — 진행 상태 (Claude Code가 갱신)
 
-**현재 Phase: 1** (2026-07-22 사용자 승인으로 Phase 0 → 1 전환)
+**현재 Phase: 2** (2026-07-22 사용자 승인으로 Phase 1 → 2 전환)
 (Phase 전환은 종료 판정 + 사용자 승인 후에만. CLAUDE.md Part 0 참조)
+
+---
+
+## Phase 2 (지시서: docs/phases/phase-2.md — 진입 조건에 따라 재구성)
+
+### 개시 기록 (2026-07-22) — CAG 트랙 종결
+**rule 트랙 = RAG 확정.** G1 미통과(51.4x, 상한 3x — 2026-07-21 실측·사용자
+확정)로 phase-2.md 진입 조건에 따라 CAG 계열(스파이크·캐시 매니저 v2·
+CAG-primary 전환)을 **전부 종결** — "그것도 유효한 결말이다"(DESIGN §8).
+- G2(registry 커버리지)는 CAG 게이트 목적은 소멸했으나 **§5 검증기 신뢰성
+  검증**으로 성격 전환해 백로그 유지 (인간 표본 감사 [사용자 액션]).
+- G3 비교 기준은 ⑩ 동결 베이스라인으로 이미 확보 (CAG 채점 대상 부재로 종결).
+- Kill criteria 중 CAG 전용 항목 소멸, 일반 항목(비용·지연·stale·critical
+  비중)은 성능 관측 백로그로 흡수.
+
+### 첫 안건 — v2 배포 준비 [사용자 액션] (작성 완료 · 실행은 지시 후)
+- **docs/deploy-notes.md 에 절차 전문**: Streamlit Cloud 신규 앱 등록(빌더
+  전용 배지 유지·URL 비공개 뷰어 제한), secrets 8종 표(필수 4·권장 1·옵션 3),
+  배포 후 확인 체크리스트(3층 분리 — 기동 시 ledger built 확인, 비critical/
+  critical/negative 3문항, **secrets 변경 시 Reboot 필수** — lru_cache 교훈이
+  v2 cache_resource 에도 동일 적용됨을 명시).
+- requirements.txt 작성 (배포 전제: streamlit·supabase·google-genai·anthropic).
+
+### 백로그 (각각 동결 베이스라인 대비 Δ 개별 측정)
+- [ ] 병렬 multi-query (원 쿼리 불가침 + dense 확장) — Phase 1 ③ 이관
+- [ ] synonym_dictionary 확장 (keyword leg 강화) — Phase 1 ③ 이관
+- [ ] negative 임계 설계 (검색 수준 판정 보완) — Phase 1 ③ 이관
+- [ ] 성능 관측: 배포 환경 TTFT/총지연 실측(프록시 환경 수치 대체) ·
+      trace 기반 지연 분해 · Kill criteria 일반 항목 모니터
+- [ ] G2 성격전환 — 파생 원장 커버리지 인간 표본 감사 [사용자 액션]
+      (문서별 무작위 1개 장 대조 — 분모 독립화)
+- (심의 대기) critical 검출 커버리지 개선 — 등재 안건 참조, 컷오버 후
 
 ---
 
@@ -129,8 +161,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 보류) · ③잔여 3건(Phase 2 백로그) · critical 커버리지 개선(등재 안건, 심의 대기)
 · G2 인간 표본 감사(Phase 2 국면 [사용자 액션]).
 
-- 사용자 승인: **⏸ 대기 — 승인 시 Phase 2 로 전환** (phase-2.md 진입 조건에
-  따라 "rule 트랙 RAG 확정" 기록 + Phase 2 백로그 정리로 개시)
+- 사용자 승인: **✅ 승인 (2026-07-22)** — Phase 2 전환 완료
 
 ### 등재 안건 (구현 금지 — 심의 후 착수)
 - **critical 검출 커버리지 개선 (키워드 사전 확장 또는 분류기 활성화)**
@@ -312,6 +343,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-22 Phase 1 종료 승인 → Phase 2 전환. 개시 기록: rule 트랙 RAG 확정(CAG 계열 종결, G2 성격전환·G3 종결). 첫 안건 = v2 배포 준비 [사용자 액션] 작성(deploy-notes+requirements). 백로그 6건 정리.
 - 2026-07-22 ⑩ 베이스라인 확정·동결(검색 42/52·인용 76.5%/위조2/neg6) + ③잔여 Phase 2 이관 + Phase 1 종료 판정 작성 — 사용자 승인 대기.
 - 2026-07-22 ⑨ 최소 UI 완료(AppTest 초기+라이브 검증) + critical 커버리지 안건 등재(H 심의·컷오버 후·구현 금지). 잔여 = ⑩ 베이스라인 확정 + ③ 잔여.
 - 2026-07-22 ⑧ critical 이식 완료: 3모듈 byte-identical + 동등성 8/8 + 경로 순서 증적(판정→검색→합성→4단핫라인). IntakeResult.critical_kind additive. 48 passed.
