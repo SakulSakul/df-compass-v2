@@ -17,6 +17,17 @@ CAG-primary 전환)을 **전부 종결** — "그것도 유효한 결말이다"(
 - Kill criteria 중 CAG 전용 항목 소멸, 일반 항목(비용·지연·stale·critical
   비중)은 성능 관측 백로그로 흡수.
 
+### 위반 기록 (2026-07-27 감리 적발 — build-guard 원칙)
+- **스키마 미확인 SQL 발행**: v1 3.6 관찰용 SQL 을 `query_logs.confidence` ·
+  `created_at` 기준으로 발행 → 42703 (실컬럼 아님, 시간 컬럼은 ts).
+  query_logs 는 R1 리플렉션 범위(nexus_%) 밖이라 **실재 확인된 적 없는
+  테이블**인데 코드 기억으로 컬럼을 추정 — chunk_incident_nodes 사고와
+  동일 클래스이며, 본인이 등재한 원칙("실재 확인 후 참조")을 스스로 위반.
+- 교정: 관찰은 **nexus_audit_logs**(R1 검증 완료 — created_at·gemini_model_id·
+  gemini_latency_ms·total_latency_ms·claude_verdict 전부 물리 실재) 기준으로
+  재발행. 재발 방지: 앞으로 사용자 실행용 SQL 은 R1 확정 컬럼 또는
+  information_schema 확인분만 사용.
+
 ### 첫 안건 — v2 배포: **완료 판정 (2026-07-27 사용자 감리·3층 마감)** ✅
 - 앱: https://df-compass-v22.streamlit.app/ (빌더 전용 · Sharing 비공개 실동작 확인)
 - 소스: v2 main 최신 / 기동: `[registry] ledger built: docs=101 chunks_scanned=774
@@ -363,6 +374,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-27 [위반 기록] 관찰 SQL 을 미확인 스키마(query_logs.confidence/created_at)로 발행 → 42703. 감리 정정: nexus_audit_logs 기준 재발행(R1 검증 컬럼만). build-guard 원칙 위반 자인·재발 방지 기록.
 - 2026-07-27 v2 배포 완료 판정(사용자 감리): 4항목 전부 ✅·URL 차단·anon 단독·속도 v1 절반. H 안건에 점 번호 체계 미인식 갭 병합. 날짜 정정(커밋 기준 07-23/07-27 분리). 다음 국면 = 실사용 검증 + 예약 작업.
 - 2026-07-27 배포 Step 3 통과(ledger 3숫자 일치·anon 단독 확정). conf=0.0 원인 분리: 합성·추출·환경 정상, verify confidence 산식의 doc-level 미반영 표시 갭 — H 안건 등재(구현 금지).
 - 2026-07-23 Phase 1 종료 승인 → Phase 2 전환. 개시 기록: rule 트랙 RAG 확정(CAG 계열 종결, G2 성격전환·G3 종결). 첫 안건 = v2 배포 준비 [사용자 액션] 작성(deploy-notes+requirements). 백로그 6건 정리.
