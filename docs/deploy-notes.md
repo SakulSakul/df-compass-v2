@@ -26,7 +26,7 @@ model= 확인" 3단계를 명시한다. (v2 도 설정 캐시를 쓰게 되면 �
 |---|---|---|
 | SUPABASE_URL | ✅ | v1 프로젝트 URL (ADR-8 — 같은 DB) |
 | SUPABASE_KEY | ✅ | anon 키 (검색·RPC — SELECT 전용) |
-| SUPABASE_SERVICE_KEY | ✅ | service_role (파생 원장 로드 — 읽기 용도로만 사용) |
+| SUPABASE_SERVICE_KEY | ❌ 불요 | **입력하지 말 것 (최소 권한).** 2026-07-22 실측: anon 키 단독으로 파생 원장 로드 성공(docs=101·chunks 774 — service 결과와 동일). 용도가 읽기여도 능력은 쓰기 전권이라 상시 배포 앱 주입은 ADR-8 정신 위배. 코드가 미설정 시 자동으로 anon 폴백 |
 | GEMINI_API_KEY | ✅ | 합성·리랭크·임베딩 |
 | ANTHROPIC_API_KEY | 권장 | Claude fallback + critical LLM 분류기 (없으면 fail-open) |
 | NEXUS_CHAT_MODEL | 옵션 | 기본 gemini-3.6-flash (확정값 — 명시 불필요) |
