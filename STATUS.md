@@ -27,6 +27,11 @@ CAG-primary 전환)을 **전부 종결** — "그것도 유효한 결말이다"(
   gemini_latency_ms·total_latency_ms·claude_verdict 전부 물리 실재) 기준으로
   재발행. 재발 방지: 앞으로 사용자 실행용 SQL 은 R1 확정 컬럼 또는
   information_schema 확인분만 사용.
+- **부수 발견 (2026-07-27 감리, 스키마 지식 갱신)**:
+  ① query_logs 에 **chat_provider / chat_model_version 컬럼 실재** (R1 범위
+    밖에서 확인) — **향후 관찰 SQL 의 모델 그룹핑은 이 컬럼 기준**.
+  ② nexus_audit_logs 는 **flag-off 로 라이브 미기록** — 위 교정 SQL(O1/O2)의
+    실사용 관찰 유효성 한계. 관찰 정본 소스 = query_logs (①의 컬럼).
 
 ### 첫 안건 — v2 배포: **완료 판정 (2026-07-27 사용자 감리·3층 마감)** ✅
 - 앱: https://df-compass-v22.streamlit.app/ (빌더 전용 · Sharing 비공개 실동작 확인)
@@ -357,9 +362,12 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
   Reboot 후 전 호출 model=gemini-3.6-flash · 4문항(징계/응급환자/비권한자/
   괴롭힘) 전부 정상 · critical 게이트 무손상(②④ ALERT+핫라인 우선 발동) ·
   실측 합성 30.4→10.7s(−65%)/23.7→15.5s(−34%) · ③은 중대재해 지침 인용으로
-  오히려 개선. **3일 관찰 타이머 기점 2026-07-22 11:49 — 2026-07-25 사용자
-  관찰 SQL 회신 시 교체 전 구간과 비교해 최종 판정 기록 예정.**
-  이상 신호 시 env 1줄 롤백(`gemini-3.5-flash`) + Reboot.
+  오히려 개선.
+  **관찰 잠정 판정 (2026-07-27 감리)**: **교체 유지 확정(잠정)** —
+  avg 32.4→21.9s(−32%) · p95 40.8→22.7s(−44%) · 품질은 golden A/B 기판정 ·
+  관측 기간 무사고. 단 **7/23 이후 v1 사용 0건으로 3.6 표본 n=4** —
+  **최종 확정은 2주 무사고 관측(~8/10)에 흡수** (별도 판정 없음).
+  이상 신호 시 env 1줄 롤백(`gemini-3.5-flash`) + Reboot 는 그대로 유효.
   ※ 배포 교훈(재기동 전 미반영 = settings() lru_cache) → docs/deploy-notes.md
 - 비용 기록: 3.6-flash 출력 단가 3배 — 당사 규모(일 ~24질의)에선 월 수천 원
   수준 증가. 채택 판단에 영향 없음 (기록만).
@@ -374,6 +382,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-27 v1 3.6 관찰 잠정 판정(감리): 유지 확정 — avg −32%·p95 −44%·무사고. 표본 n=4 한계로 최종은 2주 관측(~8/10) 흡수. 부수: query_logs.chat_provider/chat_model_version 실재(향후 그룹핑 기준)·nexus_audit_logs flag-off 미기록.
 - 2026-07-27 [위반 기록] 관찰 SQL 을 미확인 스키마(query_logs.confidence/created_at)로 발행 → 42703. 감리 정정: nexus_audit_logs 기준 재발행(R1 검증 컬럼만). build-guard 원칙 위반 자인·재발 방지 기록.
 - 2026-07-27 v2 배포 완료 판정(사용자 감리): 4항목 전부 ✅·URL 차단·anon 단독·속도 v1 절반. H 안건에 점 번호 체계 미인식 갭 병합. 날짜 정정(커밋 기준 07-23/07-27 분리). 다음 국면 = 실사용 검증 + 예약 작업.
 - 2026-07-27 배포 Step 3 통과(ledger 3숫자 일치·anon 단독 확정). conf=0.0 원인 분리: 합성·추출·환경 정상, verify confidence 산식의 doc-level 미반영 표시 갭 — H 안건 등재(구현 금지).
