@@ -71,7 +71,44 @@ CAG-primary 전환)을 **전부 종결** — "그것도 유효한 결말이다"(
   v2 cache_resource 에도 동일 적용됨을 명시).
 - requirements.txt 작성 (배포 전제: streamlit·supabase·google-genai·anthropic).
 
+### v1·v2 비교 자동 테스트 하니스 — 지시서 이행 완료 (2026-07-28) ✅
+컷오버 풀 심의(~8/10) non-inferiority 증거 산출용. v1 레포 수정 0 (git status
+clean·bytecode 차단), 배포 앱 호출 0 (로컬 사이드카), 몽키패치 0 (쓰기 차단은
+GuardedSupabase 의존성 주입 — v1 자체 fail-open 이 흡수, 검색·합성 불변).
+- 구현: eval/v1_sidecar.py·compare_matrix.py·compare_v1v2.py(스모크 게이트가
+  본 러닝을 구조적으로 차단)·gen_variants.py + variants.yaml(시드 동결 38,
+  critical·negative 제외, 커밋본이 정본). 테스트 58 passed (신규 10).
+- 스모크 게이트 15/15 통과 (g09/g47 고정): v1 실코드 경로·anon role 실측·
+  쓰기 차단 증적. 당시 ⑤는 리포트형이었음 → c7a5bc6 에서 실검사(쓰기성 RPC
+  이름 대조)로 승격, 해당 러닝분은 grep 전수 증거로 갈음 (감리 합의).
+- **본 러닝 1회 완주**: `eval/results/compare_v1v2_20260728T114752.json`
+  | 지표 (판정=공통만) | v1 | v2 |
+  |---|---|---|
+  | 재현율 (전체) | 30/51 (58.8%) | **38/50 (76.0%)** |
+  | 재현율 (blindspot 20문항 제외) | 13/30 (43.3%) | **20/29 (69.0%)** |
+  | 위조 인용 답변 | 0/52 | 4/51 (제외 집계 1/31) |
+  | negative | 3/6 (g49·g50·g51 fail) | **6/6** |
+  | 총지연 p50/p95 (상대 비교 전용) | 23.3s / 30.1s | **15.3s / 19.5s** |
+  | critical 발동 (기록) | 4/8 | 4/8 — **v1 과 완전 동일 패턴** (미발동
+    g03/g04/g06/g07 = 기등재 H 갭 재확인) |
+  - v2 위조 4건(g02·g10·g33·g46) 중 3건이 blindspot 문항 — 원장 표현 한계
+    구간과 중첩. §5 verify 가 4건 전부 degrade 강등 (안전망 작동, v2 전용 지표).
+  - v2 실패 1건 = g39 (DB 57014 statement timeout 2회) → 단독 재확인 22.3s
+    정상 완주, 일시성 확정.
+  - 변형 트랙(참고, 판정 미산입): 재현율 v1 29/41 ↔ v2 35/41, 위조 0↔4.
+  - guard: 쓰기 시도 92건 전부 차단(전부 query_logs)·실쓰기 0. RPC 3종
+    (hybrid_search_v2·force_include·diagnose_role) 전부 읽기 — 이름 대조 통과.
+  - blindspot 20문항/20문서 목록은 결과 JSON 에 축적 — H 심의(원장·정규화·
+    합성 계약 3측) 입력 자료.
+- 한계 (§8.5): ① 로컬 지연은 배포 절대값 아님(상대 비교 전용) ② v1 합성
+  단독 지연 미계측(몽키패치 금지) ③ 운영 Streamlit secrets 의 ENABLE_* 실값
+  확인 불가 → v1 코드 기본값(false) 실행 — v1 negative 3/6 은 운영 OOS
+  게이트 OFF 상태의 수치임에 유의 ④ 이 결과 파일 limitations 에는 지연
+  계측 비대칭 줄이 없음 (구코드 기동분 — c7a5bc6 코드 반영, **결과 파일
+  무편집 방침**으로 파일은 그대로 둠).
+
 ### 백로그 (각각 동결 베이스라인 대비 Δ 개별 측정)
+- [x] v1·v2 비교 자동 테스트 하니스 (2026-07-28 완료 — 위 섹션)
 - [ ] 병렬 multi-query (원 쿼리 불가침 + dense 확장) — Phase 1 ③ 이관
 - [ ] synonym_dictionary 확장 (keyword leg 강화) — Phase 1 ③ 이관
 - [ ] negative 임계 설계 (검색 수준 판정 보완) — Phase 1 ③ 이관
@@ -414,6 +451,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
 전제인 articles.py·파생 원장(registry)은 Phase 0 에서 이미 완성됨.
 
 ## 작업 로그 (최신이 위)
+- 2026-07-28 v1·v2 비교 하니스 완료: 사이드카(무수정·무패치·쓰기차단 92/92)·스모크 15/15·본 러닝 52+38 완주. 재현율 v1 58.8%↔v2 76.0%(제외 집계 43.3%↔69.0%)·neg 3/6↔6/6·지연 p50 23.3s↔15.3s·critical 발동 동일. v2 위조 4건(3건 blindspot 중첩, 전부 degrade 강등). g39 일시성 확정. 감리 보완 2건 반영(c7a5bc6).
 - 2026-07-27 후속 조사 승인(사용자) + H 갭 ②③ 심의 범위 보강: 합성 계약(SYSTEM_CONTRACT 제N조 문구) 포함 — 원장 확장 단독으로는 갭 미폐쇄. 원장·정규화·합성 3측 묶음 심의, 구현 금지 동일.
 - 2026-07-27 실사용 감리 3문항 접수(혼동 pass 1.00·critical 발동+degrade 정상 0.22·위조 유인 무응답) + 후속 조사: 괴롭힘 지침 원장 [부칙] 1건뿐·제4·5·9·10·13조 부재 → 커버리지 갭 판정·G2 필수 편입. 근본 = 원문에 제N조 표기 부재(번호 항목 체계) → H 병합 갭 ③. verify 안전망은 설계대로 작동.
 - 2026-07-27 v1 3.6 관찰 잠정 판정(감리): 유지 확정 — avg −32%·p95 −44%·무사고. 표본 n=4 한계로 최종은 2주 관측(~8/10) 흡수. 부수: query_logs.chat_provider/chat_model_version 실재(향후 그룹핑 기준)·nexus_audit_logs flag-off 미기록.
