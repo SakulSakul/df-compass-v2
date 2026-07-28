@@ -15,6 +15,14 @@ from typing import Any
 # 실조항 판정: 제N조(의M) canonical 만 인정 — "부칙" 류는 실조항이 아님
 _REAL_ARTICLE = re.compile(r"제\d+조(의\d+)?$")
 _PREFIX = re.compile(r"^\([^)]{1,12}\)\s*")
+# 쓰기성 RPC 이름 패턴 (스모크 ⑤ 실검사 — 감리 지적 2 보완)
+_WRITE_RPC = re.compile(
+    r"insert|update|upsert|delete|write|log_|_log\b|record|create|set_", re.I)
+
+
+def suspicious_rpc_names(rpc_calls: dict) -> list[str]:
+    """가드 로그의 RPC 이름 중 쓰기성으로 의심되는 것 — 스모크 ⑤ 판정 근거."""
+    return sorted(n for n in rpc_calls if _WRITE_RPC.search(n))
 
 
 def blindspot_titles(ledger: Any) -> set[str]:

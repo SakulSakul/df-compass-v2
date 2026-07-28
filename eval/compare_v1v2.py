@@ -35,7 +35,8 @@ from compass_engine.reranker import GeminiReranker  # noqa: E402
 from compass_engine.synthesis import synthesize  # noqa: E402
 from compass_engine.v1_retriever import V1RpcRetriever, gemini_embed_fn  # noqa: E402
 from compass_engine.verify import verify_answer  # noqa: E402
-from eval.compare_matrix import blindspot_titles, matrix_report, tag_blindspot  # noqa: E402
+from eval.compare_matrix import (  # noqa: E402
+    blindspot_titles, matrix_report, suspicious_rpc_names, tag_blindspot)
 from eval.golden_ab import _score  # noqa: E402  (채점 로직 단일 소스)
 from eval.runner import RESULTS_DIR, load_fixtures  # noqa: E402
 from eval.v1_sidecar import (  # noqa: E402
@@ -151,9 +152,14 @@ def run_smoke(h: Harness, entries: list[dict]) -> bool:
         mp = rec["v1"].get("module_path", "")
         checks.append((f"{sid} ④ v1 실코드 경로", "nexus_ai" in mp, mp))
     guard = h.sb_v1.guard_log.summary()
-    checks.append(("⑤ v1 DB 실쓰기 0 (가드)", True,
+    # ⑤ 실검사 (감리 지적 2 보완): table 쓰기는 프록시가 구조 차단하므로,
+    # 우회 가능 경로인 RPC 의 이름을 쓰기성 패턴과 대조해 판정한다.
+    # (from_/postgrest/storage 는 v1 ask() 경로 미사용 — grep 전수 확인 증거는
+    # 완료 보고 첨부. admin 페이지 1곳뿐이며 사이드카는 로드하지 않는다.)
+    sus = suspicious_rpc_names(guard["rpc_calls"])
+    checks.append(("⑤ v1 DB 쓰기 0 (가드+RPC 이름 대조)", not sus,
                    f"blocked={guard['blocked_write_count']} "
-                   f"rpc={list(guard['rpc_calls'])}"))
+                   f"rpc={list(guard['rpc_calls'])} 쓰기성_의심={sus}"))
     print("\n──── §2 스모크 게이트 ────")
     all_ok = True
     for name, ok, detail in checks:
@@ -230,6 +236,9 @@ def main() -> int:
             "v1 코드 기본값(false) 으로 실행, v1_config.env_vars 참조",
             "v1 은 critical 시 enforce_structure(핫라인) 포함 답변, v2 채점 "
             "경로는 동결 구성(합성 원문) — 채점은 동일 스코어러로 텍스트 대조",
+            "지연 계측 경계 비대칭: v1 총지연은 ask() 전체(내부 게이트·로깅 "
+            "시도 포함), v2 총지연은 retrieve+synthesize (intake·verify 는 "
+            "채점 밖 별도 실행이라 미포함) — 상대 비교 시 감안 (감리 지적 3)",
         ],
         "records": records,
         "matrix": report,

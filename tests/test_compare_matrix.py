@@ -7,7 +7,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from compass_engine.registry import ArticleLedger  # noqa: E402
 from eval.compare_matrix import (  # noqa: E402
-    aggregate, blindspot_titles, matrix_report, tag_blindspot)
+    aggregate, blindspot_titles, matrix_report, suspicious_rpc_names,
+    tag_blindspot)
+
+
+def test_suspicious_rpc_names():
+    # 스모크 ⑤ 실검사 — 실측 관찰된 v1 읽기 RPC 는 통과, 쓰기성 이름은 검출
+    reads = {"nexus_hybrid_search_v2": 3, "nexus_diagnose_role": 1,
+             "nexus_force_include_chunks_by_incident_nodes": 2}
+    assert suspicious_rpc_names(reads) == []
+    assert suspicious_rpc_names({**reads, "nexus_insert_feedback": 1,
+                                 "set_config": 1}) == [
+        "nexus_insert_feedback", "set_config"]
 
 
 def _ledger() -> ArticleLedger:
