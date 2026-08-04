@@ -50,4 +50,5 @@ class DummyRetriever:
         ]
         return RetrieveResult(
             chunks=chunks, query_set=[q], provider="dummy-keyword-overlap",
+            timings={}, router_hit=None,
         )

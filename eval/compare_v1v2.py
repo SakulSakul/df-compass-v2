@@ -93,6 +93,12 @@ class Harness:
             "answer": syn.answer_md,
             "elapsed_total_s": round(total_s, 3),
             "synth_ms": syn.elapsed_ms,
+            # wave 1 계측 (재검증 성립 조건): 단계 타이머·최종 청크 수·
+            # 합성 입력 크기·라우터 히트
+            "timings": res.get("timings", {}),
+            "n_chunks": len(res["chunks"]),
+            "input_chars": syn.input_chars,
+            "router_hit": res.get("router_hit"),
             "provider": syn.provider,
             "used_fallback": syn.used_fallback,
             "section_contract_ok": syn.section_contract_ok,

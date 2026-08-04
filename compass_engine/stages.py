@@ -67,6 +67,10 @@ class RetrieveResult(TypedDict):
     chunks: list[RetrievedChunk]      # 검색은 chunk, LLM 컨텍스트는 부모 section(§3)
     query_set: list[str]              # 원 쿼리 불가침 + multi-query 확장분
     provider: str                     # 구현 식별자 (eval A/B 비교 축)
+    # wave 1 계측 (구현 지시서 v1) — 단계별 ms. 재검증 성립 조건.
+    # 미계측 구현(dummy 등)은 빈 dict. 라우터 미적용(wave 3 전)이면 None.
+    timings: dict
+    router_hit: bool | None
 
 
 class Retriever(Protocol):

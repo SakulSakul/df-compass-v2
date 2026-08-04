@@ -72,8 +72,12 @@ class V1RpcRetriever:
         self.rerank_pool = rerank_pool
 
     def retrieve(self, intake: IntakeResult, route: RouteResult) -> RetrieveResult:
+        import time
+        timings: dict = {}
         q = intake["masked_text"]
+        _t = time.perf_counter()
         embedding = self._embed(q)
+        timings["embed_ms"] = int((time.perf_counter() - _t) * 1000)
         # Phase 1 ③: 원문을 그대로 넣으면 &@~ 가 AND 해석 → keyword leg 사망
         # (2026-07-21 A/B 에서 실측). v1 과 동일하게 OR 쿼리로 변환해 전달.
         from .pgroonga_query import build_pgroonga_query
@@ -85,7 +89,9 @@ class V1RpcRetriever:
             "rrf_k": 60,
             "pool_size": max(30, fetch_k * 6),
         }
+        _t = time.perf_counter()
         rows = self._sb.rpc(self.rpc_name, payload).execute().data or []
+        timings["rpc_ms"] = int((time.perf_counter() - _t) * 1000)
         chunks: list[RetrievedChunk] = []
         for r in rows:
             title = str(r.get("doc_title") or "")
@@ -102,13 +108,18 @@ class V1RpcRetriever:
                 score=float(r.get("rrf_score") or 0.0),
             ))
         if self.reranker is not None and chunks:
+            _t = time.perf_counter()
             chunks = list(self.reranker(q, chunks))[: self.top_k]
+            timings["rerank_ms"] = int((time.perf_counter() - _t) * 1000)
         if self.expand_neighbors and chunks:
             from .neighbors import expand_with_neighbors
+            _t = time.perf_counter()
             chunks = expand_with_neighbors(
                 self._sb, chunks, radius=self.neighbor_radius,
             )
+            timings["neighbors_ms"] = int((time.perf_counter() - _t) * 1000)
         provider = f"v1-rpc:{self.rpc_name}" + (
             "+rerank" if self.reranker is not None else ""
         ) + ("+neighbors" if self.expand_neighbors else "")
-        return RetrieveResult(chunks=chunks, query_set=[q], provider=provider)
+        return RetrieveResult(chunks=chunks, query_set=[q], provider=provider,
+                              timings=timings, router_hit=None)

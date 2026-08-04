@@ -67,6 +67,7 @@ class SynthesisResult:
     used_fallback: bool
     elapsed_ms: int
     section_contract_ok: bool
+    input_chars: int = 0   # wave 1 계측 — user 프롬프트 길이 (합성 입력 토큰 프록시)
 
 
 GenFn = Callable[[str, str], str]   # (system, user) -> answer
@@ -124,4 +125,5 @@ def synthesize(question: str, chunks: Sequence[RetrievedChunk], *,
         answer_md=answer, provider=provider, used_fallback=used_fallback,
         elapsed_ms=int((time.perf_counter() - t0) * 1000),
         section_contract_ok=check_section_contract(answer),
+        input_chars=len(user),
     )
