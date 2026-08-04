@@ -59,7 +59,9 @@ class V1RpcRetriever:
     def __init__(self, supabase: Any, embed_fn: EmbedFn, *, top_k: int = 3,
                  rpc_name: str = _RPC_NAME,
                  expand_neighbors: bool = True, neighbor_radius: int = 2,
-                 reranker: Any = None, rerank_pool: int = 15):
+                 reranker: Any = None, rerank_pool: int = 15,
+                 router: Any = None, reserved_seats: int = 2,
+                 proxy_quota: int | None = None, chunk_cap: int | None = None):
         self._sb = supabase
         self._embed = embed_fn
         self.top_k = top_k
@@ -70,6 +72,39 @@ class V1RpcRetriever:
         # rerank_pool 로 확장해 재정렬 후 top_k 컷 (v1 top-15 선례).
         self.reranker = reranker
         self.rerank_pool = rerank_pool
+        # wave 3 보장 계층 (심의 1·2항) — 전부 미지정이면 기존 동작과 동일
+        # (add-only 불변식: 라우팅 실패·저확신은 no-op).
+        self.router = router                    # DocRouter | None
+        self.reserved_seats = reserved_seats    # 최종 top_k 컷 면제석 (≤2)
+        self.proxy_quota = proxy_quota          # 최종 내 프록시 문서 청크 상한
+        self.chunk_cap = chunk_cap              # 중복 제거 후 총 청크 상한
+
+    @staticmethod
+    def _is_proxy(c: RetrievedChunk) -> bool:
+        from .proxies import PROXY_DOCS
+        return c["breadcrumb"].split(">")[0] in PROXY_DOCS
+
+    def _pick_doc_chunk(self, doc_id: str, title: str, question: str
+                        ) -> RetrievedChunk | None:
+        """라우팅 문서의 대표 청크 1개 — 질의 토큰 겹침 최대 (결정론 렉시컬)."""
+        import re as _re
+        try:
+            rows = (self._sb.table("nexus_chunks")
+                    .select("id,document_id,text")
+                    .eq("document_id", doc_id).execute().data or [])
+        except Exception:
+            return None
+        if not rows:
+            return None
+        qtok = set(_re.findall(r"[가-힣A-Za-z0-9]{2,}", question))
+        best = max(rows, key=lambda r: (
+            len(qtok & set(_re.findall(r"[가-힣A-Za-z0-9]{2,}", r.get("text") or ""))),
+            -len(r.get("text") or "")))
+        return RetrievedChunk(
+            chunk_id=str(best["id"]), section_id="",
+            document_id=str(best["document_id"]), source_type="rule",
+            breadcrumb=title, article_no=None,
+            text=str(best.get("text") or ""), score=0.0)
 
     def retrieve(self, intake: IntakeResult, route: RouteResult) -> RetrieveResult:
         import time
@@ -107,10 +142,74 @@ class V1RpcRetriever:
                 text=str(r.get("text") or ""),
                 score=float(r.get("rrf_score") or 0.0),
             ))
+        # ── wave 3 보장 계층 ①: 라우팅 + 풀 주입 (rerank 전, add-only) ──
+        router_hit: bool | None = None
+        routed_titles: list[str] = []
+        if self.router is not None:
+            _t = time.perf_counter()
+            r = self.router.route(q)
+            timings["router_ms"] = int((time.perf_counter() - _t) * 1000)
+            if r.get("confident") and r.get("doc_titles"):
+                routed_titles = list(r["doc_titles"])[: self.reserved_seats]
+                pool_docs = {c["document_id"] for c in chunks}
+                for t in routed_titles:
+                    did = self.router.title_to_id.get(t)
+                    if did and did not in pool_docs:
+                        inj = self._pick_doc_chunk(did, t, q)
+                        if inj is not None:
+                            chunks.append(inj)
+                            pool_docs.add(did)
+            # 저확신·무지목 → no-op (router_hit=None 유지, 기존 흐름 그대로)
+
         if self.reranker is not None and chunks:
             _t = time.perf_counter()
-            chunks = list(self.reranker(q, chunks))[: self.top_k]
+            ranked = list(self.reranker(q, chunks))
             timings["rerank_ms"] = int((time.perf_counter() - _t) * 1000)
+        else:
+            ranked = list(chunks)
+
+        # ── wave 3 보장 계층 ②: 프록시 감점 (결정론 stable 재정렬) ──
+        if self.proxy_quota is not None:
+            ranked = ([c for c in ranked if not self._is_proxy(c)]
+                      + [c for c in ranked if self._is_proxy(c)])
+
+        final = ranked[: self.top_k]
+
+        # ── 보장 계층 ③: 예약석 — 라우팅 문서 컷 면제 (add-only 추가) ──
+        if routed_titles:
+            routed_ids = {self.router.title_to_id.get(t) for t in routed_titles}
+            have = {c["document_id"] for c in final}
+            for c in ranked:
+                if c["document_id"] in routed_ids and c["document_id"] not in have:
+                    final.append(c)
+                    have.add(c["document_id"])
+            router_hit = bool(routed_ids & {c["document_id"] for c in final})
+
+        # ── 보장 계층 ④: 프록시 쿼터 (최종 내 프록시 문서 청크 ≤quota) ──
+        if self.proxy_quota is not None:
+            prox = [c for c in final if self._is_proxy(c)]
+            if len(prox) > self.proxy_quota:
+                drop_ids = {c["chunk_id"] for c in prox[self.proxy_quota:]}
+                final = [c for c in final if c["chunk_id"] not in drop_ids]
+                fin_ids = {c["chunk_id"] for c in final}
+                for c in ranked:                      # 비프록시 후순위로 보충
+                    if len(final) >= self.top_k:
+                        break
+                    if c["chunk_id"] not in fin_ids and not self._is_proxy(c):
+                        final.append(c)
+                        fin_ids.add(c["chunk_id"])
+
+        # ── 보장 계층 ⑤: 총 청크 상한 (중복 제거 후 cap) ──
+        seen_ids: set[str] = set()
+        deduped: list[RetrievedChunk] = []
+        for c in final:
+            if c["chunk_id"] not in seen_ids:
+                seen_ids.add(c["chunk_id"])
+                deduped.append(c)
+        if self.chunk_cap is not None:
+            deduped = deduped[: self.chunk_cap]
+        chunks = deduped
+
         if self.expand_neighbors and chunks:
             from .neighbors import expand_with_neighbors
             _t = time.perf_counter()
@@ -120,6 +219,7 @@ class V1RpcRetriever:
             timings["neighbors_ms"] = int((time.perf_counter() - _t) * 1000)
         provider = f"v1-rpc:{self.rpc_name}" + (
             "+rerank" if self.reranker is not None else ""
+        ) + ("+router" if self.router is not None else ""
         ) + ("+neighbors" if self.expand_neighbors else "")
         return RetrieveResult(chunks=chunks, query_set=[q], provider=provider,
-                              timings=timings, router_hit=None)
+                              timings=timings, router_hit=router_hit)

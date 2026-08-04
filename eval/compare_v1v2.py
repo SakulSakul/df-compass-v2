@@ -73,9 +73,20 @@ class Harness:
                            if os.environ.get("NEXUS_ENABLE_CITATION_CONTRACT",
                                              "true").lower() == "true" else None)
         self.rr = GeminiReranker()
-        self.retr = V1RpcRetriever(self.sb_v2, gemini_embed_fn(), top_k=3,
-                                   rpc_name="nexus_hybrid_search_v4_ctx",
-                                   expand_neighbors=True, reranker=self.rr)
+        # wave 3 보장 계층 — 플래그 off 시 종전 동결 구성 (어블레이션)
+        if os.environ.get("NEXUS_ENABLE_GUARANTEE_LAYER", "true").lower() == "true":
+            from compass_engine.doc_router import DocRouter
+            self.retr = V1RpcRetriever(
+                self.sb_v2, gemini_embed_fn(), top_k=5,
+                rpc_name="nexus_hybrid_search_v4_ctx",
+                expand_neighbors=True, neighbor_radius=1,
+                reranker=self.rr, rerank_pool=25,
+                router=DocRouter(self.sb_v2), reserved_seats=2,
+                proxy_quota=1, chunk_cap=8)
+        else:
+            self.retr = V1RpcRetriever(self.sb_v2, gemini_embed_fn(), top_k=3,
+                                       rpc_name="nexus_hybrid_search_v4_ctx",
+                                       expand_neighbors=True, reranker=self.rr)
         # v1 사이드카 — 쓰기 차단 클라이언트 주입 (운영과 동일 anon 키 클래스)
         self.v1_chatbot = load_v1_chatbot()
         self.sb_v1 = GuardedSupabase(create_client(url, anon))

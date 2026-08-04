@@ -301,11 +301,23 @@ def _engine():
     sb = create_client(url, anon)
     ledger_key = os.environ.get("SUPABASE_SERVICE_KEY") or anon
     ledger = load_ledger(create_client(url, ledger_key))
-    retriever = V1RpcRetriever(
-        sb, gemini_embed_fn(), top_k=3,
-        rpc_name="nexus_hybrid_search_v4_ctx",
-        expand_neighbors=True, reranker=GeminiReranker(),
-    )
+    # wave 3 보장 계층 (심의 확정 예산) — 플래그 off 시 종전 동결 구성
+    if os.environ.get("NEXUS_ENABLE_GUARANTEE_LAYER", "true").lower() == "true":
+        from compass_engine.doc_router import DocRouter
+        retriever = V1RpcRetriever(
+            sb, gemini_embed_fn(), top_k=5,
+            rpc_name="nexus_hybrid_search_v4_ctx",
+            expand_neighbors=True, neighbor_radius=1,
+            reranker=GeminiReranker(), rerank_pool=25,
+            router=DocRouter(sb), reserved_seats=2,
+            proxy_quota=1, chunk_cap=8,
+        )
+    else:
+        retriever = V1RpcRetriever(
+            sb, gemini_embed_fn(), top_k=3,
+            rpc_name="nexus_hybrid_search_v4_ctx",
+            expand_neighbors=True, reranker=GeminiReranker(),
+        )
     # wave 2 합성 계약 — 앵커 사전 (플래그 off 면 None → 기존 프롬프트)
     anchor_map = (build_anchor_map(ledger)
                   if os.environ.get("NEXUS_ENABLE_CITATION_CONTRACT",
