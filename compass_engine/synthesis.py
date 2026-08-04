@@ -41,9 +41,15 @@ SYSTEM_CONTRACT = """당신은 신세계디에프 사규 안내 챗봇 DF COMPAS
 [참조: <문서명>, <문서명>, ...]
 
 인용 규칙 (모든 섹션과 [참조:] 블록에 동일 적용 — 반드시 준수):
-- 발췌 표제([문서명>조항])나 본문에 조항 번호가 **그대로 보이는 경우에만**
-  그 번호로 (문서명, 제N조) 인용. 보이지 않으면 **문서명만** — 인라인이든
-  [참조:] 블록이든 조항 번호를 추측·창작하지 않는다.
+- 각 발췌 표제 아래의 〔인용 지침〕을 그대로 따른다.
+- 조항 번호 인용은 해당 발췌의 '인용 가능 조항' 목록에 있는 번호만 쓴다.
+  목록에 없는 조번호는 어떤 경우에도 쓰지 않는다 (추측·창작·인접 조 대체 금지).
+- 〔조번호 표기 금지〕 문서는 (문서명, "섹션 제목") 형식으로만 인용한다 —
+  본문의 항목 번호(예: 4.1, 11.)를 '제4조' 같은 조번호로 바꿔 쓰지 않는다.
+- 법령(…법·…시행령·…에 관한 규칙 등) 조항은 발췌 본문에 그 표기가 그대로
+  있을 때만 복사해 쓴다. 발췌에 없는 법령 조항을 지어내지 않는다.
+- 근거를 서술하는 문장에는 출처 표기를 붙인다: 조문형은 (문서명, 제N조),
+  그 외는 (문서명). 라벨을 붙일 수 있는 곳에서 출처 생략 금지.
 - 발췌에 없는 내용은 지어내지 말고 "확인 필요"로 표시.
 - 질문이 사규와 무관하면 섹션 구조 대신 "사규에서 확인되지 않는 내용"임을
   밝히고 담당 창구 문의를 안내."""
@@ -96,18 +102,47 @@ def _claude_gen(system: str, user: str) -> str:
     return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
 
 
-def build_user_prompt(question: str, chunks: Sequence[RetrievedChunk]) -> str:
+def _citation_directive(c: RetrievedChunk, anchor_map: dict | None) -> str:
+    """청크별 〔인용 지침〕 (wave 2 합성 계약 — 앵커 사전 주입).
+
+    조문형: 이 발췌 본문에 실재 + 원장 등재 조번호만 나열 (발명·인접 대체 차단).
+    C-class: 조번호 표기 금지 명시 (아라비아 항목 번호의 제N조 변환 차단).
+    anchor_map 미주입(플래그 off·어블레이션) 시 빈 문자열 — 기존 프롬프트와 동일.
+    """
+    if not anchor_map:
+        return ""
+    from .anchors import chunk_citable_anchors
+    title = c["breadcrumb"].split(">")[0]
+    doc = anchor_map.get(title)
+    if doc is None:
+        return ""
+    if doc.doc_class == "article":
+        citable = chunk_citable_anchors(c["text"], doc)
+        if citable:
+            return f"\n〔인용 지침: 인용 가능 조항 = {', '.join(citable)} — 이 목록의 번호만〕"
+        return "\n〔인용 지침: 이 발췌에는 인용 가능한 조번호 없음 — 문서명으로만 인용〕"
+    return "\n〔인용 지침: 조번호 표기 금지 문서 — (문서명, \"섹션 제목\") 으로 인용〕"
+
+
+def build_user_prompt(question: str, chunks: Sequence[RetrievedChunk],
+                      anchor_map: dict | None = None) -> str:
     ctx = "\n\n".join(
-        f"[{c['breadcrumb']}]\n{c['text'][:2500]}" for c in chunks
+        f"[{c['breadcrumb']}]{_citation_directive(c, anchor_map)}\n{c['text'][:2500]}"
+        for c in chunks
     ) or "(검색 결과 없음)"
     return f"[질문]\n{question}\n\n[사규 발췌]\n{ctx}"
 
 
 def synthesize(question: str, chunks: Sequence[RetrievedChunk], *,
+               anchor_map: dict | None = None,
                primary: GenFn = _gemini_gen,
                fallback: GenFn | None = _claude_gen) -> SynthesisResult:
-    """합성 1회 — primary 실패 시 fallback, 둘 다 실패 시 raise (no silent)."""
-    user = build_user_prompt(question, chunks)
+    """합성 1회 — primary 실패 시 fallback, 둘 다 실패 시 raise (no silent).
+
+    anchor_map: anchors.build_anchor_map(ledger) — 주입 시 청크별 인용 지침
+    활성 (플래그 NEXUS_ENABLE_CITATION_CONTRACT 는 호출부에서 제어).
+    """
+    user = build_user_prompt(question, chunks, anchor_map)
     t0 = time.perf_counter()
     try:
         answer = primary(SYSTEM_CONTRACT, user)

@@ -67,6 +67,11 @@ class Harness:
         anon = os.environ.get("SUPABASE_ANON_KEY") or os.environ["SUPABASE_KEY"]
         self.sb_v2 = create_client(url, anon)
         self.ledger = load_ledger(create_client(url, anon))
+        # wave 2 합성 계약 — 앵커 사전 (플래그 off 시 None = 어블레이션)
+        from compass_engine.anchors import build_anchor_map
+        self.anchor_map = (build_anchor_map(self.ledger)
+                           if os.environ.get("NEXUS_ENABLE_CITATION_CONTRACT",
+                                             "true").lower() == "true" else None)
         self.rr = GeminiReranker()
         self.retr = V1RpcRetriever(self.sb_v2, gemini_embed_fn(), top_k=3,
                                    rpc_name="nexus_hybrid_search_v4_ctx",
@@ -83,7 +88,7 @@ class Harness:
              "critical_matches": [], "oos": False, "faq_hit_id": None,
              "ambiguity": None},
             {"tracks": ["rule"], "intent": "compare_v1v2"})
-        syn = synthesize(question, res["chunks"])
+        syn = synthesize(question, res["chunks"], anchor_map=self.anchor_map)
         total_s = time.perf_counter() - t0
         verdict = verify_answer(syn.answer_md, self.ledger)
         # critical 발동 기록(§3, 기록 지표) — 채점 경로(동결 구성) 밖에서
@@ -103,7 +108,7 @@ class Harness:
             "used_fallback": syn.used_fallback,
             "section_contract_ok": syn.section_contract_ok,
             "verify": {"action": verdict["action"],
-                       "confidence": verdict["confidence"],
+                       "grade": verdict["grade"],     # wave 2: 서수 4등급
                        "ok": sum(1 for c in verdict["citations"]
                                  if c["verdict"] == "ok"),
                        "n": len(verdict["citations"])},

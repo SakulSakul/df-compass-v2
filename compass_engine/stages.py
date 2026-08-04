@@ -90,7 +90,8 @@ class CitationCheck(TypedDict):
 class VerifyResult(TypedDict):
     citations: list[CitationCheck]    # §5 결정론 검증 — article_registry 대조
     section_contract_ok: bool
-    confidence: float                 # 멀티시그널 산출 (Phase 1)
+    # wave 2 (심의 3항): 연속값 confidence 폐기 → 결정론 서수 4등급.
+    grade: Literal["HIGH", "MEDIUM", "LOW", "UNVERIFIED"]
     action: Literal["pass", "degrade", "block", "route_to_department"]
 
 

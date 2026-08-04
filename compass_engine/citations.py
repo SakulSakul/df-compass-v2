@@ -82,7 +82,17 @@ def check_citations(answer: str, ledger: ArticleLedger) -> list[CitationCheck]:
     cite_titles = [(m.start(1), m.end(1), m.group(1).strip())
                    for m in _CITE_FORM.finditer(answer)]
 
+    # A1(b) 법령 앵커 클래스 (wave 2): 법령 귀속 조번호는 원장 대조 대상이
+    # 아니다 — 검증 불가이지 위조가 아님. 쌍 생성 자체를 건너뛴다.
+    # 플래그 NEXUS_ENABLE_LAW_ANCHOR (기본 on) — 어블레이션용.
+    import os as _os
+    _law_on = _os.environ.get("NEXUS_ENABLE_LAW_ANCHOR", "true").lower() == "true"
+    if _law_on:
+        from .anchors import is_law_ref as _is_law_ref
+
     for ref, start, _end in find_article_refs(answer):
+        if _law_on and _is_law_ref(answer, start):
+            continue
         # ① 직접 인용형 "(문서명, 제N조)" 이 최우선 — 조항 직전(≤10자)의
         #   관용형 문서명은 원거리의 실재 문서명 출현보다 강한 귀속 신호다.
         #   (실재 제목이 근처에 있다고 위조 문서 인용을 article_missing 으로
@@ -122,6 +132,51 @@ def check_citations(answer: str, ledger: ArticleLedger) -> list[CitationCheck]:
             verdict="unattributed", position=start,
         ))
     return checks
+
+
+# ── 문서명 실재 검증 (wave 2 — verify 확장, P3b 봉쇄) ────────────
+# 명시 인용 형식(「제목」·[참조:] 블록)의 문서명만 보수적으로 검사한다.
+# 서술형 표기는 후보에서 제외 — 과잉 차단(block 폭증) 방지.
+_DOC_SUFFIX = re.compile(r"(지침|규정|기준|방침|절차서|매뉴얼|정책서)\s*$")
+_BRACKET_TITLE = re.compile(r"「([^」]{2,60})」")
+_REF_BLOCK = re.compile(r"\[참조:\s*([^\]]+)\]")
+
+
+def _title_known(cand: str, ledger: ArticleLedger) -> bool:
+    """원장 실재 여부 — exact / 접두어 생략 / 공백 변형 흡수."""
+    if _resolve_title(cand, ledger) is not None:
+        return True
+    flat = cand.replace(" ", "")
+    for t in ledger.title_to_doc_id:
+        if flat in (t.replace(" ", ""), _PREFIX.sub("", t).replace(" ", "")):
+            return True
+    return False
+
+
+def check_document_names(answer: str, ledger: ArticleLedger) -> list[CitationCheck]:
+    """명시 인용된 문서명 중 원장 비실재 → document_missing 추가분."""
+    cands: list[tuple[int, str]] = []
+    for m in _BRACKET_TITLE.finditer(answer):
+        cands.append((m.start(1), m.group(1).strip()))
+    for m in _REF_BLOCK.finditer(answer):
+        base = m.start(1)
+        pos = 0
+        for item in m.group(1).split(","):
+            it = item.strip()
+            # 제N조가 붙은 항목은 조항 쌍 경로(check_citations)가 담당 — 제외
+            if it and not re.search(r"제\s*\d+\s*조", it):
+                cands.append((base + pos, it))
+            pos += len(item) + 1
+    out: list[CitationCheck] = []
+    seen: set[str] = set()
+    for pos, cand in cands:
+        if not cand or cand in seen or not _DOC_SUFFIX.search(cand):
+            continue
+        seen.add(cand)
+        if not _title_known(cand, ledger):
+            out.append(CitationCheck(title=cand, canonical=None,
+                                     verdict="document_missing", position=pos))
+    return out
 
 
 def summarize_checks(checks: list[CitationCheck]) -> dict:

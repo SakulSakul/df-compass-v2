@@ -290,6 +290,7 @@ _BLOCK_MESSAGE = ("이 답변은 비실재 문서 인용이 감지되어 차단�
 @st.cache_resource(show_spinner="준비 중…")
 def _engine():
     from supabase import create_client
+    from compass_engine.anchors import build_anchor_map
     from compass_engine.registry import load_ledger
     from compass_engine.reranker import GeminiReranker
     from compass_engine.v1_retriever import V1RpcRetriever, gemini_embed_fn
@@ -305,7 +306,11 @@ def _engine():
         rpc_name="nexus_hybrid_search_v4_ctx",
         expand_neighbors=True, reranker=GeminiReranker(),
     )
-    return sb, ledger, retriever, load_hotlines(sb)
+    # wave 2 합성 계약 — 앵커 사전 (플래그 off 면 None → 기존 프롬프트)
+    anchor_map = (build_anchor_map(ledger)
+                  if os.environ.get("NEXUS_ENABLE_CITATION_CONTRACT",
+                                    "true").lower() == "true" else None)
+    return sb, ledger, retriever, load_hotlines(sb), anchor_map
 
 
 def _sidebar(hotlines: dict) -> None:
@@ -368,11 +373,11 @@ def _ask(question: str) -> dict:
     from compass_engine.v1port.critical_mode import enforce_structure
     from compass_engine.verify import verify_answer
 
-    sb, ledger, retriever, hotlines = _engine()
+    sb, ledger, retriever, hotlines, anchor_map = _engine()
     t0 = time.perf_counter()
     intake = run_intake(sb, question)
     res = retriever.retrieve(intake, {"tracks": ["rule"], "intent": "ui"})
-    syn = synthesize(intake["masked_text"], res["chunks"])
+    syn = synthesize(intake["masked_text"], res["chunks"], anchor_map=anchor_map)
     verdict = verify_answer(syn.answer_md, ledger)
 
     if intake["is_critical"]:
@@ -385,7 +390,7 @@ def _ask(question: str) -> dict:
     # trace — 로컬 stderr (ADR-8: DB 쓰기 금지). 화면 노출 없음.
     print(f"[ui:trace] q_len={len(question)} critical={intake['is_critical']} "
           f"chunks={len(res['chunks'])} action={verdict['action']} "
-          f"conf={verdict['confidence']} "
+          f"grade={verdict['grade']} "
           f"elapsed={time.perf_counter()-t0:.1f}s", file=sys.stderr, flush=True)
 
     blocked = verdict["action"] == "block"
