@@ -66,3 +66,38 @@ def test_prompt_directive_injection():
     # 미주입(어블레이션) 시 지침 없음 — 기존 프롬프트와 동일
     p0 = build_user_prompt("q", chunks, None)
     assert "인용 지침" not in p0
+
+
+# ── R3 wave A — 원장 정화 + 개재어 태거 (인터록) ─────────────────
+def test_intervening_law_ref():
+    for t in ("산업안전보건법 조항은 제128조의2 이다.",
+              "「개인정보 보호법」 제25조의2제1항에서 정하는 사유",
+              "근로기준법에 따른 제60조의 연차휴가"):
+        assert find_law_ref_starts(t), t
+    # 개재 구간에 실명사(사규 제목)가 끼면 불인정 — 보수 방향
+    t2 = "산업안전보건법과 휴게시설 관리지침 제5조를 함께 본다."
+    assert find_law_ref_starts(t2) == set()
+
+
+def test_build_ledger_purges_law_only_articles():
+    led = build_ledger(
+        [{"document_id": "d1",
+          "text": "1. 목적 … 「개인정보 보호법」 제25조제1항에 따라 … 부칙"},
+         {"document_id": "d2", "text": "제3조(승인) … 별표1 … 부칙"}],
+        [{"id": "d1", "title": "(총무) 영상정보기기 설치운영 지침"},
+         {"id": "d2", "title": "(CSR) 대외출강 운영 지침"}])
+    # 법령 전용 출현 조번호는 미등재, 부칙·별표는 유지
+    assert "제25조" not in led.articles_by_doc.get("d1", set())
+    assert "부칙" in led.articles_by_doc["d1"]
+    assert {"제3조", "별표1", "부칙"} <= led.articles_by_doc["d2"]
+    # 보수 규칙: 비법령 출현 1회라도 있으면 유지
+    led2 = build_ledger(
+        [{"document_id": "d3", "text": "산업안전보건법 제5조에 따라 …"},
+         {"document_id": "d3", "text": "제5조(의무) 회사는 …"}],
+        [{"id": "d3", "title": "(안전) 규정"}])
+    assert "제5조" in led2.articles_by_doc["d3"]
+    # law_filter=False (구 동작 재현 — 스냅숏 비교용)
+    led3 = build_ledger(
+        [{"document_id": "d4", "text": "산업안전보건법 제5조에 따라 …"}],
+        [{"id": "d4", "title": "(안전) 규정2"}], law_filter=False)
+    assert "제5조" in led3.articles_by_doc["d4"]

@@ -81,3 +81,14 @@ def test_docname_check_blocks_ghost_title():
 def test_docname_check_allows_prefix_and_space_variants():
     ans = "「대외출강 운영 지침」에 따라 사전승인이 필요합니다." + _SECTIONS
     assert verify_answer(ans, LEDGER)["action"] == "pass"
+
+
+def test_integrity_gate_escalates_pass_to_degrade():
+    # R3 g02 게이트 — 계약 미충족 합성은 pass 를 degrade 로 격상
+    ans = "((CSR) 대외출강 운영 지침, 제3조의2) 근거." + _SECTIONS
+    r = verify_answer(ans, LEDGER, synthesis_integrity_ok=False)
+    assert r["action"] == "degrade" and r["grade"] == "LOW"
+    # block 은 그대로 (격상은 pass 에만)
+    r2 = verify_answer("(유령 지침, 제2조) 근거." + _SECTIONS, LEDGER,
+                       synthesis_integrity_ok=False)
+    assert r2["action"] == "block"

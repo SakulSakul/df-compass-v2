@@ -74,9 +74,17 @@ class SynthesisResult:
     elapsed_ms: int
     section_contract_ok: bool
     input_chars: int = 0   # wave 1 계측 — user 프롬프트 길이 (합성 입력 토큰 프록시)
+    # R3 wave A — g02 무결성 게이트 (합성 절단 재발 계열 차단)
+    finish_reason: str = "STOP"   # primary/fallback 최종 응답의 종료 사유
+    integrity_ok: bool = True     # 계약 충족 여부 (재합성 1회 후에도 미충족이면 False)
+    retries: int = 0              # 게이트 재합성 횟수
 
 
 GenFn = Callable[[str, str], str]   # (system, user) -> answer
+
+
+class TruncatedCompletion(RuntimeError):
+    """finish_reason != STOP — 합성 절단 (R3 g02 게이트: fallback 으로 구제)."""
 
 
 def _gemini_gen(system: str, user: str) -> str:
@@ -88,6 +96,13 @@ def _gemini_gen(system: str, user: str) -> str:
         config={"system_instruction": system, "temperature": 0.0,
                 "max_output_tokens": 4096},
     )
+    fr = ""
+    try:
+        fr = str(res.candidates[0].finish_reason.name)  # type: ignore[union-attr]
+    except Exception:
+        fr = ""
+    if fr and fr != "STOP":
+        raise TruncatedCompletion(f"finish_reason={fr}")
     return getattr(res, "text", "") or ""
 
 
@@ -141,24 +156,49 @@ def synthesize(question: str, chunks: Sequence[RetrievedChunk], *,
 
     anchor_map: anchors.build_anchor_map(ledger) — 주입 시 청크별 인용 지침
     활성 (플래그 NEXUS_ENABLE_CITATION_CONTRACT 는 호출부에서 제어).
+
+    R3 g02 무결성 게이트: 절단(finish_reason != STOP)은 예외로 승격돼
+    fallback(Claude) 강제. 생성 후 계약 미충족(섹션 계약 위반 또는 [참조:]
+    푸터 부재 — OOS 무응답은 면제)이면 재합성 1회, 재실패 시
+    integrity_ok=False 로 반환 (verify 가 degrade 격상 — R2 심의 의결).
     """
+    def _gen_once() -> tuple[str, str, bool]:
+        try:
+            return (primary(SYSTEM_CONTRACT, user),
+                    f"gemini:{os.environ.get('NEXUS_CHAT_MODEL', 'gemini-3.6-flash')}",
+                    False)
+        except Exception as e:
+            print(f"[synthesis] primary FAILED → fallback: {type(e).__name__}: {e}",
+                  file=sys.stderr, flush=True)
+            if fallback is None:
+                raise
+            return (fallback(SYSTEM_CONTRACT, user),
+                    f"claude:{os.environ.get('NEXUS_FALLBACK_MODEL', 'claude-haiku-4-5-20251001')}",
+                    True)
+
+    def _contract_met(ans: str) -> bool:
+        if any(m in ans for m in _OOS_MARKERS):
+            return True                      # 무응답 표명은 푸터 면제
+        return check_section_contract(ans) and "[참조:" in ans
+
     user = build_user_prompt(question, chunks, anchor_map)
     t0 = time.perf_counter()
-    try:
-        answer = primary(SYSTEM_CONTRACT, user)
-        provider = f"gemini:{os.environ.get('NEXUS_CHAT_MODEL', 'gemini-3.6-flash')}"
-        used_fallback = False
-    except Exception as e:
-        print(f"[synthesis] primary FAILED → fallback: {type(e).__name__}: {e}",
+    answer, provider, used_fallback = _gen_once()
+    retries = 0
+    if not _contract_met(answer):
+        print("[synthesis:gate] 계약 미충족 → 재합성 1회", file=sys.stderr, flush=True)
+        retries = 1
+        answer2, provider2, fb2 = _gen_once()
+        if _contract_met(answer2):
+            answer, provider, used_fallback = answer2, provider2, fb2
+    integrity = _contract_met(answer)
+    if not integrity:
+        print("[synthesis:gate] 재합성 후에도 미충족 — integrity_ok=False (degrade 격상 예정)",
               file=sys.stderr, flush=True)
-        if fallback is None:
-            raise
-        answer = fallback(SYSTEM_CONTRACT, user)
-        provider = f"claude:{os.environ.get('NEXUS_FALLBACK_MODEL', 'claude-haiku-4-5-20251001')}"
-        used_fallback = True
     return SynthesisResult(
         answer_md=answer, provider=provider, used_fallback=used_fallback,
         elapsed_ms=int((time.perf_counter() - t0) * 1000),
         section_contract_ok=check_section_contract(answer),
         input_chars=len(user),
+        finish_reason="STOP", integrity_ok=integrity, retries=retries,
     )

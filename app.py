@@ -390,7 +390,8 @@ def _ask(question: str) -> dict:
     intake = run_intake(sb, question)
     res = retriever.retrieve(intake, {"tracks": ["rule"], "intent": "ui"})
     syn = synthesize(intake["masked_text"], res["chunks"], anchor_map=anchor_map)
-    verdict = verify_answer(syn.answer_md, ledger)
+    verdict = verify_answer(syn.answer_md, ledger,
+                            synthesis_integrity_ok=syn.integrity_ok)
 
     if intake["is_critical"]:
         answer = enforce_structure(

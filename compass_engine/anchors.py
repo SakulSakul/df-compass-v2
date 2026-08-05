@@ -33,7 +33,15 @@ _LAW_TAIL = re.compile(
     r"([가-힣0-9·\s]{1,30}?(?:법|법률|기본법|시행령|시행규칙|헌법)"
     r"|[가-힣0-9·\s]{1,30}?에\s?관한\s?규칙)\s*(?:」|\))?\s*$"
 )
+# R3 wave A 개재어 보강: "…법 조항은 제N조" / "…법에 따른 제N조" 류 —
+# 법령명과 조번호 사이에 조사·연결어만 개재하는 경우를 흡수한다.
+# 개재어는 화이트리스트 문자만 허용 (보수적 — 사규 제목 등 실명사가 끼면 불인정).
+_LAW_ANY = re.compile(
+    r"([가-힣0-9·\s]{1,30}?(?:법|법률|기본법|시행령|시행규칙|헌법)"
+    r"|[가-힣0-9·\s]{1,30}?에\s?관한\s?규칙)\s*(?:」|\))?")
+_INTERVENING = re.compile(r"^[\s의은는이가을를에서와과도만따른정하고는바같이즉,.·()「」'\"]*(?:조항은|조항|규정은|규정|상|상의|중|내|의거|의거한|근거한|따라|따르면|정한|정하는)?[\s의은는이가을를,.·()「」'\"]*$")
 _LAW_WINDOW = 30
+_LAW_WINDOW_EXT = 45   # 개재어 경로는 창을 약간 넓힘 (연결어 길이 감안)
 
 
 @dataclass(frozen=True)
@@ -54,9 +62,23 @@ def build_anchor_map(ledger: Any) -> dict[str, DocAnchors]:
 
 
 def is_law_ref(text: str, ref_start: int) -> bool:
-    """조번호(ref_start 위치)가 외부 법령 귀속인지 — 직전 꼬리 텍스트로 판정."""
+    """조번호(ref_start 위치)가 외부 법령 귀속인지.
+
+    ① 직접형: 직전 꼬리가 법령 어미로 끝남 ("산업안전보건법 제N조")
+    ② 개재형 (R3 보강): 창 내 법령명 뒤에 조사·연결어만 개재
+       ("…법 조항은 제N조", "…법에 따른 제N조") — 개재 구간에 실명사가
+       끼면 불인정 (보수 방향: 오태깅보다 미태깅).
+    """
     head = text[max(0, ref_start - _LAW_WINDOW):ref_start]
-    return bool(_LAW_TAIL.search(head))
+    if _LAW_TAIL.search(head):
+        return True
+    ext = text[max(0, ref_start - _LAW_WINDOW_EXT):ref_start]
+    last = None
+    for m in _LAW_ANY.finditer(ext):
+        last = m
+    if last is not None and _INTERVENING.fullmatch(ext[last.end():]):
+        return True
+    return False
 
 
 def find_law_ref_starts(text: str) -> set[int]:

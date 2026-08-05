@@ -40,7 +40,11 @@ def _grade(n_ok: int, action: str, proxy_cited: bool) -> str:
     return "MEDIUM" if proxy_cited else "HIGH"
 
 
-def verify_answer(answer: str, ledger: ArticleLedger) -> VerifyResult:
+def verify_answer(answer: str, ledger: ArticleLedger, *,
+                  synthesis_integrity_ok: bool = True) -> VerifyResult:
+    """synthesis_integrity_ok=False (R3 g02 게이트 — 재합성 후에도 계약
+    미충족) 이면 pass 를 degrade 로 격상한다 (R2 심의 의결분 — 기존
+    카운트 기반 3분기 자체는 불변, 격상만 추가)."""
     checks = check_citations(answer, ledger)
     # wave 2 확장 — 명시 인용 문서명 실재 검증 (플래그, 기본 on)
     if os.environ.get("NEXUS_ENABLE_DOCNAME_CHECK", "true").lower() == "true":
@@ -62,6 +66,8 @@ def verify_answer(answer: str, ledger: ArticleLedger) -> VerifyResult:
         action = "degrade"          # 비실재 조항 — 신뢰도 강등 표시
     else:
         action = "pass"
+    if action == "pass" and not synthesis_integrity_ok:
+        action = "degrade"          # R3 g02 게이트 — 계약 미충족 답변 강등
 
     proxy_cited = any(c["document_title"] in PROXY_DOCS for c in cits) or \
         any(t in answer for t in PROXY_DOCS)

@@ -101,7 +101,8 @@ class Harness:
             {"tracks": ["rule"], "intent": "compare_v1v2"})
         syn = synthesize(question, res["chunks"], anchor_map=self.anchor_map)
         total_s = time.perf_counter() - t0
-        verdict = verify_answer(syn.answer_md, self.ledger)
+        verdict = verify_answer(syn.answer_md, self.ledger,
+                                synthesis_integrity_ok=syn.integrity_ok)
         # critical 발동 기록(§3, 기록 지표) — 채점 경로(동결 구성) 밖에서
         # intake 만 별도 실행. 결과는 기록만 하고 파이프라인에 주입하지 않는다.
         intake = run_intake(self.sb_v2, question)
@@ -114,6 +115,8 @@ class Harness:
             "timings": res.get("timings", {}),
             "n_chunks": len(res["chunks"]),
             "input_chars": syn.input_chars,
+            "integrity_ok": syn.integrity_ok,
+            "synth_retries": syn.retries,
             "router_hit": res.get("router_hit"),
             "provider": syn.provider,
             "used_fallback": syn.used_fallback,

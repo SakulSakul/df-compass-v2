@@ -48,12 +48,24 @@ class ArticleLedger:
 def build_ledger(
     chunk_rows: Iterable[dict],
     document_rows: Iterable[dict] = (),
+    *,
+    law_filter: bool = True,
 ) -> ArticleLedger:
     """원장 구축 — 순수 함수 (DB 접근 없음, 오프라인 테스트 가능).
 
     chunk_rows: {document_id, text} (article_no 는 있어도 읽지 않는다)
     document_rows: {id, title} (active 문서만 넘길 것 — 필터는 로더 책임)
+
+    law_filter (R3 wave A — 원장 정화, R2 심의 확정): 제N조형(kind=article)
+    canonical 은 **비법령 귀속 출현이 있는 경우에만** 등재 — "비법령 출현
+    1회면 유지" 보수 규칙의 등재 시점 자연 구현 (전 출현이 법령 귀속인
+    조번호만 미등재). 부칙·별표·부칙 제N조는 법령 귀속 개념이 없어 필터
+    대상 아님 (⓪-2 프로브 확정 규칙). is_law_ref 태거와 인터록 — 단독 적용
+    금지 (정화 단독 = 정답 오강등, 태거 단독 = 단일 방어).
     """
+    from .anchors import is_law_ref
+    from .articles import find_article_refs
+
     ledger = ArticleLedger()
     for d in document_rows:
         doc_id, title = str(d.get("id") or ""), str(d.get("title") or "")
@@ -67,6 +79,15 @@ def build_ledger(
             continue
         ledger.chunk_rows_scanned += 1
         refs = extract_article_refs(text)
+        if not refs:
+            continue
+        if law_filter:
+            nonlaw: set[str] = set()
+            for ref, start, _end in find_article_refs(text):
+                if ref.kind == "article" and not is_law_ref(text, start):
+                    nonlaw.add(ref.canonical)
+            refs = [r for r in refs
+                    if r.kind != "article" or r.canonical in nonlaw]
         if refs:
             bucket = ledger.articles_by_doc.setdefault(doc_id, set())
             bucket.update(r.canonical for r in refs)
