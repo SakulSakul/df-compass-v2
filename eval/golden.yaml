@@ -149,9 +149,13 @@
   category: confusion
   question: "영상정보기기 지침에서 개인정보보호법 제25조와 제25조의2는 각각 어떤 경우를 다루나요?"
   expected_sources: ["(총무) 영상정보기기 설치운영 지침"]
+  # R3 정정 (R2 심의): 제25조·제25조의2 는 「개인정보 보호법」 조항 — 사규
+  # 오귀속 라벨을 3조건형으로 교체 (문서수준 인용 + 법령 정확 표기 + 오귀속 부재)
   expected_citations:
-    - {doc: "(총무) 영상정보기기 설치운영 지침", article: "제25조"}
-    - {doc: "(총무) 영상정보기기 설치운영 지침", article: "제25조의2"}
+    - {doc: "(총무) 영상정보기기 설치운영 지침", article: null}
+  expected_law_refs:
+    - {law: "개인정보 보호법", article: "제25조"}
+    - {law: "개인정보 보호법", article: "제25조의2"}
 - id: g24
   category: confusion
   question: "매장 CCTV 영상을 열람하고 싶다는 요청은 어떤 지침에 따라 처리하나요?"
@@ -173,14 +177,23 @@
   category: confusion
   question: "휴게시설 관리지침이 근거로 삼는 산업안전보건법 조항은 몇 조인가요?"
   expected_sources: ["(안전) 휴게시설 관리지침"]
-  expected_citations: [{doc: "(안전) 휴게시설 관리지침", article: "제79조"}]
+  # R3 정정 (R2 심의): 제79조=산업안전보건기준에 관한 규칙, 제128조의2=산업
+  # 안전보건법 — 법령 오귀속 라벨을 3조건형으로 교체
+  expected_citations: [{doc: "(안전) 휴게시설 관리지침", article: null}]
+  expected_law_refs:
+    - {law: "산업안전보건", article: "제79조"}
+    - {law: "산업안전보건법", article: "제128조의2"}
 - id: g28
   category: confusion
   question: "판촉비용 분담 지침의 제11조와 부당한 경영활동 간섭 금지 지침의 제11조는 서로 다른 내용인가요?"
   expected_sources: ["(공정거래) 협력회사 판촉비용 분담 지침", "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침"]
+  # R3 정정 (R2 심의): 양 지침의 "제11조"는 대규모유통업법 제11조 인용 —
+  # 사규 오귀속 라벨을 3조건형으로 교체
   expected_citations:
-    - {doc: "(공정거래) 협력회사 판촉비용 분담 지침", article: "제11조"}
-    - {doc: "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침", article: "제11조"}
+    - {doc: "(공정거래) 협력회사 판촉비용 분담 지침", article: null}
+    - {doc: "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침", article: null}
+  expected_law_refs:
+    - {law: "대규모유통업", article: "제11조"}
 
 # ── mid_corpus (8) — 제목 정렬 중간부 문서 (검색 편향 탐지) ──
 - id: g29

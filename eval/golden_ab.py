@@ -81,6 +81,29 @@ def _gen(cli, model: str, prompt: str) -> dict:
             "output_tokens": out_tokens, "finish_reason": finish}
 
 
+def _law_ref_hit(answer: str, entry: dict, checks) -> bool:
+    """R3 매처 확장 (R2 심의 의결) — 정정 라벨 3조건형의 법령 조건:
+    (i) 기대 법령 참조 ≥1 이 답변에 정확 표기 (법령명 substring + 해당
+        조번호가 법령 귀속으로 태깅됨 — is_law_ref 기반)
+    (iii) 오귀속 ok쌍 부재 — (기대 사규 doc, 기대 법령 조번호) 가 ok 로
+        잡히면 탈락 (구 D1 관통 형태의 답변을 통과시키지 않는 판별식).
+    (ii) 사규 문서수준 인용은 expected_citations(doc-level) 경로가 담당."""
+    from compass_engine.anchors import is_law_ref
+    from compass_engine.articles import find_article_refs
+    law_refs = entry.get("expected_law_refs") or []
+    law_canons = {r.canonical for r, st_, _e in
+                  ((rf, st_, en) for rf, st_, en in find_article_refs(answer))
+                  if is_law_ref(answer, st_)}
+    matched = any((lr["law"] in answer) and (lr["article"] in law_canons)
+                  for lr in law_refs)
+    exp_docs = {c.get("doc") for c in entry.get("expected_citations") or []}
+    exp_arts = {lr["article"] for lr in law_refs}
+    misattr = any(t in exp_docs and a in exp_arts
+                  for t, a in {(c.title, c.canonical)
+                               for c in checks if c.verdict == "ok"})
+    return matched and not misattr
+
+
 def _score(answer: str, entry: dict, ledger) -> dict:
     checks = check_citations(answer, ledger)
     s = summarize_checks(checks)
@@ -99,7 +122,13 @@ def _score(answer: str, entry: dict, ledger) -> dict:
             hit += 1 if (doc in answer or stripped in answer) else 0
         else:
             hit += 1 if (doc, art) in ok_pairs else 0
-    s["expected_total"] = len(exp)
+    # R3: 법령 정정 라벨은 분모 +1 (3조건 판정 — 분모 변화는 스냅숏에 명세)
+    n_law = 1 if entry.get("expected_law_refs") else 0
+    if n_law:
+        law_ok = _law_ref_hit(answer, entry, checks)
+        hit += 1 if law_ok else 0
+        s["law_ref_hit"] = law_ok
+    s["expected_total"] = len(exp) + n_law
     s["expected_hit"] = hit
     if entry.get("category") == "negative":
         s["negative_pass"] = (
