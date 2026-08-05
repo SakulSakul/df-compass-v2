@@ -150,7 +150,9 @@ class V1RpcRetriever:
             r = self.router.route(q)
             timings["router_ms"] = int((time.perf_counter() - _t) * 1000)
             if r.get("confident") and r.get("doc_titles"):
-                routed_titles = list(r["doc_titles"])[: self.reserved_seats]
+                # R1 보정: 풀 주입은 라우팅 전체(≤3, add-only) — 예약석은
+                # 아래 ③에서 여전히 문서 기준 최대 reserved_seats(2)만.
+                routed_titles = list(r["doc_titles"])
                 pool_docs = {c["document_id"] for c in chunks}
                 for t in routed_titles:
                     did = self.router.title_to_id.get(t)
@@ -177,7 +179,8 @@ class V1RpcRetriever:
 
         # ── 보장 계층 ③: 예약석 — 라우팅 문서 컷 면제 (add-only 추가) ──
         if routed_titles:
-            routed_ids = {self.router.title_to_id.get(t) for t in routed_titles}
+            routed_ids = {self.router.title_to_id.get(t)
+                          for t in routed_titles[: self.reserved_seats]}
             have = {c["document_id"] for c in final}
             for c in ranked:
                 if c["document_id"] in routed_ids and c["document_id"] not in have:

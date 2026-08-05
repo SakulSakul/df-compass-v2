@@ -32,8 +32,8 @@ PROMPT = """당신은 사규 문서 라우터입니다. 아래 [문서 카탈로
 [문서 카탈로그]
 {catalog}
 
-JSON only: {{"docs": ["<정확한 문서 제목>", "<정확한 문서 제목>"], "confident": true|false}}
-- docs 는 관련 순 최대 2개, 카탈로그의 제목을 그대로 복사.
+JSON only: {{"docs": ["<정확한 문서 제목>", "<정확한 문서 제목>", "<정확한 문서 제목>"], "confident": true|false}}
+- docs 는 관련 순 최대 3개, 카탈로그의 제목을 그대로 복사.
 - 확실히 지배 문서를 특정할 수 없으면 confident=false."""
 
 
@@ -72,7 +72,9 @@ class DocRouter:
                         "thinking_config": {"thinking_level": "minimal"}})
             m = re.search(r"\{.*\}", getattr(res, "text", "") or "", re.DOTALL)
             d = json.loads(m.group(0)) if m else {}
-            titles = [t for t in (d.get("docs") or [])[:2]
+            # R1 보정 (R3 wave C): top-2 → top-3 — CSR경영방침류 포괄 방침
+            # 미스(g03·g08·g13) 완화. 카탈로그·예약석(2석)은 불변 — 최소 침습.
+            titles = [t for t in (d.get("docs") or [])[:3]
                       if t in self.title_to_id]      # 카탈로그 실재 제목만
             return {"doc_titles": titles, "confident": bool(d.get("confident"))}
         except Exception as e:
