@@ -97,8 +97,10 @@ def test_parity_surfaces_replay(monkeypatch):
                   "quote": "외부 강의는 사전승인 대상입니다.",
                   "cite": "(CSR) 대외출강 운영 지침 제3조"},
          "ctx_titles": ["(CSR) 대외출강 운영 지침"],
-         "cite_ok": 1, "cite_n": 1, "followups": [],
-         "elapsed_s": 12.3, "provider": "gemini:x",
+         "ctx_refs": [{"crumb": "(CSR) 대외출강 운영 지침>제3조",
+                       "snippet": "제3조(승인) 외부 강의는 사전승인 대상"}],
+         "cite_ok": 1, "cite_n": 1, "followups": ["강사료는 어떻게 처리하나요?"],
+         "elapsed_s": 12.3, "provider": "gemini:g-3.6",
          "timings": {"rpc_ms": 2000, "rerank_ms": 1000},
          "router_hit": True, "n_chunks": 5, "retries": 0},
         {"role": "user", "content": "q2"},
@@ -120,8 +122,16 @@ def test_parity_surfaces_replay(monkeypatch):
     assert "조항 단위 근거 미확인" in html                  # UNVERIFIED 라벨
     assert "참고 규정" in html                             # 참고 인용 구획 캡션
     assert "📄" in html                                    # 출처 문서 칩
-    assert "응답 12.3초" in html
-    assert any("AI 검토 과정" in str(e.label) for e in at.expander)
+    assert "응답 12.3초" in html and "🤖" in html          # ⏱·🤖 표기
+    labels = [str(e.label) for e in at.expander]
+    assert any("AI 검토 과정" in l for l in labels)
+    assert any("참고 사규" in l for l in labels)             # 참고 사규 expander
+    caps = " ".join(str(c.value) for c in at.caption)
+    assert "검토 단계입니다" in caps                         # v1 캡션 문구
+    assert "이 답변이 정확하고 도움이 되셨나요?" in html      # 피드백 플로우 문구
+    assert "이런 질문도 해볼 수 있어요" in html               # 💡 후속 제안 문구
+    assert "CSR" in html and "카테고리" in html              # 카테고리 뱃지
+    assert any(m in caps for m in ("좋은 하루", "언제든", "도움이 되었길"))  # 클로징
 
 
 def test_parity_absent_on_safety_paths(monkeypatch):

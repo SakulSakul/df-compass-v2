@@ -384,6 +384,73 @@ _GRADE_LABEL = {
     # LOW 는 기존 강등 칩(안전 표면)이 담당 — 중복 표기 안 함
 }
 
+# personality (v1 core/personality.py:31-99 이식 — 표시 계층 결정론+random)
+_CLOSING_NORMAL = (
+    "오늘도 좋은 하루 되세요. 추가 질문 환영입니다.",
+    "도움이 되었길 바랍니다. 더 궁금한 점은 언제든 물어보세요.",
+    "사규 관련 질문은 언제든 환영입니다.",
+)
+_CLOSING_CRITICAL = (
+    "혼자 감당하지 마세요. CSR팀에 언제든 연락 주세요.",
+    "도움이 필요하시면 핫라인에 문의 바랍니다.",
+    "회사는 늘 곁에 있습니다. 필요할 때 핫라인을 이용해 주세요.",
+)
+_GREET = {
+    "weekend": "주말에도 수고 많으십니다. 무엇을 도와드릴까요?",
+    "friday_pm": "주말 앞두고 잘 정리하세요. 사규 관련 질문은 언제든 환영입니다.",
+    "monday_am": "한 주의 시작, 컴플라이언스 질문 편하게 주세요.",
+    "morning": "좋은 아침입니다. 무엇을 확인해 드릴까요?",
+    "noon": "점심 전후로도 사규 질문 환영입니다.",
+    "afternoon": "오후에도 수고 많으십니다. 무엇을 도와드릴까요?",
+    "evening": "저녁에도 수고 많으십니다. 사규 질문 편하게 주세요.",
+    "night": "야간에도 수고 많으십니다. 사규 관련 질문은 언제든 환영입니다.",
+}
+
+
+def _greeting_line() -> str:
+    """v1 fallback_greeting 버킷 로직 이식 (personality.py:96-121, KST)."""
+    from datetime import datetime, timedelta, timezone
+    n = datetime.now(timezone(timedelta(hours=9)))
+    wd, hr = n.weekday(), n.hour
+    if wd >= 5:
+        b = "weekend"
+    elif wd == 4 and hr >= 14:
+        b = "friday_pm"
+    elif wd == 0 and hr < 12:
+        b = "monday_am"
+    elif 5 <= hr < 12:
+        b = "morning"
+    elif 12 <= hr < 14:
+        b = "noon"
+    elif 14 <= hr < 18:
+        b = "afternoon"
+    elif 18 <= hr < 22:
+        b = "evening"
+    else:
+        b = "night"
+    return _GREET[b]
+
+
+def _closing_line(is_critical: bool, idx: int) -> str:
+    """v1 closing_remark 이식 (personality.py:46-50) — 세션 결정론 pick."""
+    pool = _CLOSING_CRITICAL if is_critical else _CLOSING_NORMAL
+    return pool[idx % len(pool)]
+
+
+# 카테고리 뱃지 (v1 ui/render.py:142-165 — 접두어 최빈값 결정론)
+_CAT_ICON = {"재무": "💳", "안전": "🦺", "인사": "👥", "공정거래": "⚖️",
+             "CSR": "🤝", "영업": "🏬", "총무": "🏢", "정보보안": "🔐",
+             "환경": "🌿", "공통": "📌"}
+
+
+def _category_of(ctx_titles: list) -> str | None:
+    import re as _re
+    from collections import Counter as _C
+    cats = [m.group(1) for t in (ctx_titles or [])
+            if (m := _re.match(r"\((.+?)\)", t))]
+    return _C(cats).most_common(1)[0][0] if cats else None
+
+
 _STANCE_TONE = {   # v1 판정 카드 색조 이식 (안전쪽 = 레드)
     "금지":   ("#C8102E", "#FCEEF0"),
     "신고대상": ("#C8102E", "#FCEEF0"),
@@ -546,6 +613,11 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
         cls, label = _GRADE_LABEL[g]
         st.markdown(f'<span class="nx-grade {cls}">{label}</span>',
                     unsafe_allow_html=True)
+    # 카테고리 뱃지 (v1 ui/render.py:142-165 — 접두어 최빈값)
+    cat = _category_of(entry.get("ctx_titles") or [])
+    if cat and not entry.get("critical"):
+        st.markdown(f'<span class="nx-doc-chip">{_CAT_ICON.get(cat, "📌")} '
+                    f'<b>{cat}</b> 카테고리</span>', unsafe_allow_html=True)
     # 판정 카드 (v1 verdict 표면 이식 — 결정론 파싱, critical 제외)
     card = entry.get("card")
     if card:
@@ -592,15 +664,28 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
                          f" / 인용 {entry.get('cite_n', 0)}건")
             for s_ in steps:
                 st.markdown(f"- {s_}")
+            st.caption("AI가 답변을 생성한 검토 단계입니다. 답변 신뢰도 판단에 "
+                       "참고하세요.")   # v1 app.py:1157 원문
+    # 참고 사규 expander (v1 ui/render.py:296-312 — 발췌 escape)
+    if entry.get("ctx_refs") and not entry.get("blocked"):
+        with st.expander("참고 사규", expanded=False):
+            for r in entry["ctx_refs"]:
+                st.markdown(f"**{_h.escape(r['crumb'])}**")
+                st.caption(_h.escape(r["snippet"]) + "…")
     # 응답 시간·피드백
     if entry.get("elapsed_s"):
-        st.markdown(f'<p class="nx-meta">⏱️ 응답 {entry["elapsed_s"]}초</p>',
-                    unsafe_allow_html=True)
+        prov = str(entry.get("provider") or "").split(":")[-1]
+        st.markdown(f'<p class="nx-meta">⏱️ 응답 {entry["elapsed_s"]}초'
+                    + (f' · 🤖 {_h.escape(prov)}' if prov else "")
+                    + "</p>", unsafe_allow_html=True)
     if not entry.get("blocked"):
+        # 피드백 플로우 (v1 ui/feedback.py:306·313 문구 이식 — 영속화는
+        # ADR-8 심의 대기, 세션+stderr 기록)
         fb_key = f"fb_{idx}"
         if st.session_state.get(fb_key):
-            st.caption("피드백이 기록되었습니다. 감사합니다.")
+            st.caption("✅ 피드백 감사합니다.")
         else:
+            st.markdown("**이 답변이 정확하고 도움이 되셨나요?**")
             c1, c2, _sp = st.columns([1, 1, 6])
             if c1.button("👍 도움됨", key=f"{fb_key}_up"):
                 st.session_state[fb_key] = "up"
@@ -610,9 +695,12 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
                 st.session_state[fb_key] = "down"
                 print(f"[ui:feedback] idx={idx} v=down", file=sys.stderr, flush=True)
                 st.rerun()
-    # 후속 질문 제안 (grounded — DB 실재 예시만)
+    # 클로징 멘트 (v1 personality closing_remark 이식)
+    if not entry.get("blocked"):
+        st.caption(_closing_line(bool(entry.get("critical")), idx))
+    # 후속 질문 제안 (grounded — DB 실재 예시만, v1 render.py:207 문구)
     if entry.get("followups"):
-        st.caption("이어서 물어보기")
+        st.markdown("💡 **이런 질문도 해볼 수 있어요**")
         cols = st.columns(len(entry["followups"]))
         for j, (col, fq) in enumerate(zip(cols, entry["followups"])):
             if col.button(fq, key=f"fu_{idx}_{j}", use_container_width=True):
@@ -670,6 +758,9 @@ def _ask(question: str) -> dict:
             followups = []
     ctx_titles = sorted({c["breadcrumb"].split(">")[0] for c in res["chunks"]
                          if c.get("breadcrumb")})
+    ctx_refs = [{"crumb": c.get("breadcrumb") or "문서",
+                 "snippet": (c.get("text") or "")[:180]}
+                for c in res["chunks"][:8]]
     card = None
     if not blocked and not intake["is_critical"]:
         card = _verdict_card_data(syn.answer_md, verdict["citations"])
@@ -683,6 +774,7 @@ def _ask(question: str) -> dict:
         "grade": verdict["grade"],
         "card": card,
         "ctx_titles": ctx_titles,
+        "ctx_refs": ctx_refs,
         "cite_ok": sum(1 for c in verdict["citations"] if c["verdict"] == "ok"),
         "cite_n": len(verdict["citations"]),
         "followups": followups,
@@ -719,9 +811,9 @@ if not st.session_state["messages"] and not question:
         '<div class="nx-hero">'
         '<p class="nx-hero-eyebrow">사규의 나침반 · Compliance Compass</p>'
         '<p class="nx-hero-title">무엇을 확인해 드릴까요<span class="q">?</span></p>'
-        '<p class="nx-hero-sub">신세계디에프 사규를 근거와 함께 안내합니다. '
-        "상황을 그대로 적어 주셔도 됩니다."
-        "</p></div>",
+        '<p class="nx-hero-sub">' + _greeting_line()
+        + " 신세계디에프 사규를 근거와 함께 안내합니다 — 상황을 그대로 적어 "
+        "주셔도 됩니다.</p></div>",
         unsafe_allow_html=True)
     # 중앙 대형 입력 + 원형 레드 전송 (v1 히어로 입력 정합 — 하단 입력과 병존)
     ic, bc = st.columns([9, 1])
@@ -755,8 +847,15 @@ if question:
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant", avatar="🧭"):
-        with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
-            entry = _ask(engine_q)
-        _render_assistant(entry, idx=len(st.session_state["messages"]),
-                          typing=True)
-    st.session_state["messages"].append(entry)
+        try:
+            with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
+                entry = _ask(engine_q)
+        except Exception as e:
+            print(f"[ui:error] {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+            st.error("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 다시 "
+                     "시도해 주세요. 계속되면 담당 부서(CSR팀)에 알려주세요.")
+            entry = None
+        if entry is not None:
+            _render_assistant(entry, idx=len(st.session_state["messages"]),
+                              typing=True)
+            st.session_state["messages"].append(entry)
