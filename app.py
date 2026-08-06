@@ -110,11 +110,44 @@ h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link { display: none !impo
   text-transform: uppercase; color: var(--c-accent); margin: 0 0 16px;
 }
 .nx-hero-title {
-  font-size: 36px; font-weight: 700; color: #1A1A1A;
-  letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 14px;
+  font-size: 54px; font-weight: 800; color: #1A1A1A;
+  letter-spacing: -0.03em; line-height: 1.12; margin: 0 0 16px;
 }
-.nx-hero-title::after { content: "."; color: var(--c-accent); margin-left: 1px; }
-.nx-hero-sub { font-size: 14px; color: #767676; line-height: 1.7; margin: 0; font-weight: 400; }
+.nx-hero-title .q { color: var(--c-accent); }
+.nx-hero-sub { font-size: 15px; color: #767676; line-height: 1.7; margin: 0; font-weight: 400; }
+/* 랜딩 상단 로고 라인 + 우측 베타 칩 (v1 topbar2 정합) */
+.nx-top2 { display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 6px; }
+.nx-top2 .brand { display: flex; align-items: baseline; gap: 10px; }
+.nx-top2 .name { font-size: 17px; font-weight: 800; color: #1A1A1A; letter-spacing: -0.01em; }
+.nx-top2 .tag { font-size: 12px; color: var(--c-caption); }
+/* 전폭 베타 배너 (v1 정합 — 방패 + 사이드바 안내) */
+.nx-beta-bar { display: flex; align-items: center; gap: 10px;
+  background: #F0EFEA; border: 1px solid var(--c-border); border-radius: 8px;
+  padding: 9px 14px; font-size: 12.5px; color: #6B6A66; margin: 6px 0 4px; }
+/* 히어로 중앙 대형 입력 + 원형 레드 전송 (st-key 스코프) */
+[class*="st-key-hero_q"] input {
+  height: 60px !important; font-size: 16px !important;
+  border-radius: 999px !important; border: 1.5px solid var(--c-border) !important;
+  background: #fff !important; padding: 0 26px !important;
+  box-shadow: 0 2px 10px rgba(31,30,29,0.06) !important;
+}
+[class*="st-key-hero_q"] input:focus { border-color: var(--c-accent) !important; }
+[class*="st-key-hero_go"] button {
+  width: 60px !important; height: 60px !important; min-height: 60px !important;
+  border-radius: 50% !important; background: var(--c-accent) !important;
+  border: 1px solid var(--c-accent) !important; color: #fff !important;
+  font-size: 20px !important; padding: 0 !important; text-align: center !important;
+}
+[class*="st-key-hero_go"] button:hover { background: var(--c-accent-dark) !important; }
+/* 히어로 예시 칩 — pill 형 (v1 정합) */
+[class*="st-key-ex_"] button {
+  border-radius: 999px !important; background: #fff !important;
+  border: 1px solid var(--c-border) !important; text-align: center !important;
+  font-size: 12.5px !important; padding: 0.55rem 1rem !important;
+}
+[class*="st-key-ex_"] button:hover { border-color: var(--c-accent) !important;
+  color: var(--c-accent) !important; }
 
 /* ── Chat messages — 줄 길이 제한 + 흰 카드 (v1 동일) ── */
 [data-testid="stChatMessage"] {
@@ -315,8 +348,12 @@ h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link { display: none !impo
 """
 st.markdown(_CSS, unsafe_allow_html=True)
 st.markdown('<div class="nx-topbar"></div>', unsafe_allow_html=True)
-st.markdown('<span class="nx-beta">베타 · 입력 내용은 학습에 사용되지 않습니다</span>',
-            unsafe_allow_html=True)
+st.markdown(
+    '<div class="nx-top2"><span class="brand">🧭 '
+    '<span class="name">DF COMPASS</span>'
+    '<span class="tag">사규의 나침반</span></span>'
+    '<span class="nx-beta">베타 · 입력 내용 학습 안 함</span></div>',
+    unsafe_allow_html=True)
 
 _EXAMPLES = (
     "법인카드 사용 기준이 어떻게 되나요?",
@@ -458,7 +495,20 @@ def _sidebar(hotlines: dict) -> None:
             unsafe_allow_html=True)
 
 
-def _render_assistant(entry: dict, idx: int = 0) -> None:
+def _typewriter(text: str):
+    """검증 완료 텍스트의 타이핑 재생 제너레이터 (표시 계층 전용).
+
+    ⚠️ 실제 토큰 스트리밍 아님 — v2 안전 체계(절단 게이트·verify·판정 카드)는
+    "완성 → 검증 → 표시" 순서가 전제라, 이미 통과된 최종 텍스트만 재생한다
+    (실 스트리밍 전환은 설계 변경 — 별도 심의 대상, 08-06 사용자 확정).
+    """
+    step = 6                                   # 문자 단위 청크 — 자연스러운 속도
+    for i in range(0, len(text), step):
+        yield text[i:i + step]
+        time.sleep(0.012)
+
+
+def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     """안전 표면 단일 렌더 경로 — 불변 조건 3종은 전부 이 함수 안에 있다.
 
     ① blocked → 답변 미표출 + 차단 안내 (verify block)
@@ -466,6 +516,8 @@ def _render_assistant(entry: dict, idx: int = 0) -> None:
     ③ degrade → ⚠ 신뢰도 강등 칩 + 답변
     UI 패리티(08-06 안건) 추가 표면: 판정 카드·grade 라벨·참고 인용 구획·
     출처 칩·검토 과정·응답 시간·피드백·후속 제안 — 전부 표시 계층.
+    typing=True (신규 답변 1회): 안전 표면·카드·라벨은 **즉시** 표시하고
+    본문만 타이핑 재생 — 히스토리 리플레이는 정적 표시.
     """
     import html as _h
     if entry.get("blocked"):
@@ -506,7 +558,10 @@ def _render_assistant(entry: dict, idx: int = 0) -> None:
         st.markdown('<p class="nx-refnote">※ 아래 인용은 질문에 대한 직접 '
                     "근거가 아닌 <b>참고 규정</b>입니다.</p>",
                     unsafe_allow_html=True)
-    st.markdown(entry["answer"])
+    if typing:
+        st.write_stream(_typewriter(entry["answer"]))
+    else:
+        st.markdown(entry["answer"])
     # 출처 문서 칩
     if entry.get("ctx_titles") and not entry.get("blocked"):
         chips = "".join(f'<span class="nx-doc-chip">📄 {_h.escape(t)}</span>'
@@ -649,13 +704,24 @@ if not question:
 
 if not st.session_state["messages"] and not question:
     st.markdown(
+        '<div class="nx-beta-bar">🛡️ 베타 서비스 — 입력 내용은 학습에 '
+        "사용되지 않습니다. 자세한 안내는 좌측 사이드바 참조."
+        "</div>", unsafe_allow_html=True)
+    st.markdown(
         '<div class="nx-hero">'
         '<p class="nx-hero-eyebrow">사규의 나침반 · Compliance Compass</p>'
-        '<p class="nx-hero-title">무엇을 확인해 드릴까요?</p>'
+        '<p class="nx-hero-title">무엇을 확인해 드릴까요<span class="q">?</span></p>'
         '<p class="nx-hero-sub">신세계디에프 사규를 근거와 함께 안내합니다. '
-        "상황을 그대로 적어 주셔도 됩니다 — 아래 예시를 눌러도 좋습니다."
+        "상황을 그대로 적어 주셔도 됩니다."
         "</p></div>",
         unsafe_allow_html=True)
+    # 중앙 대형 입력 + 원형 레드 전송 (v1 히어로 입력 정합 — 하단 입력과 병존)
+    ic, bc = st.columns([9, 1])
+    hero_q = ic.text_input("질문", key="hero_q", label_visibility="collapsed",
+                           placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?")
+    if bc.button("↑", key="hero_go") and (hero_q or "").strip():
+        st.session_state["pending_q"] = hero_q.strip()
+        st.rerun()
     for row_start in (0, 3):
         cols = st.columns(3)
         for i, (col, ex) in enumerate(
@@ -683,5 +749,6 @@ if question:
     with st.chat_message("assistant", avatar="🧭"):
         with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
             entry = _ask(engine_q)
-        _render_assistant(entry, idx=len(st.session_state["messages"]))
+        _render_assistant(entry, idx=len(st.session_state["messages"]),
+                          typing=True)
     st.session_state["messages"].append(entry)

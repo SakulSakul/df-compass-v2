@@ -38,12 +38,13 @@ def test_home_user_facing_no_dev_surface(monkeypatch):
     assert "confidence" not in html
     # 사용자 화면 구성 (UI 패리티 08-06): v1 히어로 문안 + 베타 배너 +
     # 예시 6개 + 질의 범위 + 입력창 (클래스명은 CSS 에도 있어 실문안 판정)
-    assert "무엇을 확인해 드릴까요?" in html
-    assert "학습에 사용되지 않습니다" in html
+    assert "무엇을 확인해 드릴까요" in html   # 물음표는 레드 span 분리
+    assert "학습에 사용되지 않습니다" in html   # 전폭 베타 배너
+    assert "드릴까요?." not in html              # 오타 회귀 방지 (::after 버그)
     assert len(at.selectbox) == 1          # 질의 범위 필터
     assert "nx-brand" in html
     assert "nx-disclaimer" in html
-    assert len(at.button) == 6
+    assert len(at.button) == 7   # 예시 6 + 히어로 전송
     assert len(at.chat_input) == 1
 
 
@@ -79,7 +80,7 @@ def test_hero_hidden_after_history(monkeypatch):
     ]
     at.run()
     assert not at.exception
-    assert "무엇을 확인해 드릴까요?" not in _all_markdown(at)
+    assert "무엇을 확인해 드릴까요" not in _all_markdown(at)
 
 
 def test_parity_surfaces_replay(monkeypatch):
