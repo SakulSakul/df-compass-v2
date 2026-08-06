@@ -109,11 +109,14 @@ h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link { display: none !impo
   font-size: 11px; font-weight: 700; letter-spacing: 0.3em;
   text-transform: uppercase; color: var(--c-accent); margin: 0 0 16px;
 }
-.nx-hero-title {
-  font-size: 54px; font-weight: 800; color: #1A1A1A;
-  letter-spacing: -0.03em; line-height: 1.12; margin: 0 0 16px;
+p.nx-hero-title, .nx-hero-title {
+  font-size: 54px !important; font-weight: 800 !important; color: #1A1A1A !important;
+  letter-spacing: -0.03em !important; line-height: 1.12 !important;
+  margin: 0 0 16px !important;
 }
-.nx-hero-title .q { color: var(--c-accent); }
+.nx-hero-title .q { color: var(--c-accent) !important; }
+p.nx-hero-eyebrow { font-size: 12px !important; }
+p.nx-hero-sub { font-size: 15px !important; }
 .nx-hero-sub { font-size: 15px; color: #767676; line-height: 1.7; margin: 0; font-weight: 400; }
 /* 랜딩 상단 로고 라인 + 우측 베타 칩 (v1 topbar2 정합) */
 .nx-top2 { display: flex; align-items: center; justify-content: space-between;
@@ -133,19 +136,24 @@ h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link { display: none !impo
   box-shadow: 0 2px 10px rgba(31,30,29,0.06) !important;
 }
 [class*="st-key-hero_q"] input:focus { border-color: var(--c-accent) !important; }
+[class*="st-key-hero_go"] .stButton > button,
 [class*="st-key-hero_go"] button {
   width: 60px !important; height: 60px !important; min-height: 60px !important;
   border-radius: 50% !important; background: var(--c-accent) !important;
   border: 1px solid var(--c-accent) !important; color: #fff !important;
   font-size: 20px !important; padding: 0 !important; text-align: center !important;
 }
+[class*="st-key-hero_go"] .stButton > button p { color: #fff !important; }
+[class*="st-key-hero_go"] .stButton > button:hover,
 [class*="st-key-hero_go"] button:hover { background: var(--c-accent-dark) !important; }
 /* 히어로 예시 칩 — pill 형 (v1 정합) */
+[class*="st-key-ex_"] .stButton > button,
 [class*="st-key-ex_"] button {
   border-radius: 999px !important; background: #fff !important;
   border: 1px solid var(--c-border) !important; text-align: center !important;
   font-size: 12.5px !important; padding: 0.55rem 1rem !important;
 }
+[class*="st-key-ex_"] .stButton > button:hover,
 [class*="st-key-ex_"] button:hover { border-color: var(--c-accent) !important;
   color: var(--c-accent) !important; }
 
