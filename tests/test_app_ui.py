@@ -17,9 +17,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 
-def _at(monkeypatch) -> AppTest:
+def _at(monkeypatch, *, env: str = "prod-test") -> AppTest:
     # 엔진 초기화가 네트워크로 나가지 않도록 env 제거 → hotlines fallback 경로
     monkeypatch.delenv("SUPABASE_URL", raising=False)
+    # 동의 게이트는 전용 테스트에서 검증 — 기본은 prod(게이트 해제)로 본 화면
+    monkeypatch.setenv("NEXUS_ENV", env)
     return AppTest.from_file(str(ROOT / "app.py"), default_timeout=15)
 
 
@@ -129,9 +131,16 @@ def test_parity_surfaces_replay(monkeypatch):
     caps = " ".join(str(c.value) for c in at.caption)
     assert "검토 단계입니다" in caps                         # v1 캡션 문구
     assert "이 답변이 정확하고 도움이 되셨나요?" in html      # 피드백 플로우 문구
+    assert "베타 단계입니다" in caps                         # v1 피드백 캡션 (검산 지적①)
     assert "이런 질문도 해볼 수 있어요" in html               # 💡 후속 제안 문구
     assert "CSR" in html and "카테고리" in html              # 카테고리 뱃지
     assert any(m in caps for m in ("좋은 하루", "언제든", "도움이 되었길"))  # 클로징
+    # PROACTIVE DOCK (검산 지적②): UNVERIFIED 답변 → hr 분기 주 액션 + 라벨
+    assert "다음 단계 예측" in html
+    btns = [str(b.label) for b in at.button]
+    assert any("인사교육팀 문의" in b for b in btns)
+    assert any("다시 답변" in b for b in btns)               # reroll (q1 은 hidden 분기)
+    assert "보다 구체적인 답변을 위해" in caps               # 구체화 유도 (규칙3 문구)
 
 
 def test_parity_absent_on_safety_paths(monkeypatch):
@@ -157,3 +166,69 @@ def test_parity_absent_on_safety_paths(monkeypatch):
     assert "본문" not in html                              # blocked 미표출 불변
     assert "✓ 사규 원문 근거 확인" not in html              # blocked 라벨 미표출
     assert "심각 사안 감지" in html and "신뢰도 강등" in html  # 안전 표면 유지
+
+
+def test_consent_gate_beta(monkeypatch):
+    """베타 env → 동의서 화면만, 본 화면 차단. 세션 통과 플래그 → 본 화면."""
+    at = _at(monkeypatch, env="beta-personal")
+    at.run()
+    assert not at.exception
+    html = _all_markdown(at)
+    assert "베타 참가 동의서" in html
+    assert "무엇을 확인해 드릴까요" not in html            # 본 화면 미노출
+    assert len(at.chat_input) == 0                        # 챗 입력도 차단
+    assert any("동의하고 시작" in str(b.label) for b in at.button)
+    # 세션 통과 플래그 → 게이트 통과, 본 화면 렌더
+    at2 = _at(monkeypatch, env="beta-personal")
+    at2.session_state["beta_consent_v"] = "v1"
+    at2.run()
+    assert not at2.exception
+    assert "무엇을 확인해 드릴까요" in _all_markdown(at2)
+
+
+def test_rate_limit_guard(monkeypatch):
+    """비용 가드: 한도 0 → 엔진 미호출로 경고 안내 (오프라인에서 예외 없이)."""
+    monkeypatch.setenv("NEXUS_DAILY_QUERY_LIMIT", "0")
+    at = _at(monkeypatch)
+    at.run()
+    at.chat_input[0].set_value("법인카드 사용 기준이 어떻게 되나요?").run()
+    assert not at.exception
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "질의 한도(0회)를 초과" in warns
+    assert "베타 비용 가드" in warns
+    # 안내가 히스토리에 영속 (notice 엔트리)
+    assert any(m.get("notice") for m in at.session_state["messages"])
+
+
+def test_fragment_coach_surface(monkeypatch):
+    """파편 후속 질문 → 엔진을 돌리지 않고 이해 확인 + 구체화 칩 (실재 예시만).
+    오프라인에서 예외 없이 통과 = 검색·합성 미호출 증명."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "클린신고 제도가 뭔가요?"},
+        {"role": "assistant", "answer": "클린신고는 자진 신고 제도입니다.",
+         "blocked": False, "critical": False, "degraded": False,
+         "grade": "HIGH", "card": None, "ctx_titles": [],
+         "cite_ok": 1, "cite_n": 1, "n_chunks": 3, "timings": {}, "retries": 0,
+         "followups": ["클린신고 한도가 얼마인가요?"]},
+    ]
+    at.run()
+    at.chat_input[0].set_value("그럼 얼마까지 되는데?").run()
+    assert not at.exception
+    html = _all_markdown(at)
+    assert "질문을 이렇게 이해했어요" in html
+    assert "독립적으로" in html                            # 단일 턴 안내
+    assert any("클린신고 한도가 얼마인가요?" in str(b.label) for b in at.button)
+    assert any(m.get("coach") for m in at.session_state["messages"])
+
+
+def test_fragment_noop_without_prev(monkeypatch):
+    """직전 턴이 없으면 파편형 문자열도 가로채지 않는다 (no-op 폴백) —
+    정상 경로로 진입해 오프라인 에러 표면이 뜨는 것으로 증명."""
+    at = _at(monkeypatch)
+    at.run()
+    at.chat_input[0].set_value("그럼 얼마까지 되는데?").run()
+    assert not at.exception
+    assert "질문을 이렇게 이해했어요" not in _all_markdown(at)
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs                         # 엔진 경로 진입 증명

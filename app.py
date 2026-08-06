@@ -352,6 +352,17 @@ p.nx-hero-sub { font-size: 15px !important; }
 }
 .nx-refnote { font-size: 12px; color: var(--c-caption); margin: 6px 0 2px; }
 .nx-meta { font-size: 11.5px; color: var(--c-caption); margin-top: 8px; }
+/* PROACTIVE DOCK 주 액션 + 동의 제출 — 레드 primary (v1 type="primary" 정합) */
+[class*="st-key-dock_"] .stButton > button,
+[class*="st-key-consent_submit"] .stButton > button {
+  background: var(--c-accent) !important; border-color: var(--c-accent) !important;
+  color: #fff !important; text-align: center !important; font-weight: 700 !important;
+}
+[class*="st-key-dock_"] .stButton > button p,
+[class*="st-key-consent_submit"] .stButton > button p { color: #fff !important; }
+[class*="st-key-dock_"] .stButton > button:hover,
+[class*="st-key-consent_submit"] .stButton > button:hover {
+  background: var(--c-accent-dark) !important; }
 </style>
 """
 st.markdown(_CSS, unsafe_allow_html=True)
@@ -494,6 +505,228 @@ def _verdict_card_data(answer: str, citations: list) -> dict | None:
 _BLOCK_MESSAGE = ("이 답변은 비실재 문서 인용이 감지되어 차단되었습니다. "
                   "질문을 바꿔 다시 시도하거나 담당 부서에 문의해 주세요.")
 
+# ── 베타 참가 동의서 (v1 app.py:1318-1358 원문 기반 — 데이터 흐름 서술만
+#    v2 실태로 정정: v2 는 질의 로그·동의 기록을 DB 에 저장하지 않는다(ADR-8).
+#    영속 기록은 ADR-8 심의 후 도입) ──
+_CONSENT_BODY_MD = """
+**본 챗봇은 베타 테스트 중이며, 정보처리자가 회사가 아닌 개별 운영자입니다.**
+정식 OPEN 시 회사 GCP(Vertex AI) + 회사 Supabase 로 이관 예정이며,
+그 시점부터 회사가 정보처리자가 됩니다.
+
+참가자께서는 아래 내용을 확인·동의하신 뒤 베타 테스트에 참여해 주시기 바랍니다.
+
+1. **데이터 흐름**
+   - 입력하신 질의는 `[익명]` 마스킹 후 외부 LLM API로 전송되어 답변이 생성됩니다.
+   - 사용 LLM (베타 단계):
+     - 주(主) 모델: Google Gemini API (유료 티어)
+     - 보조 모델: Anthropic Claude API (Gemini API 일시 장애 시 자동 우회)
+   - **두 API 모두 약관상 입력·출력이 모델 학습에 사용되지 않습니다.**
+     - Gemini 유료 티어: Google API 약관에 따라 학습 제외
+     - Claude API: Anthropic Commercial Terms 에 따라 학습 제외
+   - 다만 양사는 **이용약관 위반 모니터링(Trust & Safety) 목적**으로 입력·
+     출력을 단기간 보관할 수 있습니다 (Anthropic 기본 최대 30일, Google
+     정책 동일 수준). **이 보관은 모델 학습과 무관**하며 보관 기간 종료
+     시 자동 폐기됩니다.
+   - 본 베타(v2) 단계에서는 **질의 로그를 데이터베이스에 저장하지 않습니다.**
+     원본 질의는 답변 생성 후 즉시 폐기됩니다.
+
+2. **인프라 주체 (베타 한정)**
+   - Supabase 프로젝트 / Gemini · Claude API 키 모두 **개별 운영자(개인)** 명의입니다.
+   - 회사-Google 간 DPA(데이터 처리 계약) 및 회사 차원의 처리방침 고지는
+     **정식 OPEN 후** 적용됩니다.
+
+3. **답변 한계**
+   - 본 챗봇은 사규 해석 보조 도구이며 **법적 효력이 없습니다.**
+   - 신고·조사 사항은 CSR팀 또는 신세계면세점 핫라인으로 접수해 주시기 바랍니다.
+   - 인사 규정·복리후생 등 인사 행정 사항은 인사교육팀에 문의해 주시기 바랍니다.
+
+4. **수집 정보**
+   - 본 동의 화면에서 입력하신 **성명·사번**은 동의 확인 목적으로 운영
+     로그에만 남으며, 데이터베이스에 저장되지 않습니다.
+
+5. **철회**
+   - 동의 후에도 운영자(`ADMIN`)에게 요청하시면 관련 기록을 삭제할 수 있습니다.
+"""
+
+
+def _consent_gate() -> bool:
+    """베타 참가 동의 게이트 (v1 app.py:1411-1533 표시 계층 이식).
+
+    운영(`NEXUS_ENV=prod*`)에서는 비활성. v1 과 달리 쿠키 영속·DB 기록 없음
+    (ADR-8: DB 쓰기 금지 — 세션 통과 + stderr 기록. v1 의 CookieManager 는
+    rerun 인터럽트 사고 이력이 있어 의존성째 미이식)."""
+    env = os.environ.get("NEXUS_ENV", "beta-personal")
+    if env.startswith("prod"):
+        return True
+    ver = os.environ.get("NEXUS_CONSENT_VERSION", "v1")
+    if st.session_state.get("beta_consent_v") == ver:
+        return True
+    st.markdown(
+        '<div class="nx-hero" style="margin-bottom:24px">'
+        '<p class="nx-hero-eyebrow">BETA · 사전 동의</p>'
+        '<p class="nx-hero-title">베타 참가 동의서</p>'
+        '<p class="nx-hero-sub">본 환경은 정식 OPEN 전 베타 테스트입니다. '
+        "아래 내용을 확인하시고 동의해 주신 분께만 베타 챗봇이 활성화됩니다."
+        "</p></div>",
+        unsafe_allow_html=True)
+    st.markdown(_CONSENT_BODY_MD)
+    st.markdown("---")
+    c1, c2 = st.columns(2)
+    name = c1.text_input("성명 *", value="", key="consent_name")
+    emp_no = c2.text_input("사번 (선택)", value="", key="consent_emp")
+    agree = st.checkbox("위 내용을 모두 읽고 베타 참가에 동의합니다.",
+                        key="consent_agree")
+    if st.button("동의하고 시작", key="consent_submit"):
+        # 입력 검증 (v1 app.py:1497-1509 원문 — stored XSS/SQL 페이로드 차단)
+        import re as _re
+        if not name.strip():
+            st.error("성명을 입력해 주세요.")
+        elif not _re.match(r"^[가-힣A-Za-z\s]{1,50}$", name.strip()):
+            st.error("성명은 한글·영문·공백만 사용해 주세요 (1~50자).")
+        elif emp_no.strip() and not _re.match(r"^[0-9-]{4,12}$", emp_no.strip()):
+            st.error("사번은 숫자 4~12자 (하이픈 허용) 형식이어야 합니다.")
+        elif not agree:
+            st.error("동의 체크박스를 선택해 주세요.")
+        else:
+            print(f"[ui:consent] v={ver} name={name.strip()} "
+                  f"emp={emp_no.strip() or '-'}", file=sys.stderr, flush=True)
+            st.session_state["beta_consent_v"] = ver
+            st.rerun()
+    return False
+
+
+def _check_rate_limit() -> bool:
+    """세션 단위 일일 질의 한도 — 베타 비용 가드 (v1 app.py:515-532 이식).
+    KST 자정 기준 리셋. 통과 시 카운터 증가 + True."""
+    import datetime as _dt
+    limit = int(os.environ.get("NEXUS_DAILY_QUERY_LIMIT", "100"))
+    kst = _dt.timezone(_dt.timedelta(hours=9))
+    today = _dt.datetime.now(kst).date().isoformat()
+    rec = st.session_state.get("_rate_rec") or {"date": today, "count": 0}
+    if rec["date"] != today:
+        rec = {"date": today, "count": 0}
+    if rec["count"] >= limit:
+        st.session_state["_rate_rec"] = rec
+        return False
+    rec["count"] += 1
+    st.session_state["_rate_rec"] = rec
+    return True
+
+
+# ── 이해 확인 + 구체화 유도 표면 (08-06 사용자 설계 — 표시 계층 전용) ──
+# 파편·지시어 후속 질문을 엔진 호출 _전_ 에 감지해, 검색을 돌리지 않고
+# 단일 턴 안내 + 직전 답변 기반 구체화 칩(실재 예시만)을 보여준다.
+# 감지 실패 = 현행 동작 그대로 (no-op 폴백). 엔진(검색·합성·verify) 무접촉.
+_FRAG_STARTS = ("그럼", "그거", "그건", "그게", "그러면", "그래서", "근데",
+                "그리고", "아까", "방금", "위에", "그때", "그럴", "그거는")
+_FRAG_BARE = ("얼마", "언제", "왜", "어디", "누가", "누구", "어떻게", "몇",
+              "한도는", "기준은", "되는데", "안되", "안 되")
+
+
+def _is_fragment_followup(q: str, has_prev: bool) -> bool:
+    """지시어로 시작하거나 짧은 파편형 질문 + 직전 턴 존재 → True.
+    자기완결형(길거나 목적어가 앞에 오는) 질문은 가로채지 않는다 (보수적)."""
+    if not has_prev:
+        return False
+    t = (q or "").strip()
+    if not t or len(t) > 25:
+        return False
+    if any(t.startswith(s) for s in _FRAG_STARTS):
+        return True
+    return len(t) <= 12 and any(t.startswith(s) for s in _FRAG_BARE)
+
+
+# ── PROACTIVE DOCK "다음 단계 예측" (v1 ui/feedback.py:112-140 이식) ──
+# 분기 로직은 v1 core/nexus_button_branch.classify_button 의 축약 이식
+# (표시 계층 전용 — confidence 신호는 v2 grade/degrade 로 대응).
+_Q_HR_KW = ("휴가", "수당", "복리후생", "근태", "휴직", "급여", "출퇴근",
+            "재택", "부서 이동", "승진", "평가", "이의 제기", "근무 시간",
+            "월급", "퇴직금", "초과근무", "연차", "교육 신청", "직급")
+_Q_REPORT_KW = ("신고", "보고", "위반", "분실", "도용", "유출", "수수", "받았",
+                "발견", "위조", "횡령", "뇌물", "절도", "압력", "누설", "반출",
+                "협박", "해킹", "발생했", "공유 요구", "사적으로", "추천했",
+                "변경했", "도둑질", "갑질", "차별")
+_A_BROAD_KW = ("신고·조사", "SRMS", "신세계면세점 핫라인", "일반 사건사고 보고지침",
+               "중대 사건사고 보고지침", "사건사고 보고지침")
+_A_REPORT_KW = _A_BROAD_KW + ("클린신고", "공정거래법 위반", "공정거래를 저해",
+                              "위변조 또는 허위작성", "부정/부실행위")
+_A_CLEAN_KW = ("클린신고", "클린뱅크", "자진 신고", "자진신고", "클린신고서",
+               "클린신고신청서", "SHRS CSR경영란", "CSR경영란", "윤리실천등록")
+_A_HR_KW = ("인사 규정·복리후생 등 인사 행정 사항은 인사교육팀에 문의",
+            "인사교육팀에 문의해 주시기 바랍니다",
+            "인사 규정·복리후생 등 인사 행정 사항은 인사팀에 문의",
+            "인사팀에 문의해 주시기 바랍니다")
+
+
+def _dock_branch(entry: dict, question: str) -> str:
+    import re as _re
+    if entry.get("critical"):
+        return "report"
+    ans, q = entry.get("answer") or "", question or ""
+    q_hr = any(k in q for k in _Q_HR_KW)
+    q_rep = any(k in q for k in _Q_REPORT_KW)
+    a_grace = any(k in ans for k in _A_HR_KW)
+    a_rep = any(k in ans for k in _A_REPORT_KW)
+    a_broad = any(k in ans for k in _A_BROAD_KW)
+    a_clean = any(k in ans for k in _A_CLEAN_KW)
+    cats = {m.group(1) for t in (entry.get("ctx_titles") or [])
+            if (m := _re.match(r"\((.+?)\)", t))}
+    low = entry.get("grade") in ("LOW", "UNVERIFIED") or entry.get("degraded")
+    if q_hr and (a_grace or low):
+        return "hr"
+    if a_clean and not a_broad:
+        return "clean"
+    if q_rep or ("공정거래" in cats and cats != {"인사"}) or a_rep:
+        return "report"
+    if a_grace or low:
+        return "hr"
+    return "hidden"
+
+
+def _render_dock_panel(branch: str, hotlines: dict) -> None:
+    """신고/클린신고/인사 문의 패널 (v1 ui/panels.py 3종 축약 이식)."""
+    ethics = (hotlines.get("ethics_hotline_url") or "").strip()
+    anon = (hotlines.get("internal_report_url") or "").strip()
+    ext = (hotlines.get("external_hotline") or "").strip()
+    with st.container(border=True):
+        if branch == "report":
+            st.markdown("**📞 신고 방법 안내**")
+            st.markdown("신고·조사 사항은 **CSR팀** 또는 **신세계면세점 "
+                        "핫라인**으로 접수해 주시기 바랍니다.")
+            st.markdown("**📋 1차 보고**: SRMS 시스템 즉시 등록 (인지 시점 24시간 內)")
+            st.link_button("🔗 SRMS 바로가기", "https://rms.shinsegae.com/",
+                           use_container_width=True)
+            if ethics:
+                st.link_button("🏢 신세계면세점 핫라인", ethics,
+                               use_container_width=True)
+        elif branch == "clean":
+            st.markdown("**💼 클린신고 (자진 신고) 안내**")
+            st.markdown("금품·향응 수수 등 이해관계자와의 비위 행위는 "
+                        "**SHRS**의 **클린신고신청서**를 통해 자진 신고하시기 바랍니다.")
+            st.markdown("**📋 등록방법**:  \nSHRS → **윤리경영** → "
+                        "**윤리실천등록** → **클린신고신청서**")
+            st.markdown("**📋 신고 기한**: 수수 확인일로부터 **3일 이내** "
+                        "(7일 이내 자진 신고 시 징계 감경 가능)")
+            st.link_button("🔗 SHRS 바로가기", "https://hr.shinsegae.com/index.jsp",
+                           use_container_width=True)
+        else:   # hr
+            st.markdown("**📞 인사교육팀 문의 채널**")
+            st.markdown((hotlines.get("hr_contact_text") or "").strip()
+                        or "인사교육팀에 직접 문의하세요.")
+            hr_bot = (hotlines.get("hr_chatbot_url") or "").strip()
+            if hr_bot:
+                st.link_button("💬 사내 인사 챗봇", hr_bot, use_container_width=True)
+        if anon:
+            st.link_button("🔒 사내 익명 제보 채널", anon, use_container_width=True)
+        if ext:
+            st.markdown(f"📞 외부 상담채널: {ext}")
+        st.caption("⚠️ 본 답변은 사규 해석 보조이며, 실제 신고·문의는 사규 "
+                   "절차에 따라 직접 진행하시기 바랍니다.")
+
+
+_DOCK_LABEL = {"hr": "📞 인사교육팀 문의", "clean": "💼 클린신고 안내",
+               "report": "📞 신고 방법 안내"}
+
 
 @st.cache_resource(show_spinner="준비 중…")
 def _engine():
@@ -595,6 +828,24 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     본문만 타이핑 재생 — 히스토리 리플레이는 정적 표시.
     """
     import html as _h
+    # 비용 가드 안내 (엔진 미호출 턴 — 히스토리 영속 표시)
+    if entry.get("notice"):
+        st.warning(entry["notice"])
+        return
+    # 이해 확인 + 구체화 유도 표면 (파편 후속 질문 — 엔진 미호출 턴)
+    if entry.get("coach"):
+        st.markdown(f"질문을 이렇게 이해했어요: **‘{entry.get('frag', '')}’**")
+        st.markdown("이 챗봇은 질문마다 **독립적으로** 답해요. 아래처럼 "
+                    "구체적으로 물어보시면 정확한 사규를 찾아드립니다.")
+        chips = entry.get("chips") or []
+        for j, chip in enumerate(chips):
+            if st.button(chip, key=f"coach_{idx}_{j}", use_container_width=True):
+                st.session_state["pending_q"] = chip
+                st.rerun()
+        if not chips:
+            st.caption("예: ‘클린신고 한도가 얼마인가요?’처럼 완전한 문장으로 "
+                       "물어봐 주세요.")
+        return
     if entry.get("blocked"):
         st.error(_BLOCK_MESSAGE)
         return
@@ -678,6 +929,32 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
         st.markdown(f'<p class="nx-meta">⏱️ 응답 {entry["elapsed_s"]}초'
                     + (f' · 🤖 {_h.escape(prov)}' if prov else "")
                     + "</p>", unsafe_allow_html=True)
+    # PROACTIVE DOCK "다음 단계 예측" (v1 ui/feedback.py:112-140 이식)
+    msgs = st.session_state.get("messages") or []
+    orig_q = (msgs[idx - 1].get("content")
+              if 0 < idx <= len(msgs) and msgs[idx - 1].get("role") == "user"
+              else None)
+    branch = _dock_branch(entry, orig_q or "")
+    rerolled: set = st.session_state.setdefault("rerolled", set())
+    can_reroll = bool(orig_q) and idx not in rerolled
+    if branch != "hidden":
+        st.markdown('<div style="font-size:11.5px;font-weight:700;'
+                    'letter-spacing:0.06em;color:#9A968D;margin:8px 0 6px 2px;">'
+                    "다음 단계 예측</div>", unsafe_allow_html=True)
+        dock_open: set = st.session_state.setdefault("dock_open", set())
+        lbl = _DOCK_LABEL[branch] + (" 닫기" if idx in dock_open else "")
+        if st.button(lbl, key=f"dock_{idx}", use_container_width=True):
+            dock_open.symmetric_difference_update({idx})
+            st.rerun()
+        if idx in dock_open:
+            _render_dock_panel(branch, _hotlines)
+    if can_reroll:
+        # v1 의 '다시 답변' — v2 는 단일 턴 설계라 동일 질문 재실행(새 턴)으로
+        # 대응. prev_answer 컨텍스트 전달은 엔진 접촉이라 미이식.
+        if st.button("🔄 다시 답변", key=f"reroll_{idx}", use_container_width=True):
+            rerolled.add(idx)
+            st.session_state["pending_q"] = orig_q
+            st.rerun()
     if not entry.get("blocked"):
         # 피드백 플로우 (v1 ui/feedback.py:306·313 문구 이식 — 영속화는
         # ADR-8 심의 대기, 세션+stderr 기록)
@@ -686,6 +963,8 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
             st.caption("✅ 피드백 감사합니다.")
         else:
             st.markdown("**이 답변이 정확하고 도움이 되셨나요?**")
+            st.caption("베타 단계입니다. 여러분의 피드백이 답변 품질 개선에 "
+                       "직결됩니다.")   # v1 ui/feedback.py:314 원문
             c1, c2, _sp = st.columns([1, 1, 6])
             if c1.button("👍 도움됨", key=f"{fb_key}_up"):
                 st.session_state[fb_key] = "up"
@@ -706,6 +985,11 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
             if col.button(fq, key=f"fu_{idx}_{j}", use_container_width=True):
                 st.session_state["pending_q"] = fq
                 st.rerun()
+    # 구체화 유도 (v1 core/prompts.py:296 규칙 3 문구의 표시 계층 이식 —
+    # LLM 상황 리스트 생성은 합성 계약 접촉이라 정적 안내 + 위 grounded 칩이 담당)
+    if not entry.get("critical"):
+        st.caption("보다 구체적인 답변을 위해 상황(대상·시점·금액 등)을 함께 "
+                   "적어 완전한 문장으로 질문해 주시면 도움이 됩니다.")
 
 
 def _ask(question: str) -> dict:
@@ -788,6 +1072,9 @@ def _ask(question: str) -> dict:
 
 
 # ── 페이지 조립 ──────────────────────────────────────────────────
+if not _consent_gate():   # 베타 동의 게이트 (운영 NEXUS_ENV=prod* 는 통과)
+    st.stop()
+
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
@@ -843,19 +1130,35 @@ if question:
     scope = st.session_state.get("scope", "전체")
     engine_q = question if scope in (None, "전체") \
         else f"{question} (질의 범위: {scope})"
+    # 직전 실답변 (coach·notice 제외) — 파편 후속 질문 감지의 전제
+    _prev = next((m for m in reversed(st.session_state["messages"])
+                  if m.get("role") == "assistant"
+                  and not m.get("coach") and not m.get("notice")), None)
     st.session_state["messages"].append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant", avatar="🧭"):
-        try:
-            with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
-                entry = _ask(engine_q)
-        except Exception as e:
-            print(f"[ui:error] {type(e).__name__}: {e}", file=sys.stderr, flush=True)
-            st.error("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 다시 "
-                     "시도해 주세요. 계속되면 담당 부서(CSR팀)에 알려주세요.")
-            entry = None
+        if _is_fragment_followup(question, _prev is not None):
+            # 이해 확인 + 구체화 유도 — 검색을 돌리지 않는다 (오답·오문서 방지).
+            # 칩은 직전 답변 문서 기반 실재 예시(auto_query_examples)만.
+            entry = {"role": "assistant", "coach": True, "frag": question,
+                     "chips": (_prev.get("followups") or [])[:3]}
+        elif not _check_rate_limit():
+            limit = int(os.environ.get("NEXUS_DAILY_QUERY_LIMIT", "100"))
+            entry = {"role": "assistant", "notice":
+                     f"⚠️ 오늘 질의 한도({limit}회)를 초과했습니다. "
+                     "베타 비용 가드 정책입니다. 내일 다시 이용해 주세요."}
+        else:
+            try:
+                with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
+                    entry = _ask(engine_q)
+            except Exception as e:
+                print(f"[ui:error] {type(e).__name__}: {e}",
+                      file=sys.stderr, flush=True)
+                st.error("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 다시 "
+                         "시도해 주세요. 계속되면 담당 부서(CSR팀)에 알려주세요.")
+                entry = None
         if entry is not None:
             _render_assistant(entry, idx=len(st.session_state["messages"]),
-                              typing=True)
+                              typing=not (entry.get("coach") or entry.get("notice")))
             st.session_state["messages"].append(entry)
