@@ -30,6 +30,7 @@ st.set_page_config(page_title="DF COMPASS", page_icon="🧭", layout="wide")
 _CSS = """
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
 
 :root {
   /* warm editorial — accent 레드·font Pretendard, 뉴트럴은 웜 톤 (v1 동일) */
@@ -272,16 +273,111 @@ h1 > a.anchor-link, h2 > a.anchor-link, h3 > a.anchor-link { display: none !impo
   color: #8A1020;
   border: 1px solid var(--c-accent);
 }
+
+/* ── UI 패리티 (08-06 안건): 판정 카드 · 등급 라벨 · 출처 칩 · 베타 배너 ── */
+.nx-beta {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  color: var(--c-caption); background: var(--c-surface);
+  border: 1px solid var(--c-border); border-radius: 999px;
+  padding: 3px 12px; margin-left: 10px;
+}
+.nx-vd { margin: 2px 0 14px; }
+.nx-vd-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 13px; border-radius: 11px; border: 1px solid var(--vd-c, #6B6A66);
+  background: var(--vd-bg, #F0EFEC);
+}
+.nx-vd-pill .ico { width: 8px; height: 8px; border-radius: 50%;
+  background: var(--vd-c, #6B6A66); flex: 0 0 8px; }
+.nx-vd-pill b { font-size: 13.5px; font-weight: 700; color: var(--vd-c, #6B6A66); }
+.nx-vd-quote { border-left: 3px solid var(--vd-c, #6B6A66);
+  padding: 5px 0 5px 16px; margin: 12px 0 8px; }
+.nx-vd-quote p { font-family: 'Nanum Myeongjo', serif; font-size: 15px;
+  font-weight: 600; line-height: 1.85; color: #1F1D1A; margin: 0; }
+.nx-vd-cite { display: inline-block; font-size: 11px; color: #5F5E5A;
+  background: var(--c-surface); border-radius: 6px; padding: 3px 9px; margin-top: 6px; }
+.nx-grade {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  border-radius: 6px; padding: 3px 10px; margin: 0 6px 8px 0;
+  border: 1px solid var(--c-border); background: var(--c-surface); color: #5F5E5A;
+}
+.nx-grade.high   { border-color: #2F7A4D; background: #EAF5EE; color: #2F7A4D; }
+.nx-grade.medium { border-color: #B7791F; background: #FBF3E2; color: #B7791F; }
+.nx-grade.unv    { border-color: var(--c-muted); background: var(--c-surface); color: #6B6A66; }
+.nx-doc-chip {
+  display: inline-block; font-size: 11.5px; color: #5F5E5A;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: 999px; padding: 3px 11px; margin: 2px 6px 2px 0;
+}
+.nx-refnote { font-size: 12px; color: var(--c-caption); margin: 6px 0 2px; }
+.nx-meta { font-size: 11.5px; color: var(--c-caption); margin-top: 8px; }
 </style>
 """
 st.markdown(_CSS, unsafe_allow_html=True)
 st.markdown('<div class="nx-topbar"></div>', unsafe_allow_html=True)
+st.markdown('<span class="nx-beta">베타 · 입력 내용은 학습에 사용되지 않습니다</span>',
+            unsafe_allow_html=True)
 
 _EXAMPLES = (
     "법인카드 사용 기준이 어떻게 되나요?",
     "협력사에서 선물을 받았는데 어떻게 해야 하나요?",
     "국내 출장 시 숙박비 한도가 궁금합니다.",
+    "외부에서 강연 요청이 왔는데 회사 승인이 필요한가요?",
+    "매장에서 손님이 두고 간 물건은 어떻게 처리하나요?",
+    "거래처가 명절 선물을 보내왔어요. 받아도 되나요?",
 )
+
+# 질의 범위 (표시 계층 — 선택 시 질문에 범위 문구를 부가해 라우터·합성이 참고)
+_SCOPES = ("전체", "CSR", "공정거래", "공통", "안전", "영업", "인사",
+           "재무", "정보보안", "총무", "환경")
+
+# conf 4등급 → 사용자 라벨 (심의 결정 3항 — UI 표기 의무. 산식 무접촉)
+_GRADE_LABEL = {
+    "HIGH": ("high", "✓ 사규 원문 근거 확인"),
+    "MEDIUM": ("medium", "참고 문서 기반 — 원문 대조 권장"),
+    "UNVERIFIED": ("unv", "조항 단위 근거 미확인 — 원문 확인 권장"),
+    # LOW 는 기존 강등 칩(안전 표면)이 담당 — 중복 표기 안 함
+}
+
+_STANCE_TONE = {   # v1 판정 카드 색조 이식 (안전쪽 = 레드)
+    "금지":   ("#C8102E", "#FCEEF0"),
+    "신고대상": ("#C8102E", "#FCEEF0"),
+    "조건부":  ("#B7791F", "#FBF3E2"),
+    "허용":   ("#2F7A4D", "#EAF5EE"),
+    "확인필요": ("#6B6A66", "#F0EFEC"),
+}
+
+
+def _verdict_card_data(answer: str, citations: list) -> dict | None:
+    """판정 카드 데이터 — 결정론 텍스트 파싱 (표시 계층 전용, LLM·엔진 무접촉).
+
+    stance: 핵심 결론 문구의 키워드 → v1 색조 체계. 대표 인용은 📋 사규 기준
+    첫 문장, 출처는 verify ok 쌍 우선. 파싱 실패 시 None → 카드 생략(안전).
+    """
+    import re as _re
+    m = _re.search(r"\*\*핵심 결론\*\*\s*\n(.+?)(?:\n\s*\n|\n\*\*)", answer, _re.DOTALL)
+    if not m:
+        return None
+    concl = m.group(1).strip().replace("\n", " ")
+    if any(k in concl for k in ("불가", "금지", "안 됩니다", "안됩니다", "위반")):
+        stance = "금지"
+    elif any(k in concl for k in ("신고", "보고해야")):
+        stance = "신고대상"
+    elif any(k in concl for k in ("조건", "제한", "한하여", "경우에만", "승인", "사전")):
+        stance = "조건부"
+    elif any(k in concl for k in ("가능", "허용", "무방")):
+        stance = "허용"
+    else:
+        stance = "확인필요"
+    label = concl[:60] + ("…" if len(concl) > 60 else "")
+    q = _re.search(r"\*\*📋 사규 기준\*\*\s*\n[\-\*\s]*(.+?)(?:\n|$)", answer)
+    quote = (q.group(1).strip()[:120] if q else "")
+    cite = ""
+    for c in citations or []:
+        if c.get("verdict") == "ok" and c.get("document_title"):
+            cite = c["document_title"] + (f" {c['article_no']}" if c.get("article_no") else "")
+            break
+    return {"stance": stance, "label": label, "quote": quote, "cite": cite}
 
 _BLOCK_MESSAGE = ("이 답변은 비실재 문서 인용이 감지되어 차단되었습니다. "
                   "질문을 바꿔 다시 시도하거나 담당 부서에 문의해 주세요.")
@@ -347,6 +443,12 @@ def _sidebar(hotlines: dict) -> None:
             st.link_button("신세계면세점 핫라인 제보하기", url,
                            use_container_width=True)
         st.markdown("---")
+        st.markdown('<p class="nx-brand-eyebrow">질의 범위</p>',
+                    unsafe_allow_html=True)
+        st.selectbox("질의 범위", _SCOPES, index=0, key="scope",
+                     label_visibility="collapsed")
+        st.caption("범위를 고르면 질문에 해당 분야 표시가 함께 전달됩니다.")
+        st.markdown("---")
         st.markdown(
             '<p class="nx-disclaimer">'
             "본 답변은 사규 해석 보조 도구이며 법적 효력은 없습니다.<br>"
@@ -356,13 +458,16 @@ def _sidebar(hotlines: dict) -> None:
             unsafe_allow_html=True)
 
 
-def _render_assistant(entry: dict) -> None:
-    """안전 표면 단일 렌더 경로 — 불변 조건은 전부 이 함수 안에 있다.
+def _render_assistant(entry: dict, idx: int = 0) -> None:
+    """안전 표면 단일 렌더 경로 — 불변 조건 3종은 전부 이 함수 안에 있다.
 
     ① blocked → 답변 미표출 + 차단 안내 (verify block)
     ② critical → 배너 + (enforce_structure 된) 답변
     ③ degrade → ⚠ 신뢰도 강등 칩 + 답변
+    UI 패리티(08-06 안건) 추가 표면: 판정 카드·grade 라벨·참고 인용 구획·
+    출처 칩·검토 과정·응답 시간·피드백·후속 제안 — 전부 표시 계층.
     """
+    import html as _h
     if entry.get("blocked"):
         st.error(_BLOCK_MESSAGE)
         return
@@ -375,7 +480,81 @@ def _render_assistant(entry: dict) -> None:
     if entry.get("degraded"):
         st.markdown('<span class="nx-chip-warn">⚠ 인용 일부 미검증 — '
                     "신뢰도 강등</span>", unsafe_allow_html=True)
+    # grade 라벨 (심의 3항 UI 표기 — LOW 는 위 강등 칩이 담당, 중복 없음)
+    g = entry.get("grade")
+    if g in _GRADE_LABEL and not entry.get("critical"):
+        cls, label = _GRADE_LABEL[g]
+        st.markdown(f'<span class="nx-grade {cls}">{label}</span>',
+                    unsafe_allow_html=True)
+    # 판정 카드 (v1 verdict 표면 이식 — 결정론 파싱, critical 제외)
+    card = entry.get("card")
+    if card:
+        color, bg = _STANCE_TONE.get(card["stance"], ("#6B6A66", "#F0EFEC"))
+        html = (f'<div class="nx-vd" style="--vd-c:{color};--vd-bg:{bg}">'
+                f'<span class="nx-vd-pill"><span class="ico"></span>'
+                f'<b>{_h.escape(card["label"])}</b></span>')
+        if card.get("quote"):
+            html += (f'<div class="nx-vd-quote"><p>{_h.escape(card["quote"])}'
+                     "</p></div>")
+        if card.get("cite"):
+            html += f'<span class="nx-vd-cite">📕 {_h.escape(card["cite"])}</span>'
+        st.markdown(html + "</div>", unsafe_allow_html=True)
+    # '참고 인용' 구획 캡션 — 무응답 표명 + 인용 존재 시 (표시만, 판정식 무접촉)
+    _neg_markers = ("확인되지 않", "확인할 수 없", "사규에서 확인되지 않")
+    if (any(m in (entry.get("answer") or "") for m in _neg_markers)
+            and entry.get("cite_n", 0) > 0 and not entry.get("critical")):
+        st.markdown('<p class="nx-refnote">※ 아래 인용은 질문에 대한 직접 '
+                    "근거가 아닌 <b>참고 규정</b>입니다.</p>",
+                    unsafe_allow_html=True)
     st.markdown(entry["answer"])
+    # 출처 문서 칩
+    if entry.get("ctx_titles") and not entry.get("blocked"):
+        chips = "".join(f'<span class="nx-doc-chip">📄 {_h.escape(t)}</span>'
+                        for t in entry["ctx_titles"])
+        st.markdown(chips, unsafe_allow_html=True)
+    # 🧠 검토 과정 (접힘) — 사용자 친화 문구
+    if entry.get("n_chunks") is not None:
+        with st.expander("🧠 AI 검토 과정", expanded=False):
+            t = entry.get("timings") or {}
+            steps = [f"사규 검색 — 관련 발췌 {entry.get('n_chunks')}건 확보"
+                     + (f" ({(t.get('rpc_ms', 0) + t.get('embed_ms', 0)) / 1000:.1f}초)"
+                        if t.get("rpc_ms") else "")]
+            if entry.get("router_hit"):
+                steps.append("지배 규정 라우팅 — 핵심 문서를 우선 확보")
+            if t.get("rerank_ms"):
+                steps.append(f"관련도 재정렬 ({t['rerank_ms'] / 1000:.1f}초)")
+            steps.append(f"답변 작성" + (f" — 재작성 {entry['retries']}회 수행"
+                                     if entry.get("retries") else ""))
+            steps.append(f"인용 검증 — {entry.get('cite_ok', 0)}건 원장 대조 통과"
+                         f" / 인용 {entry.get('cite_n', 0)}건")
+            for s_ in steps:
+                st.markdown(f"- {s_}")
+    # 응답 시간·피드백
+    if entry.get("elapsed_s"):
+        st.markdown(f'<p class="nx-meta">⏱️ 응답 {entry["elapsed_s"]}초</p>',
+                    unsafe_allow_html=True)
+    if not entry.get("blocked"):
+        fb_key = f"fb_{idx}"
+        if st.session_state.get(fb_key):
+            st.caption("피드백이 기록되었습니다. 감사합니다.")
+        else:
+            c1, c2, _sp = st.columns([1, 1, 6])
+            if c1.button("👍 도움됨", key=f"{fb_key}_up"):
+                st.session_state[fb_key] = "up"
+                print(f"[ui:feedback] idx={idx} v=up", file=sys.stderr, flush=True)
+                st.rerun()
+            if c2.button("👎 아쉬움", key=f"{fb_key}_dn"):
+                st.session_state[fb_key] = "down"
+                print(f"[ui:feedback] idx={idx} v=down", file=sys.stderr, flush=True)
+                st.rerun()
+    # 후속 질문 제안 (grounded — DB 실재 예시만)
+    if entry.get("followups"):
+        st.caption("이어서 물어보기")
+        cols = st.columns(len(entry["followups"]))
+        for j, (col, fq) in enumerate(zip(cols, entry["followups"])):
+            if col.button(fq, key=f"fu_{idx}_{j}", use_container_width=True):
+                st.session_state["pending_q"] = fq
+                st.rerun()
 
 
 def _ask(question: str) -> dict:
@@ -407,12 +586,49 @@ def _ask(question: str) -> dict:
           f"elapsed={time.perf_counter()-t0:.1f}s", file=sys.stderr, flush=True)
 
     blocked = verdict["action"] == "block"
+    # 후속 질문 제안 — 최종 컨텍스트 문서의 auto_query_examples SELECT (읽기
+    # 전용, grounded — 실재 예시만. v1 grounded_suggestions 의 표시 계층 이식)
+    followups: list[str] = []
+    if not blocked and not intake["is_critical"]:
+        try:
+            doc_ids = list({c["document_id"] for c in res["chunks"]})[:5]
+            rows = (sb.table("nexus_documents")
+                    .select("auto_query_examples").in_("id", doc_ids)
+                    .execute().data or [])
+            seen: set[str] = set()
+            for r in rows:
+                for ex in (r.get("auto_query_examples") or []):
+                    ex = str(ex).strip()
+                    if ex and ex != question and ex not in seen:
+                        seen.add(ex)
+                        followups.append(ex)
+            followups = followups[:3]
+        except Exception:
+            followups = []
+    ctx_titles = sorted({c["breadcrumb"].split(">")[0] for c in res["chunks"]
+                         if c.get("breadcrumb")})
+    card = None
+    if not blocked and not intake["is_critical"]:
+        card = _verdict_card_data(syn.answer_md, verdict["citations"])
     return {
         "role": "assistant",
         "answer": "" if blocked else answer,   # block 답변은 저장조차 안 함
         "blocked": blocked,
         "critical": bool(intake["is_critical"]),
         "degraded": verdict["action"] == "degrade",
+        # ── UI 패리티 (표시 전용 필드) ──
+        "grade": verdict["grade"],
+        "card": card,
+        "ctx_titles": ctx_titles,
+        "cite_ok": sum(1 for c in verdict["citations"] if c["verdict"] == "ok"),
+        "cite_n": len(verdict["citations"]),
+        "followups": followups,
+        "elapsed_s": round(time.perf_counter() - t0, 1),
+        "provider": syn.provider,
+        "timings": res.get("timings", {}),
+        "router_hit": res.get("router_hit"),
+        "n_chunks": len(res["chunks"]),
+        "retries": syn.retries,
     }
 
 
@@ -434,31 +650,38 @@ if not question:
 if not st.session_state["messages"] and not question:
     st.markdown(
         '<div class="nx-hero">'
-        '<p class="nx-hero-eyebrow">Ethics · Compliance</p>'
-        '<p class="nx-hero-title">사규, 물어보면 바로 나침반</p>'
+        '<p class="nx-hero-eyebrow">사규의 나침반 · Compliance Compass</p>'
+        '<p class="nx-hero-title">무엇을 확인해 드릴까요?</p>'
         '<p class="nx-hero-sub">신세계디에프 사규를 근거와 함께 안내합니다. '
-        "아래 예시를 누르거나 자유롭게 질문해 보세요.</p></div>",
+        "상황을 그대로 적어 주셔도 됩니다 — 아래 예시를 눌러도 좋습니다."
+        "</p></div>",
         unsafe_allow_html=True)
-    cols = st.columns(len(_EXAMPLES))
-    for i, (col, ex) in enumerate(zip(cols, _EXAMPLES)):
-        if col.button(ex, key=f"ex_{i}", use_container_width=True):
-            st.session_state["pending_q"] = ex
-            st.rerun()
+    for row_start in (0, 3):
+        cols = st.columns(3)
+        for i, (col, ex) in enumerate(
+                zip(cols, _EXAMPLES[row_start:row_start + 3]), start=row_start):
+            if col.button(ex, key=f"ex_{i}", use_container_width=True):
+                st.session_state["pending_q"] = ex
+                st.rerun()
 
-for m in st.session_state["messages"]:
+for i, m in enumerate(st.session_state["messages"]):
     if m["role"] == "user":
         with st.chat_message("user"):
             st.markdown(m["content"])
     else:
         with st.chat_message("assistant", avatar="🧭"):
-            _render_assistant(m)
+            _render_assistant(m, idx=i)
 
 if question:
+    # 질의 범위 (표시 계층 조립 — 선택 시 범위 문구 부가, 엔진 코드 무접촉)
+    scope = st.session_state.get("scope", "전체")
+    engine_q = question if scope in (None, "전체") \
+        else f"{question} (질의 범위: {scope})"
     st.session_state["messages"].append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant", avatar="🧭"):
         with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
-            entry = _ask(question)
-        _render_assistant(entry)
+            entry = _ask(engine_q)
+        _render_assistant(entry, idx=len(st.session_state["messages"]))
     st.session_state["messages"].append(entry)
