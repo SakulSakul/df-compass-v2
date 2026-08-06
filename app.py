@@ -358,7 +358,7 @@ def _verdict_card_data(answer: str, citations: list) -> dict | None:
     m = _re.search(r"\*\*핵심 결론\*\*\s*\n(.+?)(?:\n\s*\n|\n\*\*)", answer, _re.DOTALL)
     if not m:
         return None
-    concl = m.group(1).strip().replace("\n", " ")
+    concl = m.group(1).strip().replace("\n", " ").replace("**", "")
     if any(k in concl for k in ("불가", "금지", "안 됩니다", "안됩니다", "위반")):
         stance = "금지"
     elif any(k in concl for k in ("신고", "보고해야")):
@@ -371,7 +371,7 @@ def _verdict_card_data(answer: str, citations: list) -> dict | None:
         stance = "확인필요"
     label = concl[:60] + ("…" if len(concl) > 60 else "")
     q = _re.search(r"\*\*📋 사규 기준\*\*\s*\n[\-\*\s]*(.+?)(?:\n|$)", answer)
-    quote = (q.group(1).strip()[:120] if q else "")
+    quote = (q.group(1).strip().replace("**", "")[:120] if q else "")
     cite = ""
     for c in citations or []:
         if c.get("verdict") == "ok" and c.get("document_title"):
