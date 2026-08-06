@@ -37,6 +37,15 @@ JSON only: {{"docs": ["<정확한 문서 제목>", "<정확한 문서 제목>", 
 - 확실히 지배 문서를 특정할 수 없으면 confident=false."""
 
 
+# CG-4 (컷오버 심의 발효 조건): 포괄 방침 문서의 라우팅 사각(g03·g13 —
+# CSR경영방침) 보정 — DB 무수정 앱 레이어 보조 힌트. 문서가 실제로 다루는
+# 일반 개념어만 기술한다 (홀드아웃·골든 질의 문구 복사 금지 — 시험 오염 방지).
+CATALOG_HINTS: dict[str, str] = {
+    "(영업) CSR경영방침": ("윤리경영·반부패 전반의 상위 방침 — 내부신고/제보 "
+                          "채널, 금품·향응·접대 관련 행동 원칙, 이해관계자 책임"),
+}
+
+
 def build_catalog(sb: Any) -> tuple[str, dict[str, str]]:
     """카탈로그 텍스트 + {title: document_id}. active 문서 전수 (SELECT 전용)."""
     rows = (sb.table("nexus_documents")
@@ -46,8 +55,10 @@ def build_catalog(sb: Any) -> tuple[str, dict[str, str]]:
     for r in sorted(rows, key=lambda x: x["title"]):
         kw = ", ".join((r.get("auto_keywords") or [])[:8])
         ex = " / ".join((r.get("auto_query_examples") or [])[:2])
+        hint = CATALOG_HINTS.get(r["title"])
         lines.append(f"- {r['title']}" + (f" | 키워드: {kw}" if kw else "")
-                     + (f" | 예시: {ex}" if ex else ""))
+                     + (f" | 예시: {ex}" if ex else "")
+                     + (f" | 보충: {hint}" if hint else ""))
         title_to_id[r["title"]] = str(r["id"])
     return "\n".join(lines), title_to_id
 
