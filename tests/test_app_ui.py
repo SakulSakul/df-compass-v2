@@ -290,6 +290,59 @@ def test_theme_pinned_light():
     assert 'textColor' in cfg
 
 
+def test_motion_css_present(monkeypatch):
+    """F 계급(시간축) 보조 검증 — 모션 자체는 녹화/연속 캡처가 정본이고,
+    AppTest 는 keyframes·THINKING 블록 CSS 의 존재만 고정한다."""
+    at = _at(monkeypatch)
+    at.run()
+    html = _all_markdown(at)
+    for token in ("nx-spin", "nx-pulse", "nx-cycle", "nx-think"):
+        assert token in html
+
+
+def test_stop_flag_to_notice(monkeypatch):
+    """⏹ 생성 중지: 플래그 → 다음 런에서 안내 엔트리 전환 + 플래그 소거."""
+    at = _at(monkeypatch)
+    at.session_state["_stop_requested"] = True
+    at.session_state["messages"] = [{"role": "user", "content": "질문"}]
+    at.run()
+    assert not at.exception
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "생성이 중지되었습니다" in warns
+    assert "_stop_requested" not in at.session_state
+
+
+def test_feedback_reason_flow(monkeypatch):
+    """피드백 (A)→(B)→(C): 👍 클릭 → 사유 pills·자유 의견·제출 → 감사 캡션
+    (v1 feedback.py:270-420 플로우)."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q"}, _entry(cite_n=1)]
+    at.run()
+    up = next(b for b in at.button if "👍 도움됐어요" in str(b.label))
+    up.click().run()
+    # (B) 표면: 사유 pills(button_group)·자유 의견·제출/건너뛰기
+    assert any("자유 의견" in str(t.label) for t in at.text_area)
+    assert any("제출" == str(b.label) for b in at.button)
+    assert any("건너뛰기" == str(b.label) for b in at.button)
+    submit = next(b for b in at.button if str(b.label) == "제출")
+    submit.click().run()
+    caps = " ".join(str(c.value) for c in at.caption)
+    assert "피드백 감사합니다" in caps
+
+
+def test_hero_enter_submit(monkeypatch):
+    """히어로 입력 Enter 제출 (v1 home.py on_change 패턴) — 값 변경만으로
+    질문이 제출되어 처리 경로에 진입한다 (오프라인 → 에러 표면 = 진입 증명)."""
+    at = _at(monkeypatch)
+    at.run()
+    at.text_input(key="hero_q").set_value("법인카드 기준 알려줘").run()
+    html = _all_markdown(at)
+    assert "법인카드 기준 알려줘" in html              # user 말풍선
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs                    # 엔진 경로 진입
+
+
 def test_fragment_noop_without_prev(monkeypatch):
     """직전 턴이 없으면 파편형 문자열도 가로채지 않는다 (no-op 폴백) —
     정상 경로로 진입해 오프라인 에러 표면이 뜨는 것으로 증명."""

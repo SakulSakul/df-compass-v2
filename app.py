@@ -352,6 +352,33 @@ p.nx-hero-sub { font-size: 15px !important; }
 }
 .nx-refnote { font-size: 12px; color: var(--c-caption); margin: 6px 0 2px; }
 .nx-meta { font-size: 11.5px; color: var(--c-caption); margin-top: 8px; }
+
+/* ── 시간축(모션) F 계급 — v1 ui/styles.py:750-784 keyframes +
+      app.py:734-746 THINKING 블록 이식 ── */
+@keyframes nx-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes nx-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1);    }
+  50%      { opacity: 0.55; transform: scale(1.18); }
+}
+@keyframes nx-cycle {
+  0%, 24%   { content: "🧠"; }
+  25%, 49%  { content: "💭"; }
+  50%, 74%  { content: "✍️"; }
+  75%, 100% { content: "📝"; }
+}
+.nx-pulse { animation: nx-pulse 1.4s ease-in-out infinite; display: inline-block; }
+.nx-cycle::before { content: "🧠"; animation: nx-cycle 2s linear infinite;
+  display: inline-block; }
+.nx-think { display: flex; align-items: center; gap: 14px; padding: 16px 4px; }
+.nx-think-spin { display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%; background: rgba(200,16,46,0.08);
+  font-size: 22px; animation: nx-spin 2s linear infinite; }
+.nx-think-txt { display: flex; flex-direction: column; gap: 3px; }
+.nx-think-line { font-size: 15px; font-weight: 600; color: var(--c-primary); }
+.nx-think-sub { font-size: 12.5px; color: #9A968D; }
 /* PROACTIVE DOCK 주 액션 + 동의 제출 — 레드 primary (v1 type="primary" 정합) */
 [class*="st-key-dock_"] .stButton > button,
 [class*="st-key-consent_submit"] .stButton > button {
@@ -512,6 +539,11 @@ def _verdict_card_data(answer: str, citations: list) -> dict | None:
 
 _BLOCK_MESSAGE = ("이 답변은 비실재 문서 인용이 감지되어 차단되었습니다. "
                   "질문을 바꿔 다시 시도하거나 담당 부서에 문의해 주세요.")
+
+# 피드백 사유 풀 (v1 ui/feedback.py:12-25 원문)
+_FB_REASONS_NEG = ["사실과 달라요", "출처가 부족해요", "질문 의도 못 파악",
+                   "답변이 모호함", "신고·문의 안내 누락", "기타"]
+_FB_REASONS_POS = ["정확해요", "출처가 명확", "실무에 바로 적용 가능", "기타"]
 
 # ── 베타 참가 동의서 (v1 app.py:1318-1358 원문 기반 — 데이터 흐름 서술만
 #    v2 실태로 정정: v2 는 질의 로그·동의 기록을 DB 에 저장하지 않는다(ADR-8).
@@ -806,6 +838,56 @@ def _sidebar(hotlines: dict) -> None:
             unsafe_allow_html=True)
 
 
+# ── 시간축(모션) 대기 표면 — F 계급 (v1 app.py:702-820 이식) ──
+_TIMER_HTML = """
+<div style="background:#FAF6F1;padding:10px 14px;border-radius:10px;
+     font-family:-apple-system,'Segoe UI',sans-serif;font-size:13px;color:#666;
+     display:flex;justify-content:space-between;align-items:center;
+     border:1px solid #EDE6DC;box-sizing:border-box;">
+  <span>⏱️ <span id="dfc-elapsed" style="font-weight:600;color:#C8102E;">0</span>초 경과</span>
+  <span style="font-size:12px;color:#9A968D;">예상 소요 약 20~60초</span>
+</div>
+<script>
+  (function() {
+    var start = Date.now();
+    var elem = document.getElementById('dfc-elapsed');
+    if (!elem) return;
+    setInterval(function() {
+      elem.innerText = Math.round((Date.now() - start) / 1000);
+    }, 250);
+  })();
+</script>
+"""
+
+
+def _nx_iframe(html: str, *, height: int = 0) -> None:
+    """v1 app.py:9-21 이식 — st.iframe 우선, 구 components.html 폴백.
+    iframe 내부 JS 가 self-contained 로 동작 (실시간 경과 카운터)."""
+    fn = getattr(st, "iframe", None)
+    if fn is not None and height > 0:
+        fn(html, height=height)
+    else:
+        import streamlit.components.v1 as components
+        components.html(html, height=height)
+
+
+def _request_stop() -> None:
+    """⏹ 생성 중지 on_click (v1 app.py:555-557) — 클릭이 rerun 을 유발해
+    진행 중 런이 중단·결과 폐기되고, 다음 런 상단이 플래그를 안내로 전환."""
+    st.session_state["_stop_requested"] = True
+
+
+def _spinner_html(line: str, sub: str = "", cycle: bool = False) -> str:
+    """v1 app.py:756-763 THINKING 스피너 — cycle=True 는 답변 작성 단계의
+    이모지 순환(nx-cycle, v1 PR-Fun1.9)."""
+    icon = ('<span class="nx-think-spin" style="animation:none">'
+            '<span class="nx-cycle"></span></span>' if cycle
+            else '<span class="nx-think-spin">🧭</span>')
+    s = f'<div class="nx-think-sub">{sub}</div>' if sub else ""
+    return (f'<div class="nx-think">{icon}<div class="nx-think-txt">'
+            f'<div class="nx-think-line">{line}</div>{s}</div></div>')
+
+
 def _typewriter(text: str):
     """검증 완료 텍스트의 타이핑 재생 제너레이터 (표시 계층 전용).
 
@@ -968,21 +1050,57 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
             st.session_state["pending_q"] = orig_q
             st.rerun()
     if not entry.get("blocked"):
-        # 피드백 플로우 (v1 ui/feedback.py:306·313 문구 이식 — 영속화는
-        # ADR-8 심의 대기, 세션+stderr 기록)
+        # 피드백 3단계 플로우 (v1 ui/feedback.py:270-420 이식 — (A) CTA →
+        # (B) 사유 pills + 자유 의견 + 제출/건너뛰기 → (C) 감사 캡션.
+        # 영속화는 ADR-8 심의 대기, 세션+stderr 기록)
         fb_key = f"fb_{idx}"
-        if st.session_state.get(fb_key):
+        fb_state = st.session_state.get(fb_key)
+        if fb_state == "done":
             st.caption("✅ 피드백 감사합니다.")
+        elif fb_state in ("up", "down"):
+            is_pos = fb_state == "up"
+            sel = ("text-align:center;padding:8px 0;color:#1A1A1A;font-size:14px;"
+                   "border:2px solid #1A1A1A;border-radius:4px;background:#fff;"
+                   "font-weight:600;")
+            off = ("text-align:center;padding:8px 0;color:#aaa;font-size:14px;"
+                   "border:1px solid #eee;border-radius:4px;background:#fafafa;")
+            ca, cb_ = st.columns(2)
+            ca.markdown(f'<div style="{sel if is_pos else off}">'
+                        f'{"✓ " if is_pos else ""}👍 도움됐어요</div>',
+                        unsafe_allow_html=True)
+            cb_.markdown(f'<div style="{sel if not is_pos else off}">'
+                         f'{"✓ " if not is_pos else ""}👎 아쉬워요</div>',
+                         unsafe_allow_html=True)
+            reasons = st.pills(
+                "어떤 점이 좋았나요? (복수 선택 가능)" if is_pos
+                else "어떤 점이 아쉬웠나요? (복수 선택 가능)",
+                options=_FB_REASONS_POS if is_pos else _FB_REASONS_NEG,
+                selection_mode="multi", key=f"{fb_key}_reasons")
+            comment = st.text_area(
+                "자유 의견 (선택)", height=80,
+                placeholder="구체적인 의견을 자유롭게 적어주세요 (선택)",
+                key=f"{fb_key}_comment")
+            c1, c2 = st.columns(2)
+            if c1.button("제출", key=f"{fb_key}_submit", use_container_width=True):
+                print(f"[ui:feedback] idx={idx} v={fb_state} "
+                      f"reasons={list(reasons or [])} "
+                      f"comment={(comment or '')[:300]!r}",
+                      file=sys.stderr, flush=True)
+                st.session_state[fb_key] = "done"
+                st.rerun()
+            if c2.button("건너뛰기", key=f"{fb_key}_skip", use_container_width=True):
+                st.session_state[fb_key] = "done"
+                st.rerun()
         else:
             st.markdown("**이 답변이 정확하고 도움이 되셨나요?**")
             st.caption("베타 단계입니다. 여러분의 피드백이 답변 품질 개선에 "
                        "직결됩니다.")   # v1 ui/feedback.py:314 원문
             c1, c2, _sp = st.columns([1, 1, 6])
-            if c1.button("👍 도움됨", key=f"{fb_key}_up"):
+            if c1.button("👍 도움됐어요", key=f"{fb_key}_up"):
                 st.session_state[fb_key] = "up"
                 print(f"[ui:feedback] idx={idx} v=up", file=sys.stderr, flush=True)
                 st.rerun()
-            if c2.button("👎 아쉬움", key=f"{fb_key}_dn"):
+            if c2.button("👎 아쉬워요", key=f"{fb_key}_dn"):
                 st.session_state[fb_key] = "down"
                 print(f"[ui:feedback] idx={idx} v=down", file=sys.stderr, flush=True)
                 st.rerun()
@@ -1004,18 +1122,29 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
                    "적어 완전한 문장으로 질문해 주시면 도움이 됩니다.")
 
 
-def _ask(question: str) -> dict:
-    """정본 파이프라인 1턴 실행 → 히스토리 엔트리 (엔진 무변경 배선)."""
+def _ask(question: str, status_cb=None) -> dict:
+    """정본 파이프라인 1턴 실행 → 히스토리 엔트리 (엔진 무변경 배선).
+    status_cb: 단계 전환 콜백 (F-1 대기 표면) — 파이프라인 호출 지점 사이에만
+    삽입, 엔진 함수 시그니처·로직 무접촉."""
     from compass_engine.intake import run_intake
     from compass_engine.synthesis import synthesize
     from compass_engine.v1port.critical_mode import enforce_structure
     from compass_engine.verify import verify_answer
 
+    cb = status_cb or (lambda *a: None)
     sb, ledger, retriever, hotlines, anchor_map = _engine()
     t0 = time.perf_counter()
+    cb("analyze", None)
     intake = run_intake(sb, question)
+    cb("search", None)
     res = retriever.retrieve(intake, {"tracks": ["rule"], "intent": "ui"})
+    _seen: set[str] = set()
+    _titles = [t for c in res["chunks"]
+               if (t := (c.get("breadcrumb") or "").split(">")[0])
+               and t not in _seen and not _seen.add(t)]
+    cb("synthesize", _titles)
     syn = synthesize(intake["masked_text"], res["chunks"], anchor_map=anchor_map)
+    cb("verify", None)
     verdict = verify_answer(syn.answer_md, ledger,
                             synthesis_integrity_ok=syn.integrity_ok)
 
@@ -1090,6 +1219,15 @@ if not _consent_gate():   # 베타 동의 게이트 (운영 NEXUS_ENV=prod* 는 
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
+# ⏹ 생성 중지 처리 (v1 main() 상단 대응): 중지 클릭 → rerun 이 진행 런을
+# 중단시켜 결과는 자연 폐기 — 여기서 플래그를 안내 엔트리로 전환한다.
+if st.session_state.pop("_stop_requested", False):
+    _msgs = st.session_state["messages"]
+    if _msgs and _msgs[-1].get("role") == "user":
+        _msgs.append({"role": "assistant", "notice":
+                      "⏹ 생성이 중지되었습니다. 질문을 다시 입력해 주세요."})
+    st.toast("⏹ 생성을 중지했습니다")
+
 try:
     _hotlines = _engine()[3]
 except Exception:
@@ -1115,9 +1253,16 @@ if not st.session_state["messages"] and not question:
         "주셔도 됩니다.</p></div>",
         unsafe_allow_html=True)
     # 중앙 대형 입력 + 원형 레드 전송 (v1 히어로 입력 정합 — 하단 입력과 병존)
+    def _hero_submit() -> None:
+        # Enter 제출 (v1 home.py:76-100 on_change 패턴) — 버튼 클릭과 동일 경로
+        v = (st.session_state.get("hero_q") or "").strip()
+        if v:
+            st.session_state["pending_q"] = v
+
     ic, bc = st.columns([9, 1])
     hero_q = ic.text_input("질문", key="hero_q", label_visibility="collapsed",
-                           placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?")
+                           placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?",
+                           on_change=_hero_submit)
     if bc.button("↑", key="hero_go") and (hero_q or "").strip():
         st.session_state["pending_q"] = hero_q.strip()
         st.rerun()
@@ -1161,15 +1306,50 @@ if question:
                      f"⚠️ 오늘 질의 한도({limit}회)를 초과했습니다. "
                      "베타 비용 가드 정책입니다. 내일 다시 이용해 주세요."}
         else:
+            # F-1 대기 표면 (v1 app.py:702-820): 실시간 경과 타이머(iframe JS)
+            # + 단계 전환 스피너 + ⏹ 생성 중지. 완료·실패 시 placeholder 정리.
+            timer_ph = st.empty()
+            prog_ph = st.empty()
+            stop_ph = st.empty()
+            with timer_ph.container():
+                _nx_iframe(_TIMER_HTML, height=60)
+            prog_ph.markdown(_spinner_html("질문 분석 중…", "핵심 쟁점·도메인 파악"),
+                             unsafe_allow_html=True)
+            with stop_ph.container():
+                st.button("⏹ 생성 중지", key="_stop_gen_btn",
+                          on_click=_request_stop, use_container_width=True)
+
+            def _stage(stage: str, payload) -> None:
+                if stage == "search":
+                    prog_ph.markdown(
+                        _spinner_html("관련 사규 탐색 중…", "근거 조항 검색"),
+                        unsafe_allow_html=True)
+                elif stage == "synthesize":
+                    titles = payload or []
+                    shown = titles[:2]
+                    more = len(titles) - len(shown)
+                    t = ", ".join(shown) + (f" 외 {more}건" if more > 0 else "")
+                    sub = (f"근거 사규: {t}" if t
+                           else "검색 결과 없음 — 답변에 한계가 있을 수 있어요")
+                    prog_ph.markdown(_spinner_html("답변 작성 중…", sub, cycle=True),
+                                     unsafe_allow_html=True)
+                elif stage == "verify":
+                    prog_ph.markdown(
+                        _spinner_html("답변 검증 중…", "인용 원장 대조"),
+                        unsafe_allow_html=True)
+
             try:
-                with st.spinner("사규를 확인하고 답변을 작성하는 중…"):
-                    entry = _ask(engine_q)
+                entry = _ask(engine_q, status_cb=_stage)
             except Exception as e:
                 print(f"[ui:error] {type(e).__name__}: {e}",
                       file=sys.stderr, flush=True)
                 st.error("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 다시 "
                          "시도해 주세요. 계속되면 담당 부서(CSR팀)에 알려주세요.")
                 entry = None
+            finally:
+                timer_ph.empty()
+                prog_ph.empty()
+                stop_ph.empty()
         if entry is not None:
             _render_assistant(entry, idx=len(st.session_state["messages"]),
                               typing=not (entry.get("coach") or entry.get("notice")))
