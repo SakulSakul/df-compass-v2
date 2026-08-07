@@ -121,7 +121,9 @@ def test_parity_surfaces_replay(monkeypatch):
     assert "✓ 사규 원문 근거 확인" in html                 # HIGH 라벨
     assert "조건부로 가능합니다" in html                    # 판정 카드 pill
     assert "📕" in html and "제3조" in html               # 카드 출처
-    assert "조항 단위 근거 미확인" in html                  # UNVERIFIED 라벨
+    # 결함1(08-07): UNVERIFIED + 인용 존재·비강등 → 중립 톤 라벨 (a)
+    assert "사규 문서 대조 확인" in html
+    assert "조항 단위 근거 미확인" not in html
     assert "참고 규정" in html                             # 참고 인용 구획 캡션
     assert "📄" in html                                    # 출처 문서 칩
     assert "응답 12.3초" in html and "🤖" in html          # ⏱·🤖 표기
@@ -135,11 +137,13 @@ def test_parity_surfaces_replay(monkeypatch):
     assert "이런 질문도 해볼 수 있어요" in html               # 💡 후속 제안 문구
     assert "CSR" in html and "카테고리" in html              # 카테고리 뱃지
     assert any(m in caps for m in ("좋은 하루", "언제든", "도움이 되었길"))  # 클로징
-    # PROACTIVE DOCK (검산 지적②): UNVERIFIED 답변 → hr 분기 주 액션 + 라벨
+    # PROACTIVE DOCK (결함4 재설계): CSR 카테고리 → 클린신고 분기.
+    # UNVERIFIED(안전 카테고리) 답변은 확신 없음 → 주 액션 생략 (오안내<무안내)
     assert "다음 단계 예측" in html
     btns = [str(b.label) for b in at.button]
-    assert any("인사교육팀 문의" in b for b in btns)
-    assert any("다시 답변" in b for b in btns)               # reroll (q1 은 hidden 분기)
+    assert any("클린신고 안내" in b for b in btns)
+    assert not any("인사교육팀 문의" in b for b in btns)
+    assert any("다시 답변" in b for b in btns)
     assert "보다 구체적인 답변을 위해" in caps               # 구체화 유도 (규칙3 문구)
 
 
@@ -220,6 +224,70 @@ def test_fragment_coach_surface(monkeypatch):
     assert "독립적으로" in html                            # 단일 턴 안내
     assert any("클린신고 한도가 얼마인가요?" in str(b.label) for b in at.button)
     assert any(m.get("coach") for m in at.session_state["messages"])
+
+
+def _entry(**kw) -> dict:
+    base = {"role": "assistant", "answer": "일반 안내 본문입니다.",
+            "blocked": False, "critical": False, "degraded": False,
+            "grade": "UNVERIFIED", "card": None, "ctx_titles": [],
+            "cite_ok": 0, "cite_n": 1, "n_chunks": 3, "timings": {},
+            "retries": 0, "followups": [], "elapsed_s": 5.0}
+    base.update(kw)
+    return base
+
+
+def test_unverified_label_branches(monkeypatch):
+    """결함1(08-07): (a) 인용 존재(앵커 카운트 또는 문서수준 표기)·비강등 →
+    중립 톤 / (b) 인용 부재 또는 강등 → 강한 경고 유지. 산식·action 무접촉."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q1"},
+        _entry(cite_n=1),                       # (a) 앵커 카운트 경로
+        {"role": "user", "content": "q2"},
+        _entry(cite_n=0, answer="사용 기준 안내.\n\n[참조: (재무) 법인카드 관리 지침]"),
+        {"role": "user", "content": "q3"},      # ↑ (a) 문서수준 표기 경로
+        _entry(cite_n=0),                       # (b) 인용 자체 부재
+        {"role": "user", "content": "q4"},
+        _entry(cite_n=1, degraded=True, grade="UNVERIFIED"),  # (b) 강등
+    ]
+    at.run()
+    assert not at.exception
+    html = _all_markdown(at)
+    assert html.count("사규 문서 대조 확인 — 세부 조항은 원문 참조") == 2  # (a)×2
+    assert html.count("조항 단위 근거 미확인 — 원문 확인 권장") == 2      # (b)×2
+
+
+def test_dock_category_mapping(monkeypatch):
+    """결함4(08-07): 카테고리 결정론 매핑 — 재무→경리팀·경영관리팀 /
+    인사→인사교육팀 / 무매핑(안전)→주 액션 생략 (오안내<무안내)."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "법인카드 사용 기준이 어떻게 되나요?"},
+        _entry(ctx_titles=["(재무) 법인카드 관리 지침"]),
+        {"role": "user", "content": "연차는 어떻게 신청하나요?"},
+        _entry(ctx_titles=["(인사) 취업규칙"]),
+        {"role": "user", "content": "공기질 관리 기준은?"},
+        _entry(ctx_titles=["(안전) 공기질 유지관리 지침"]),
+    ]
+    at.run()
+    assert not at.exception
+    btns = [str(b.label) for b in at.button]
+    assert any("경리팀·경영관리팀" in b for b in btns)      # 재무 매핑
+    assert any("인사교육팀 문의" in b for b in btns)        # 인사 매핑
+    # 재무 답변에 인사 패널 미표출 — dock 주 액션은 엔트리당 1개, hr 은 인사만
+    assert sum(1 for b in btns if "인사교육팀" in b) == 1
+    # 무매핑 카테고리는 주 액션 생략 (dock 키 3개 중 안전용 없음)
+    assert sum(1 for b in btns
+               if any(t in b for t in ("문의", "안내"))) == 2
+
+
+def test_theme_pinned_light():
+    """결함2·3(08-07) 근본 수정 가드: 테마 라이트 고정 (config.toml).
+    다크 모드 브라우저에서 emotion 텍스트 색(백색)이 주입 CSS 의 라이트
+    배경 위에 얹혀 빈 항목처럼 보이는 결함 — 재발 방지 고정."""
+    cfg = (ROOT / ".streamlit" / "config.toml").read_text()
+    assert 'base = "light"' in cfg
+    assert 'textColor' in cfg
 
 
 def test_fragment_noop_without_prev(monkeypatch):

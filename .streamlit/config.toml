@@ -1,0 +1,16 @@
+# v1 .streamlit/config.toml 이식 (테마 라이트 고정 — 다크 모드 브라우저에서
+# Streamlit 다크 테마의 텍스트 색이 주입 CSS의 라이트 배경 위에 얹혀
+# 백색-on-백색 소실되는 결함의 근본 수정). 색 값은 v2 Warm Editorial 정합.
+[theme]
+base = "light"
+primaryColor = "#C8102E"
+backgroundColor = "#F5F4ED"
+secondaryBackgroundColor = "#FAF9F5"
+textColor = "#3D3C38"
+font = "sans serif"
+
+[server]
+headless = true
+
+[client]
+toolbarMode = "viewer"

@@ -462,6 +462,14 @@ def _category_of(ctx_titles: list) -> str | None:
     return _C(cats).most_common(1)[0][0] if cats else None
 
 
+def _has_citation_form(answer: str) -> bool:
+    """섹션/문서 인용 표기 존재 (결함1 라벨 분기용 — 표시 계층 결정론).
+    [참조: …] 블록 · 「문서명」 · 계약형 ((카테고리) 문서명, "섹션") 3형."""
+    import re as _re
+    return bool(_re.search(
+        r"\[참조:|「[^」]{2,}」|\(\([^()]{1,20}\)\s*[^,()]{2,},\s*\"", answer))
+
+
 _STANCE_TONE = {   # v1 판정 카드 색조 이식 (안전쪽 = 레드)
     "금지":   ("#C8102E", "#FCEEF0"),
     "신고대상": ("#C8102E", "#FCEEF0"),
@@ -637,50 +645,37 @@ def _is_fragment_followup(q: str, has_prev: bool) -> bool:
 
 
 # ── PROACTIVE DOCK "다음 단계 예측" (v1 ui/feedback.py:112-140 이식) ──
-# 분기 로직은 v1 core/nexus_button_branch.classify_button 의 축약 이식
-# (표시 계층 전용 — confidence 신호는 v2 grade/degrade 로 대응).
-_Q_HR_KW = ("휴가", "수당", "복리후생", "근태", "휴직", "급여", "출퇴근",
-            "재택", "부서 이동", "승진", "평가", "이의 제기", "근무 시간",
-            "월급", "퇴직금", "초과근무", "연차", "교육 신청", "직급")
-_Q_REPORT_KW = ("신고", "보고", "위반", "분실", "도용", "유출", "수수", "받았",
-                "발견", "위조", "횡령", "뇌물", "절도", "압력", "누설", "반출",
-                "협박", "해킹", "발생했", "공유 요구", "사적으로", "추천했",
-                "변경했", "도둑질", "갑질", "차별")
+# 08-07 결함4 재설계: 분기 = 답변 내 명시적 신고 신호 + 카테고리(뱃지와 동일
+# 산출) 결정론 매핑만. v1 classify_button 의 confidence="low" fallback 을
+# grade UNVERIFIED 로 대응시킨 것이 오분기 원인이었다 — v1 에선 low 가
+# 희귀하지만 v2 는 C-class 문서(76/101)가 전부 UNVERIFIED 라 hr fallback 이
+# 광역 오발동. 질문 키워드 휴리스틱도 제거 — 확신 없으면 생략(오안내<무안내).
 _A_BROAD_KW = ("신고·조사", "SRMS", "신세계면세점 핫라인", "일반 사건사고 보고지침",
-               "중대 사건사고 보고지침", "사건사고 보고지침")
-_A_REPORT_KW = _A_BROAD_KW + ("클린신고", "공정거래법 위반", "공정거래를 저해",
-                              "위변조 또는 허위작성", "부정/부실행위")
+               "중대 사건사고 보고지침", "사건사고 보고지침", "공정거래법 위반",
+               "공정거래를 저해", "위변조 또는 허위작성", "부정/부실행위")
 _A_CLEAN_KW = ("클린신고", "클린뱅크", "자진 신고", "자진신고", "클린신고서",
                "클린신고신청서", "SHRS CSR경영란", "CSR경영란", "윤리실천등록")
 _A_HR_KW = ("인사 규정·복리후생 등 인사 행정 사항은 인사교육팀에 문의",
             "인사교육팀에 문의해 주시기 바랍니다",
             "인사 규정·복리후생 등 인사 행정 사항은 인사팀에 문의",
             "인사팀에 문의해 주시기 바랍니다")
+_CAT_DOCK = {"재무": "finance", "인사": "hr", "CSR": "clean"}
 
 
-def _dock_branch(entry: dict, question: str) -> str:
-    import re as _re
+def _dock_branch(entry: dict) -> str:
     if entry.get("critical"):
         return "report"
-    ans, q = entry.get("answer") or "", question or ""
-    q_hr = any(k in q for k in _Q_HR_KW)
-    q_rep = any(k in q for k in _Q_REPORT_KW)
-    a_grace = any(k in ans for k in _A_HR_KW)
-    a_rep = any(k in ans for k in _A_REPORT_KW)
-    a_broad = any(k in ans for k in _A_BROAD_KW)
+    ans = entry.get("answer") or ""
     a_clean = any(k in ans for k in _A_CLEAN_KW)
-    cats = {m.group(1) for t in (entry.get("ctx_titles") or [])
-            if (m := _re.match(r"\((.+?)\)", t))}
-    low = entry.get("grade") in ("LOW", "UNVERIFIED") or entry.get("degraded")
-    if q_hr and (a_grace or low):
-        return "hr"
+    a_broad = any(k in ans for k in _A_BROAD_KW)
     if a_clean and not a_broad:
         return "clean"
-    if q_rep or ("공정거래" in cats and cats != {"인사"}) or a_rep:
+    if a_broad:
         return "report"
-    if a_grace or low:
+    if any(k in ans for k in _A_HR_KW):
         return "hr"
-    return "hidden"
+    cat = _category_of(entry.get("ctx_titles") or [])
+    return _CAT_DOCK.get(cat or "", "hidden")
 
 
 def _render_dock_panel(branch: str, hotlines: dict) -> None:
@@ -699,6 +694,13 @@ def _render_dock_panel(branch: str, hotlines: dict) -> None:
             if ethics:
                 st.link_button("🏢 신세계면세점 핫라인", ethics,
                                use_container_width=True)
+        elif branch == "finance":
+            # 결함4 (08-07): 재무 카테고리 결정론 매핑 — 본문 권장 행동과
+            # 동일한 담당 부서 안내 (경리팀 카드 관리 · 경영관리팀 예산 합의)
+            st.markdown("**💳 재무 담당 부서 안내**")
+            st.markdown("법인카드·경비 등 재무 실무는 **경리팀**(카드 관리), "
+                        "예산 협의는 **경영관리팀**(예산 합의)에 문의해 "
+                        "주시기 바랍니다.")
         elif branch == "clean":
             st.markdown("**💼 클린신고 (자진 신고) 안내**")
             st.markdown("금품·향응 수수 등 이해관계자와의 비위 행위는 "
@@ -725,7 +727,8 @@ def _render_dock_panel(branch: str, hotlines: dict) -> None:
 
 
 _DOCK_LABEL = {"hr": "📞 인사교육팀 문의", "clean": "💼 클린신고 안내",
-               "report": "📞 신고 방법 안내"}
+               "report": "📞 신고 방법 안내",
+               "finance": "💳 경리팀·경영관리팀 안내"}
 
 
 @st.cache_resource(show_spinner="준비 중…")
@@ -862,6 +865,15 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     g = entry.get("grade")
     if g in _GRADE_LABEL and not entry.get("critical"):
         cls, label = _GRADE_LABEL[g]
+        # UNVERIFIED 문구 분기 (08-07 결함1 — grade 산식·action 무변경):
+        # 문서명 실재 검증 전건 통과는 비차단이 보증(n_dm>0=block, 여기 도달
+        # 자체가 통과). 섹션/문서 인용 존재는 표기 탐지로 판정 — verify 의
+        # check_document_names 는 통과 항목을 기록하지 않아 cite_n 으론 불가.
+        # 인용 부재·강등(앵커 실패)만 기존 강한 경고 유지.
+        if (g == "UNVERIFIED" and not entry.get("degraded")
+                and (entry.get("cite_n", 0) > 0
+                     or _has_citation_form(entry.get("answer") or ""))):
+            label = "사규 문서 대조 확인 — 세부 조항은 원문 참조"
         st.markdown(f'<span class="nx-grade {cls}">{label}</span>',
                     unsafe_allow_html=True)
     # 카테고리 뱃지 (v1 ui/render.py:142-165 — 접두어 최빈값)
@@ -934,7 +946,7 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     orig_q = (msgs[idx - 1].get("content")
               if 0 < idx <= len(msgs) and msgs[idx - 1].get("role") == "user"
               else None)
-    branch = _dock_branch(entry, orig_q or "")
+    branch = _dock_branch(entry)
     rerolled: set = st.session_state.setdefault("rerolled", set())
     can_reroll = bool(orig_q) and idx not in rerolled
     if branch != "hidden":

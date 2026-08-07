@@ -26,13 +26,14 @@
 | 베타 참가 동의서 게이트 | app.py:1411-1533 (consent_version) | 이식됨 (사용자 판정) | `_consent_gate()` — v1 문안·검증 regex·prod 비활성 규칙 동일. 차이: 쿠키 30일 영속 미이식(CookieManager rerun 인터럽트 사고 이력 — 세션 단위 동의), DB 기록은 ADR-8 로 stderr 기록 대체(심의 후 영속화). 동의서 본문의 데이터 흐름 서술은 v2 실태(질의 로그 무저장)로 정정. AppTest |
 | 베타 비용 가드 (일일 한도 안내) | app.py:515-532·608-615 (daily_query_limit) | 이식됨 (사용자 판정) | `_check_rate_limit()` — KST 자정 리셋·세션 카운터·v1 한도값(NEXUS_DAILY_QUERY_LIMIT=100)·경고 문구 원문. 안내는 notice 엔트리로 히스토리 영속. AppTest |
 | 푸터 고지 | app.py 하단 고지 | 이식됨 | 사이드바 디스클레이머로 통합 (v1 문안 동일) |
+| 테마 라이트 고정 | .streamlit/config.toml (base=light) | 이식됨 (08-07 결함2·3 근본 수정) | **전수 대조가 놓쳤던 진짜 누락** — 코드 표면만 훑고 설정 파일을 대조하지 않은 오류. 미고정 시 다크 모드 브라우저에서 emotion 텍스트 색(백색)이 주입 CSS 라이트 배경 위에 얹혀 expander 불릿·번호·캡션류가 "빈 항목"으로 소실. computed color 실측으로 수정 검증 (rgb(250,250,250)→rgb(61,60,56)) |
 
 ## B. 답변 상단
 | 항목 | v1 근거 | v2 상태 | v2 근거 |
 |---|---|---|---|
 | 검토 과정 expander + 캡션 | app.py:1157 ("AI가 답변을 생성한 검토 단계입니다…") | 이식됨 | 🧠 expander + 동일 캡션 원문, AppTest |
 | 판정 카드 (stance pill·세리프 인용·출처) | cards.py:97-148 (_build_verdict_card_html) | 이식됨 | `_verdict_card_data` 결정론 파싱 + v1 색조(`_STANCE_TONE`) — v1은 LLM verdict, v2는 핵심 결론 파싱(엔진 무접촉 대체) |
-| 신뢰도 칩 | cards.py:121-122 (conf_label) | 이식됨 | conf 4등급 사용자 라벨 (심의 3항) — HIGH/MEDIUM/UNVERIFIED + LOW=강등 칩 |
+| 신뢰도 칩 | cards.py:121-122 (conf_label) | 이식됨 (08-07 결함1 문구 분기) | conf 4등급 사용자 라벨 (심의 3항) — UNVERIFIED 는 문구 분기: 인용 표기 존재(cite_n 또는 [참조:]·「」·계약형 탐지 — check_document_names 가 통과 항목을 기록하지 않아 표기 탐지 병행)·비강등이면 중립 톤 "사규 문서 대조 확인", 인용 부재·강등만 강한 경고. 산식·action 무접촉. **문서수준 MEDIUM 등급 정식 신설의 필요성 실증 사례로 기등재 백로그 심의 자료에 기록** (C-class 76/101 → 정상 답변 대다수가 UNVERIFIED) |
 | 신뢰도 부족 게이트 (❌) | chatbot.py 게이트①② (SAFE_NO_CONTEXT 등) | **대체 설계** | v2 는 §5 verify 체계가 대체: block(비실재 인용 차단)·degrade(강등 칩)·UNVERIFIED 라벨. v1 게이트류(검색 부실 deflect)는 v2 보장 계층+negative 무응답 표명이 담당 |
 
 ## C. 본문
@@ -48,7 +49,7 @@
 | ⏱·🤖 표기 | app.py:709-713 (elapsed) + 모델 표기 | 이식됨 | "⏱️ 응답 N초 · 🤖 모델" 메타 라인 |
 | 참고 사규 expander | render.py:296-312 (_render_contexts) | 이식됨 | ctx_refs 발췌(escape — v1 XSS 교훈 승계) expander |
 | 💡 이런 질문도 해볼 수 있어요 | render.py:207 | 이식됨 | 동일 문구 + grounded 제안(auto_query_examples SELECT) |
-| 다음 단계 예측 (PROACTIVE DOCK) | ui/feedback.py:112-140 (grep 누락 정정) + core/nexus_button_branch.py | 이식됨 (검산 지적②) | 라벨 div 원문 + 분기 주 액션(신고/클린신고/인사 문의 — classify_button 다중 신호 축약 이식, confidence 는 grade/degrade 로 대응) + 패널 3종(ui/panels.py 축약) + 🔄 다시 답변(1회 한정 — v2 단일 턴이라 동일 질문 재실행, prev_answer 전달은 엔진 접촉이라 미이식). AppTest |
+| 다음 단계 예측 (PROACTIVE DOCK) | ui/feedback.py:112-140 (grep 누락 정정) + core/nexus_button_branch.py | 이식됨 (08-07 결함4 재설계) | 라벨 div 원문 + 분기 주 액션 + 패널 4종(신고/클린신고/인사/재무=경리팀·경영관리팀) + 🔄 다시 답변(1회 한정). **오분기 근본원인**: v1 confidence="low"(희귀)를 v2 grade UNVERIFIED(C-class 76/101 → 대다수)로 대응시켜 hr fallback 광역 오발동 → 재설계 = 답변 내 명시 신고 신호 + 카테고리(뱃지 동일 산출) 결정론 매핑만, 질문 키워드 휴리스틱·low fallback 제거, 무매핑 카테고리는 주 액션 생략(오안내<무안내). AppTest |
 | personality 클로징 (시간·요일) | personality.py:31-50 (closing_remark 풀) | 이식됨 | `_closing_line` — NORMAL/CRITICAL 풀 원문, 세션 결정론 pick |
 | 👍👎 피드백 전체 플로우 | feedback.py:306·313·314 | 이식됨 (플로우 문구 + 캡션) | "이 답변이 정확하고 도움이 되셨나요?" + 캡션 "베타 단계입니다…"(검산 지적①) + 👍👎 + "✅ 피드백 감사합니다." — **DB 영속화만 ADR-8 심의 대기(세션+stderr 기록)**, AppTest |
 | 🔗 관련 추가 질문 모드 | app.py:618-631 (prev_turn) | **백로그 확정 (사용자 의결 4항)** | 엔진형(prev_turn 전달)은 엔진 접촉 — 신규 "이해 확인 + 구체화 유도" 표면의 실사용 결과가 그 설계의 입력이 된다 |
