@@ -532,6 +532,7 @@ contextual 적재(원 2번)는 ctx_* 백필로 이미 대체됨.
   구현 동결 유지 (프로브 4종 포함 어떤 착수도 지시서 이후).**
 
 ## 작업 로그 (최신이 위)
+- 2026-08-08(2) **사이드바 ADMIN 연결**(사용자 의결 — 링크만, 완전 이식은 ADR-8 개정 심의 후): v1 위치 정합(디스클레이머 하단 ADMIN expander, v1 app.py:234-261·299-309) + st.link_button → v1 admin 콘솔(https://df-nexus-ai.streamlit.app/admin — 라우팅 근거 v1:261 switch_page("pages/admin.py")=파일명 경로 /admin. 배포 URL 직접 검증은 세션 프록시 차단으로 불가 — 감리 육안 단계 확인 필요 명기). 비번 게이트·쓰기 전부 v1 담당 — DB 쓰기 0·엔진 0줄. **101 passed**(expander 라벨+href 어서션)·로컬 href 실측 일치. 정지.
 - 2026-08-08 **DOCK 공정거래 결정론 복원**(감리 적발 — 결함4 재설계 때 결정론 신호까지 누락): v1 REPORT_DOC_DOMAINS={"공정거래"}(nexus_button_branch.py:47·165-167) 이식 — 근거 문서 집합 멤버십 검사(최빈값 아님 — v1 contexts-단독 케이스 보존, _CAT_DOCK 에도 등재). 부대조건(contexts_only_hr) 확인 결과 공정거래 존재 시 {인사} 단독 불가라 논리상 항상 통과 — 별도 반영 불요 명기. 그 외 분기·패널·라벨 무변경. **100 passed**(공정거래 최빈+소수 혼합 2케이스·기존 4종 회귀 유지). 엔진 0줄. admin 이식은 ADR-8 개정 심의 후 순서 확정(감리자 제안 수용). 정지.
 - 2026-08-07(6) **빈 홈 폭 제한 이식**(감리 적발 — v1 ui/home.py:45 누락): 빈 홈 렌더 블록에 960px 가운데 정렬 CSS 추가(stChatInput 숨김과 동일 위치 — 미렌더 시 자동 원복, 답변 화면 880px 무접촉). 99 passed(폭 마커 존재/부재 어서션)·빈 홈+1문답 후 재캡처. 정지.
 - 2026-08-07(5) **빈 홈 추천 칩 v1 정합**(감리 판정 — 6개 대형 카드는 pre-패리티 잔재): _EXAMPLES 6종 제거 → v1 3개 알약형 이식 — 라벨/전체질의 분리(_HERO_PILLS_FALLBACK 원문 3쌍), faq_cache(show_on_home) SELECT ttl=300+폴백(v1 ui/home.py:16-32·core/faq_cache.py:264-288, 현재 show_on_home 0행 → 폴백 발동·컬럼 실재 확인), 클릭=pending_q 단일 경로, CSS v1 사양 원문(+전역 .stButton 규칙 대비 .stButton 조합 셀렉터 — 1차 캡처에서 radius 미적용 발견·수정, computed 999px/36px/13px 실증). **99 passed**·빈 홈(칩 3)+1문답 후 2장 재캡처. 엔진 0줄·DB 쓰기 0. 정지 → 커밋 검산 대기.

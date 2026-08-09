@@ -369,6 +369,18 @@ def test_processing_run_recovers_input(monkeypatch):
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
 
 
+def test_sidebar_admin_link(monkeypatch):
+    """사이드바 ADMIN 연결 (사용자 의결 — v1 콘솔 링크. 완전 이식은 ADR-8
+    심의 후): expander 라벨 v1 정합 + href = v1 admin URL."""
+    at = _at(monkeypatch)
+    at.run()
+    assert any(str(e.label) == "ADMIN" for e in at.expander)
+    links = at.get("link_button")
+    admin = [l for l in links if "Admin" in str(l.label)]
+    assert admin
+    assert admin[0].url == "https://df-nexus-ai.streamlit.app/admin"
+
+
 def test_motion_css_present(monkeypatch):
     """F 계급(시간축) 보조 검증 — 모션 자체는 녹화/연속 캡처가 정본이고,
     AppTest 는 keyframes·THINKING 블록 CSS 의 존재만 고정한다."""

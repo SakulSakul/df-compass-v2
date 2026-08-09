@@ -438,6 +438,10 @@ def _home_chip_items() -> list:
     except Exception:
         return []
 
+# v1 admin 콘솔 URL — pages/admin.py 의 Streamlit 파일명 라우팅(/admin).
+# v1 app.py:261 st.switch_page("pages/admin.py") 근거
+_V1_ADMIN_URL = "https://df-nexus-ai.streamlit.app/admin"
+
 # 질의 범위 (표시 계층 — 선택 시 질문에 범위 문구를 부가해 라우터·합성이 참고)
 _SCOPES = ("전체", "CSR", "공정거래", "공통", "안전", "영업", "인사",
            "재무", "정보보안", "총무", "환경")
@@ -874,6 +878,14 @@ def _sidebar(hotlines: dict) -> None:
             "인사 규정·복리후생 등 인사 행정 사항은 인사교육팀으로 "
             "문의해 주시기 바랍니다.</p>",
             unsafe_allow_html=True)
+        st.markdown("---")
+        # ADMIN — v1 콘솔 링크 (v1 app.py:234-261·299-309 위치 정합).
+        # 완전 이식은 DB 쓰기가 본질이라 ADR-8 개정 심의 후 — 여기는 링크만.
+        # 쓰기·비밀번호 게이트는 전부 v1 앱이 담당 (사용자 의결: "admin 연결").
+        with st.expander("ADMIN"):
+            st.caption("관리 콘솔은 v1 앱에서 운영됩니다 (비밀번호 게이트 포함).")
+            st.link_button("▶  Admin 대시보드 열기 (v1 콘솔)", _V1_ADMIN_URL,
+                           use_container_width=True)
 
 
 # ── 시간축(모션) 대기 표면 — F 계급 (v1 app.py:702-820 이식) ──
