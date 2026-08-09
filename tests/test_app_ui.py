@@ -258,14 +258,21 @@ def test_unverified_label_branches(monkeypatch):
 
 
 def test_dock_category_mapping(monkeypatch):
-    """결함4(08-07): 카테고리 결정론 매핑 — 재무→경리팀·경영관리팀 /
-    인사→인사교육팀 / 무매핑(안전)→주 액션 생략 (오안내<무안내)."""
+    """카테고리 결정론 매핑 (트랙C 개정): 재무→경리팀·경영관리팀 / 무매핑
+    (안전·인사 카테고리 단독)→주 액션 생략 — hr dock 은 답변 내 인사 안내
+    문구(_A_HR_KW) 신호로만 발동 (v1 정합, 오안내<무안내)."""
     at = _at(monkeypatch)
     at.session_state["messages"] = [
         {"role": "user", "content": "법인카드 사용 기준이 어떻게 되나요?"},
         _entry(ctx_titles=["(재무) 법인카드 관리 지침"]),
         {"role": "user", "content": "연차는 어떻게 신청하나요?"},
+        # 인사 카테고리 + 인사 문구 없는 일반 답변 → hidden (nomatch 오안내 방지)
         _entry(ctx_titles=["(인사) 취업규칙"]),
+        {"role": "user", "content": "복리후생 규정이 궁금해요"},
+        # 답변에 인사 안내 문구 → hr 발동 (v1 답변 신호 경로)
+        _entry(ctx_titles=["(인사) 취업규칙"],
+               answer="인사 규정·복리후생 등 인사 행정 사항은 "
+                      "인사교육팀에 문의해 주시기 바랍니다."),
         {"role": "user", "content": "공기질 관리 기준은?"},
         _entry(ctx_titles=["(안전) 공기질 유지관리 지침"]),
     ]
@@ -273,10 +280,9 @@ def test_dock_category_mapping(monkeypatch):
     assert not at.exception
     btns = [str(b.label) for b in at.button]
     assert any("경리팀·경영관리팀" in b for b in btns)      # 재무 매핑
-    assert any("인사교육팀 문의" in b for b in btns)        # 인사 매핑
-    # 재무 답변에 인사 패널 미표출 — dock 주 액션은 엔트리당 1개, hr 은 인사만
-    assert sum(1 for b in btns if "인사교육팀" in b) == 1
-    # 무매핑 카테고리는 주 액션 생략 (dock 키 3개 중 안전용 없음)
+    # hr 은 문구 신호 건 1건만 — 인사 카테고리 단독 건은 미발동
+    assert sum(1 for b in btns if "인사교육팀 문의" in b) == 1
+    # dock 주 액션 총량 = 재무 1 + hr(문구) 1 (안전·인사 단독은 생략)
     assert sum(1 for b in btns
                if any(t in b for t in ("문의", "안내"))) == 2
 

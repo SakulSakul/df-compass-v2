@@ -43,6 +43,11 @@ QUESTIONS = [
 ANSWER_MARKERS = ("이 답변이 정확하고", "찾지 못했습니다", "일시적인 오류",
                   "트래픽 폭주", "차단되었습니다")
 
+# 부분 재실행: python run_compare.py fair_trade,hr,nomatch
+if len(sys.argv) > 1:
+    _sel = set(sys.argv[1].split(","))
+    QUESTIONS = [q for q in QUESTIONS if q[0] in _sel]
+
 
 def _launch(app_dir: str, port: int) -> subprocess.Popen:
     env = dict(os.environ)
@@ -150,7 +155,16 @@ async def _run_app(pw, name: str, port: int) -> dict:
                     done = True
                     break
             rec["answered"] = done
-            await pg.wait_for_timeout(2500)
+            # 답변 하단 위젯(피드백·dock) 안착 대기 — v2 는 마무리 rerun 뒤
+            # 렌더되므로 직전 프레임 스냅샷의 타이밍 아티팩트를 제거한다
+            for _ in range(8):
+                settled = await pg.evaluate(
+                    "() => [...document.querySelectorAll('button')]"
+                    ".some(b => /도움됐어요|아쉬워요/.test(b.innerText))")
+                if settled:
+                    break
+                await pg.wait_for_timeout(1500)
+            await pg.wait_for_timeout(1500)
             fin = await _checks(pg)
             fin["timer_after"] = await _timer_present(pg)
             rec["answer"] = fin

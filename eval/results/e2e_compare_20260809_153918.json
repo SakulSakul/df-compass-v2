@@ -1,0 +1,473 @@
+{
+ "ts": "20260809_153918",
+ "note": "DIFF 는 원시 기록 — 의도/결함 판정은 감리자 재검산",
+ "diff_table": {
+  "fair_trade": {
+   "home": {
+    "dock_labels": "PASS",
+    "dock_present": "PASS",
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": "PASS",
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "answer": {
+    "dock_labels": "PASS",
+    "dock_present": "PASS",
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": "PASS",
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "timer_after": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "processing": {
+    "timer_any": "PASS",
+    "stop_any": "PASS"
+   },
+   "answered": "PASS"
+  },
+  "hr": {
+   "home": {
+    "dock_labels": "PASS",
+    "dock_present": "PASS",
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": "PASS",
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "answer": {
+    "dock_labels": {
+     "v1": [
+      "📞 인사교육팀 문의"
+     ],
+     "v2": []
+    },
+    "dock_present": {
+     "v1": true,
+     "v2": false
+    },
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": {
+     "v1": 2,
+     "v2": 1
+    },
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "timer_after": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "processing": {
+    "timer_any": "PASS",
+    "stop_any": "PASS"
+   },
+   "answered": "PASS"
+  },
+  "nomatch": {
+   "home": {
+    "dock_labels": "PASS",
+    "dock_present": "PASS",
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": "PASS",
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "answer": {
+    "dock_labels": "PASS",
+    "dock_present": "PASS",
+    "feedback_btns": "PASS",
+    "footer": "PASS",
+    "ghost_text_nodes": "PASS",
+    "home_chips": "PASS",
+    "stop_btn": "PASS",
+    "timer_after": "PASS",
+    "visible_inputs": "PASS"
+   },
+   "processing": {
+    "timer_any": "PASS",
+    "stop_any": "PASS"
+   },
+   "answered": "PASS"
+  }
+ },
+ "raw": {
+  "v1": {
+   "app": "v1",
+   "questions": {
+    "fair_trade": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": false,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": false
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [
+       "📞 신고 방법 안내"
+      ],
+      "dock_present": true,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 2,
+      "timer_after": false
+     }
+    },
+    "hr": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [
+       "📞 인사교육팀 문의"
+      ],
+      "dock_present": true,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 2,
+      "timer_after": false
+     }
+    },
+    "nomatch": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": false,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": false
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 1,
+      "timer_after": false
+     }
+    }
+   }
+  },
+  "v2": {
+   "app": "v2",
+   "questions": {
+    "fair_trade": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [
+       "📞 신고 방법 안내"
+      ],
+      "dock_present": true,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 2,
+      "timer_after": false
+     }
+    },
+    "hr": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 1,
+      "timer_after": false
+     }
+    },
+    "nomatch": {
+     "home": {
+      "visible_inputs": 1,
+      "home_chips": 3,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": false,
+      "footer": true,
+      "ghost_text_nodes": 0
+     },
+     "processing_samples": [
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      },
+      {
+       "visible_inputs": 1,
+       "home_chips": 0,
+       "stop_btn": true,
+       "dock_labels": [],
+       "dock_present": false,
+       "feedback_btns": false,
+       "footer": true,
+       "ghost_text_nodes": 1,
+       "timer": true
+      }
+     ],
+     "answered": true,
+     "answer": {
+      "visible_inputs": 1,
+      "home_chips": 0,
+      "stop_btn": false,
+      "dock_labels": [],
+      "dock_present": false,
+      "feedback_btns": true,
+      "footer": true,
+      "ghost_text_nodes": 1,
+      "timer_after": false
+     }
+    }
+   }
+  }
+ }
+}
