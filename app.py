@@ -146,16 +146,20 @@ p.nx-hero-sub { font-size: 15px !important; }
 [class*="st-key-hero_go"] .stButton > button p { color: #fff !important; }
 [class*="st-key-hero_go"] .stButton > button:hover,
 [class*="st-key-hero_go"] button:hover { background: var(--c-accent-dark) !important; }
-/* 히어로 예시 칩 — pill 형 (v1 정합) */
-[class*="st-key-ex_"] .stButton > button,
-[class*="st-key-ex_"] button {
-  border-radius: 999px !important; background: #fff !important;
-  border: 1px solid var(--c-border) !important; text-align: center !important;
-  font-size: 12.5px !important; padding: 0.55rem 1rem !important;
+/* 홈 추천 칩 — 알약형 3개 (v1 ui/home.py:111-119 사양 원문. 전역
+   .stButton>button 규칙보다 뒤지지 않도록 .stButton 조합 셀렉터 병기) */
+[class*="st-key-hpill_"] .stButton > button,
+[class*="st-key-hpill_"] button {
+  min-height: 36px !important; border-radius: 999px !important;
+  border: 1px solid var(--c-border) !important; background: #fff !important;
+  color: #6B6760 !important; font-size: 13px !important;
+  font-weight: 500 !important; padding: 6px 12px !important;
+  box-shadow: none !important; white-space: nowrap !important;
+  text-align: center !important;
 }
-[class*="st-key-ex_"] .stButton > button:hover,
-[class*="st-key-ex_"] button:hover { border-color: var(--c-accent) !important;
-  color: var(--c-accent) !important; }
+[class*="st-key-hpill_"] .stButton > button:hover,
+[class*="st-key-hpill_"] button:hover {
+  border-color: var(--c-accent) !important; color: var(--c-accent) !important; }
 
 /* ── Chat messages — 줄 길이 제한 + 흰 카드 (v1 동일) ── */
 [data-testid="stChatMessage"] {
@@ -401,14 +405,38 @@ st.markdown(
     '<span class="nx-beta">베타 · 입력 내용 학습 안 함</span></div>',
     unsafe_allow_html=True)
 
-_EXAMPLES = (
-    "법인카드 사용 기준이 어떻게 되나요?",
-    "협력사에서 선물을 받았는데 어떻게 해야 하나요?",
-    "국내 출장 시 숙박비 한도가 궁금합니다.",
-    "외부에서 강연 요청이 왔는데 회사 승인이 필요한가요?",
-    "매장에서 손님이 두고 간 물건은 어떻게 처리하나요?",
-    "거래처가 명절 선물을 보내왔어요. 받아도 되나요?",
-)
+# 빈 홈 추천 칩 — v1 ui/home.py:9-13 폴백 상수 원문 (짧은 라벨 ↔ 전체 질의)
+_HERO_PILLS_FALLBACK = [
+    ("선물 받았어요", "거래처에서 선물을 받아도 되나요?"),
+    ("동료 부상", "동료가 다쳤어요. 긴급 보고는 어떻게 하나요?"),
+    ("법인카드", "법인카드를 개인 용도로 사용해도 되나요?"),
+]
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def _home_chip_items() -> list:
+    """FAQ 캐시(show_on_home) 기반 홈 칩 [(label, query)] — v1 ui/home.py:16-32
+    + core/faq_cache.py:264-288 이식 (SELECT only, ADR-8). 실패/빈 결과 []."""
+    try:
+        sb = _engine()[0]
+        rows = (sb.table("nexus_faq_cache")
+                .select("query_display,home_label,home_order")
+                .eq("approved", True).eq("is_critical", False)
+                .eq("show_on_home", True)
+                .order("home_order", desc=False)
+                .order("hit_count", desc=True)
+                .limit(3).execute().data or [])
+        out = []
+        for r in rows:
+            q = (r.get("query_display") or "").strip()
+            if not q:
+                continue
+            label = (r.get("home_label") or "").strip() or (
+                q[:12] + ("…" if len(q) > 12 else ""))
+            out.append((label, q))
+        return out
+    except Exception:
+        return []
 
 # 질의 범위 (표시 계층 — 선택 시 질문에 범위 문구를 부가해 라우터·합성이 참고)
 _SCOPES = ("전체", "CSR", "공정거래", "공통", "안전", "영업", "인사",
@@ -1291,13 +1319,15 @@ if not st.session_state["messages"] and not question:
         if bc.button("↑", key="hero_go") and (hero_q or "").strip():
             st.session_state["pending_q"] = hero_q.strip()
             st.rerun()
-        for row_start in (0, 3):
-            cols = st.columns(3)
-            for i, (col, ex) in enumerate(
-                    zip(cols, _EXAMPLES[row_start:row_start + 3]), start=row_start):
-                if col.button(ex, key=f"ex_{i}", use_container_width=True):
-                    st.session_state["pending_q"] = ex
-                    st.rerun()
+        # 추천 칩 정확히 3개 — 짧은 라벨, 클릭 = 매핑된 전체 질의 제출
+        # (v1 ui/home.py:109-126 — pending_q 단일 경로)
+        pills = _home_chip_items() or _HERO_PILLS_FALLBACK
+        pcols = st.columns(len(pills))
+        for pi, (plabel, pq) in enumerate(pills):
+            if pcols[pi].button(plabel, key=f"hpill_{pi}",
+                                use_container_width=True):
+                st.session_state["pending_q"] = pq
+                st.rerun()
 
 for i, m in enumerate(st.session_state["messages"]):
     if m["role"] == "user":

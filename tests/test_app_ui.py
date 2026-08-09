@@ -46,7 +46,7 @@ def test_home_user_facing_no_dev_surface(monkeypatch):
     assert len(at.selectbox) == 1          # 질의 범위 필터
     assert "nx-brand" in html
     assert "nx-disclaimer" in html
-    assert len(at.button) == 7   # 예시 6 + 히어로 전송
+    assert len(at.button) == 4   # 추천 필 3 (v1 정합) + 히어로 전송
     assert len(at.chat_input) == 1
 
 
@@ -385,6 +385,25 @@ def test_feedback_reason_flow(monkeypatch):
     submit.click().run()
     caps = " ".join(str(c.value) for c in at.caption)
     assert "피드백 감사합니다" in caps
+
+
+def test_home_pills_v1_parity(monkeypatch):
+    """빈 홈 추천 칩 v1 정합 (ui/home.py:9-13·109-126): 정확히 3개, 짧은
+    라벨 ↔ 전체 질의 분리, 클릭 시 매핑된 전체 질의가 pending_q 단일 경로로
+    제출된다 (오프라인 → 폴백 상수 3쌍)."""
+    at = _at(monkeypatch)
+    at.run()
+    pills = [b for b in at.button if str(b.label) != "↑"]
+    assert len(pills) == 3
+    labels = {str(b.label) for b in pills}
+    assert labels == {"선물 받았어요", "동료 부상", "법인카드"}   # 라벨 = 축약형
+    pill = next(b for b in at.button if str(b.label) == "선물 받았어요")
+    pill.click().run()
+    html = _all_markdown(at)
+    # 제출된 것은 라벨이 아닌 매핑된 전체 질의
+    assert "거래처에서 선물을 받아도 되나요?" in html
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs                        # 처리 경로 진입 증명
 
 
 def test_hero_enter_submit(monkeypatch):
