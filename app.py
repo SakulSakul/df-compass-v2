@@ -917,6 +917,10 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     if entry.get("notice"):
         st.warning(entry["notice"])
         return
+    # 오류 안내 — 처리 후 rerun(v1 :1913) 에서도 살아남도록 영속 엔트리
+    if entry.get("notice_error"):
+        st.error(entry["notice_error"])
+        return
     # 이해 확인 + 구체화 유도 표면 (파편 후속 질문 — 엔진 미호출 턴)
     if entry.get("coach"):
         st.markdown(f"질문을 이렇게 이해했어요: **‘{entry.get('frag', '')}’**")
@@ -1239,9 +1243,15 @@ _sidebar(_hotlines)
 # (pending_q — v1 clicked_q 대응)이 있는 run 에서는 disabled 로 잠가 동시
 # 제출이 진행 run 을 폐기하는 것을 원천 차단 (v1 PR-concurrent-guard).
 _q_processing = bool(st.session_state.get("pending_q"))
-question = st.chat_input("사규에 대해 물어보세요", disabled=_q_processing)
-if not question:
-    question = st.session_state.pop("pending_q", None)
+q_input = st.chat_input("사규에 대해 물어보세요", disabled=_q_processing)
+if q_input:
+    # 인라인 처리 제거 (v1 app.py:1924-1929) — 하단 직접 입력도 pending_q
+    # 경로로 통일 후 rerun. 처리 run 은 항상 _q_processing=True 로 렌더돼
+    # 위젯 전부 잠긴 상태에서 합성이 돈다 → 합성 도중 재제출(진행 run 폐기)
+    # 이 하단 경로에서도 원천 차단된다.
+    st.session_state["pending_q"] = q_input
+    st.rerun()
+question = st.session_state.pop("pending_q", None)
 
 # 빈 홈 — st.empty() placeholder 렌더 (v1 app.py:1690-1696 구조 가드 이식).
 # 게이트에 question(하단 q_input + pending_q 합류)이 포함되어, 첫 질문이
@@ -1358,14 +1368,23 @@ if question:
             except Exception as e:
                 print(f"[ui:error] {type(e).__name__}: {e}",
                       file=sys.stderr, flush=True)
-                st.error("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 다시 "
-                         "시도해 주세요. 계속되면 담당 부서(CSR팀)에 알려주세요.")
-                entry = None
+                # 영속 안내 엔트리 — 아래 마무리 rerun 후에도 replay 로 표출
+                entry = {"role": "assistant", "notice_error":
+                         "일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 "
+                         "다시 시도해 주세요. 계속되면 담당 부서(CSR팀)에 "
+                         "알려주세요."}
             finally:
                 timer_ph.empty()
                 prog_ph.empty()
                 stop_ph.empty()
         if entry is not None:
-            _render_assistant(entry, idx=len(st.session_state["messages"]),
-                              typing=not (entry.get("coach") or entry.get("notice")))
+            # 타이핑 재생은 이 run 에서 재생 (엔진 답변만) — 정적 엔트리는
+            # 아래 rerun 후 replay 가 렌더
+            if not (entry.get("coach") or entry.get("notice")
+                    or entry.get("notice_error")):
+                _render_assistant(entry, idx=len(st.session_state["messages"]),
+                                  typing=True)
             st.session_state["messages"].append(entry)
+    # 처리 완료 → 즉시 다음 cycle 복귀 (v1 app.py:1913) — pending_q 가 비워진
+    # 상태로 재렌더되어 chat_input 잠금 해제. 잠금은 처리 run 프레임에만 존재.
+    st.rerun()

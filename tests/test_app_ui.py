@@ -315,15 +315,33 @@ def test_single_input_state_machine(monkeypatch):
     assert not at2.chat_input[0].disabled
 
 
-def test_chat_input_locked_while_processing(monkeypatch):
-    """_q_processing 가드 (v1 PR-concurrent-guard): pending_q 처리 run 에서
-    chat_input disabled — 동시 제출로 진행 run 이 폐기되는 것을 차단."""
+def test_chat_input_submit_unified_via_pending(monkeypatch):
+    """v1 '인라인 처리 제거' 불변식 (app.py:1924-1929 + :1913): 하단 제출은
+    pending_q 적재 + rerun 으로 통일 — 처리 run(잠금 프레임)은 과도 상태라
+    라이브 실측이 정본이고, AppTest 는 완주 결과를 고정한다: 오류가 영속
+    엔트리로 남고(마무리 rerun 생존), pending 소비 완료, 입력 잠금 해제 복귀."""
+    at = _at(monkeypatch)
+    at.run()
+    at.chat_input[0].set_value("법인카드 사용 기준이 어떻게 되나요?").run()
+    assert not at.exception
+    assert "법인카드 사용 기준" in _all_markdown(at)      # user 말풍선
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs                        # 처리 경로 진입 증명
+    assert any(m.get("notice_error")                      # 영속 엔트리 (rerun 생존)
+               for m in at.session_state["messages"])
+    assert "pending_q" not in at.session_state            # 적재분 소비 완료
+    assert not at.chat_input[0].disabled                  # 마무리 rerun 후 해제
+
+
+def test_processing_run_recovers_input(monkeypatch):
+    """pending_q 처리 완주 후 마무리 rerun(v1 :1913) — 입력 재활성·히어로
+    미복귀·안내 영속. (처리 중 disabled 잠금 프레임은 라이브 실측으로 검증)"""
     at = _at(monkeypatch)
     at.session_state["pending_q"] = "법인카드 사용 기준이 어떻게 되나요?"
     at.run()
     assert not at.exception
-    assert at.chat_input[0].disabled               # 처리 run 잠금
-    assert "무엇을 확인해 드릴까요" not in _all_markdown(at)   # 히어로 미렌더
+    assert not at.chat_input[0].disabled           # 처리 후 잠금 해제
+    assert "무엇을 확인해 드릴까요" not in _all_markdown(at)   # 빈 홈 미복귀
     errs = " ".join(str(e.value) for e in at.error)
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
 
