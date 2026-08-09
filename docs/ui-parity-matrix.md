@@ -19,7 +19,7 @@
 | 로고 라인+우측 베타 칩 | app.py:270-278 (nx-brand) / home.py topbar2 | 이식됨 | `.nx-top2` 로고 라인 + "베타·입력 내용 학습 안 함" 칩, AppTest |
 | 전폭 베타 배너 (방패+사이드바 안내) | app.py:506-509 | 이식됨 | `.nx-beta-bar` 🛡️ + "자세한 안내는 좌측 사이드바 참조" |
 | 히어로 + 레드 물음표 | home.py:66-73 (nx-hero2) | 이식됨 | 54px 타이포+`.q` 레드 물음표 (computed 54px 기계 확인), 오타 회귀 테스트 |
-| 중앙 대형 입력 + 원형 레드 전송 | home.py:76-110 (hero_ask_input) | 이식됨 | `hero_q`/`hero_go` (원형 50%·rgb(200,16,46) 기계 확인), 하단 입력 병존 |
+| 중앙 대형 입력 + 원형 레드 전송 | home.py:76-110 (hero_ask_input) | 이식됨 (08-07 상태 기계 정합) | `hero_q`/`hero_go` (원형 50%·rgb(200,16,46) 기계 확인). ~~하단 입력 병존~~ → **결함 판정·수정**: v1 상태 기계 이식 — chat_input 은 항상 호출(v1 app.py:1675-1685)하되 빈 홈 렌더 블록 안에서만 CSS 숨김(ui/home.py:40-50, 미렌더 시 자동 원복), 빈 홈은 st.empty() placeholder + 게이트(q_input 포함), `_q_processing` 가드(pending_q 처리 run 은 chat_input disabled — 동시 제출의 진행 run 폐기 차단). 어느 시점에도 가시 입력 = 정확히 1개, 라이브 실측(빈 홈 visible False → 1문답 후 True·히어로 부재) |
 | 예시 칩 (pill) | home.py 예시 칩 + styles 칩 규칙 | 이식됨 | pill 999px 6종 (상황형 3 추가) |
 | 사이드바 4요소 (브랜드·안내·핫라인·디스클레이머) | app.py:268-315 | 이식됨 | `_sidebar` — v1 문안 + 질의 범위 추가 |
 | 시간대·요일 인사 (empty-state) | personality.py:96-121 (fallback_greeting) | 이식됨 | `_greeting_line()` 버킷 로직 이식 → 히어로 서브 |

@@ -1234,45 +1234,60 @@ except Exception:
     _hotlines = {}
 _sidebar(_hotlines)
 
-# chat_input 은 하단 고정 위젯이라 위치 무관 — 먼저 읽어 히어로 조건에 반영
-question = st.chat_input("사규에 대해 물어보세요")
+# chat_input 은 항상 먼저 호출 (v1 app.py:1675-1685 상태 기계 이식) — 하단
+# sticky 확보 + 첫 질문이 하단으로 와도 빈 홈 게이트에 반영. 처리 예정 질문
+# (pending_q — v1 clicked_q 대응)이 있는 run 에서는 disabled 로 잠가 동시
+# 제출이 진행 run 을 폐기하는 것을 원천 차단 (v1 PR-concurrent-guard).
+_q_processing = bool(st.session_state.get("pending_q"))
+question = st.chat_input("사규에 대해 물어보세요", disabled=_q_processing)
 if not question:
     question = st.session_state.pop("pending_q", None)
 
+# 빈 홈 — st.empty() placeholder 렌더 (v1 app.py:1690-1696 구조 가드 이식).
+# 게이트에 question(하단 q_input + pending_q 합류)이 포함되어, 첫 질문이
+# 어느 입력으로 와도 빈 홈이 답변과 동시에 렌더되지 않는다.
+_home_ph = st.empty()
 if not st.session_state["messages"] and not question:
-    st.markdown(
-        '<div class="nx-beta-bar">🛡️ 베타 서비스 — 입력 내용은 학습에 '
-        "사용되지 않습니다. 자세한 안내는 좌측 사이드바 참조."
-        "</div>", unsafe_allow_html=True)
-    st.markdown(
-        '<div class="nx-hero">'
-        '<p class="nx-hero-eyebrow">사규의 나침반 · Compliance Compass</p>'
-        '<p class="nx-hero-title">무엇을 확인해 드릴까요<span class="q">?</span></p>'
-        '<p class="nx-hero-sub">' + _greeting_line()
-        + " 신세계디에프 사규를 근거와 함께 안내합니다 — 상황을 그대로 적어 "
-        "주셔도 됩니다.</p></div>",
-        unsafe_allow_html=True)
-    # 중앙 대형 입력 + 원형 레드 전송 (v1 히어로 입력 정합 — 하단 입력과 병존)
-    def _hero_submit() -> None:
-        # Enter 제출 (v1 home.py:76-100 on_change 패턴) — 버튼 클릭과 동일 경로
-        v = (st.session_state.get("hero_q") or "").strip()
-        if v:
-            st.session_state["pending_q"] = v
+    with _home_ph.container():
+        # 빈 홈 한정: 하단 chat_input 숨김 (v1 ui/home.py:40-50 — 중앙 입력과
+        # 중복 방지. 본 블록 미렌더 시 CSS 미주입 → 자동 원복, 조건부 분기 없음)
+        st.markdown('<style>[data-testid="stChatInput"]'
+                    "{display:none !important;}</style>",
+                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="nx-beta-bar">🛡️ 베타 서비스 — 입력 내용은 학습에 '
+            "사용되지 않습니다. 자세한 안내는 좌측 사이드바 참조."
+            "</div>", unsafe_allow_html=True)
+        st.markdown(
+            '<div class="nx-hero">'
+            '<p class="nx-hero-eyebrow">사규의 나침반 · Compliance Compass</p>'
+            '<p class="nx-hero-title">무엇을 확인해 드릴까요<span class="q">?</span></p>'
+            '<p class="nx-hero-sub">' + _greeting_line()
+            + " 신세계디에프 사규를 근거와 함께 안내합니다 — 상황을 그대로 적어 "
+            "주셔도 됩니다.</p></div>",
+            unsafe_allow_html=True)
 
-    ic, bc = st.columns([9, 1])
-    hero_q = ic.text_input("질문", key="hero_q", label_visibility="collapsed",
-                           placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?",
-                           on_change=_hero_submit)
-    if bc.button("↑", key="hero_go") and (hero_q or "").strip():
-        st.session_state["pending_q"] = hero_q.strip()
-        st.rerun()
-    for row_start in (0, 3):
-        cols = st.columns(3)
-        for i, (col, ex) in enumerate(
-                zip(cols, _EXAMPLES[row_start:row_start + 3]), start=row_start):
-            if col.button(ex, key=f"ex_{i}", use_container_width=True):
-                st.session_state["pending_q"] = ex
-                st.rerun()
+        # 중앙 대형 입력 + 원형 레드 전송 (빈 홈의 유일한 가시 입력 — v1 정합)
+        def _hero_submit() -> None:
+            # Enter 제출 (v1 home.py:76-100 on_change 패턴) — 버튼과 동일 경로
+            v = (st.session_state.get("hero_q") or "").strip()
+            if v:
+                st.session_state["pending_q"] = v
+
+        ic, bc = st.columns([9, 1])
+        hero_q = ic.text_input("질문", key="hero_q", label_visibility="collapsed",
+                               placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?",
+                               on_change=_hero_submit)
+        if bc.button("↑", key="hero_go") and (hero_q or "").strip():
+            st.session_state["pending_q"] = hero_q.strip()
+            st.rerun()
+        for row_start in (0, 3):
+            cols = st.columns(3)
+            for i, (col, ex) in enumerate(
+                    zip(cols, _EXAMPLES[row_start:row_start + 3]), start=row_start):
+                if col.button(ex, key=f"ex_{i}", use_container_width=True):
+                    st.session_state["pending_q"] = ex
+                    st.rerun()
 
 for i, m in enumerate(st.session_state["messages"]):
     if m["role"] == "user":

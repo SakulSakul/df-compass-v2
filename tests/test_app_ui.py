@@ -290,6 +290,44 @@ def test_theme_pinned_light():
     assert 'textColor' in cfg
 
 
+_HIDE_CSS = '[data-testid="stChatInput"]{display:none !important;}'
+
+
+def test_single_input_state_machine(monkeypatch):
+    """빈 홈 입력창 이중화 해소 (v1 상태 기계): 빈 홈 = 히어로 입력만
+    (하단 chat_input 은 CSS 숨김), 대화 후 = 하단 입력만 (숨김 CSS 자동
+    원복 + 히어로 부재). chat_input 은 두 상태 모두 항상 호출된다."""
+    at = _at(monkeypatch)
+    at.run()
+    html = _all_markdown(at)
+    assert _HIDE_CSS in html                       # 빈 홈: 하단 입력 숨김 마커
+    assert "무엇을 확인해 드릴까요" in html          # 히어로 존재
+    assert len(at.chat_input) == 1                 # 항상 호출 (제거 아님)
+    # 1문답 후 — 숨김 CSS 미주입(자동 원복) + 히어로 부재 + chat_input 존재
+    at2 = _at(monkeypatch)
+    at2.session_state["messages"] = [
+        {"role": "user", "content": "q"}, _entry(cite_n=1)]
+    at2.run()
+    html2 = _all_markdown(at2)
+    assert _HIDE_CSS not in html2
+    assert "무엇을 확인해 드릴까요" not in html2
+    assert len(at2.chat_input) == 1
+    assert not at2.chat_input[0].disabled
+
+
+def test_chat_input_locked_while_processing(monkeypatch):
+    """_q_processing 가드 (v1 PR-concurrent-guard): pending_q 처리 run 에서
+    chat_input disabled — 동시 제출로 진행 run 이 폐기되는 것을 차단."""
+    at = _at(monkeypatch)
+    at.session_state["pending_q"] = "법인카드 사용 기준이 어떻게 되나요?"
+    at.run()
+    assert not at.exception
+    assert at.chat_input[0].disabled               # 처리 run 잠금
+    assert "무엇을 확인해 드릴까요" not in _all_markdown(at)   # 히어로 미렌더
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
+
+
 def test_motion_css_present(monkeypatch):
     """F 계급(시간축) 보조 검증 — 모션 자체는 녹화/연속 캡처가 정본이고,
     AppTest 는 keyframes·THINKING 블록 CSS 의 존재만 고정한다."""
