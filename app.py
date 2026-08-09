@@ -719,10 +719,12 @@ _A_HR_KW = ("인사 규정·복리후생 등 인사 행정 사항은 인사교�
             "인사교육팀에 문의해 주시기 바랍니다",
             "인사 규정·복리후생 등 인사 행정 사항은 인사팀에 문의",
             "인사팀에 문의해 주시기 바랍니다")
-_CAT_DOCK = {"재무": "finance", "인사": "hr", "CSR": "clean"}
+_CAT_DOCK = {"재무": "finance", "인사": "hr", "CSR": "clean",
+             "공정거래": "report"}
 
 
 def _dock_branch(entry: dict) -> str:
+    import re as _re
     if entry.get("critical"):
         return "report"
     ans = entry.get("answer") or ""
@@ -734,6 +736,14 @@ def _dock_branch(entry: dict) -> str:
         return "report"
     if any(k in ans for k in _A_HR_KW):
         return "hr"
+    # 공정거래 결정론 (v1 REPORT_DOC_DOMAINS, nexus_button_branch.py:47·165-167):
+    # 근거 문서 "집합"에 공정거래가 있으면 report — 최빈값이 아니어도 발동
+    # (v1 이 의도한 contexts-단독 케이스). v1 의 contexts_only_hr 가드는
+    # 공정거래가 집합에 존재하면 {인사} 단독일 수 없어 논리상 항상 통과.
+    cats = {m.group(1) for t in (entry.get("ctx_titles") or [])
+            if (m := _re.match(r"\((.+?)\)", t))}
+    if "공정거래" in cats:
+        return "report"
     cat = _category_of(entry.get("ctx_titles") or [])
     return _CAT_DOCK.get(cat or "", "hidden")
 

@@ -281,6 +281,26 @@ def test_dock_category_mapping(monkeypatch):
                if any(t in b for t in ("문의", "안내"))) == 2
 
 
+def test_dock_fair_trade_deterministic(monkeypatch):
+    """공정거래 결정론 (v1 REPORT_DOC_DOMAINS — nexus_button_branch.py:47):
+    최빈값이든 소수 혼합이든 근거 문서 집합에 공정거래가 있으면 report.
+    기존 4종 매핑 회귀 없음은 test_dock_category_mapping 이 담당."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "협력사 지정은 어떻게 하나요?"},
+        _entry(ctx_titles=["(공정거래) 하도급 거래 공정화 지침"]),
+        {"role": "user", "content": "경비 처리 기준 알려줘"},
+        # 공정거래가 최빈이 아닌 혼합 케이스 — v1 contexts-단독 케이스 보존
+        _entry(ctx_titles=["(재무) 일반경비 처리지침", "(재무) 예산합의 관리 지침",
+                           "(공정거래) 하도급 거래 공정화 지침"]),
+    ]
+    at.run()
+    assert not at.exception
+    btns = [str(b.label) for b in at.button]
+    assert sum(1 for b in btns if "신고 방법 안내" in b) == 2   # 두 건 모두 report
+    assert not any("경리팀" in b for b in btns)                # 혼합 건도 finance 아님
+
+
 def test_theme_pinned_light():
     """결함2·3(08-07) 근본 수정 가드: 테마 라이트 고정 (config.toml).
     다크 모드 브라우저에서 emotion 텍스트 색(백색)이 주입 CSS 의 라이트
