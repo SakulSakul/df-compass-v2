@@ -369,6 +369,55 @@ def test_processing_run_recovers_input(monkeypatch):
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
 
 
+def test_footer_present(monkeypatch):
+    """트랙A ①: v1 app.py:1885-1893 푸터 원문 — 빈 홈·대화 후 공통."""
+    at = _at(monkeypatch)
+    at.run()
+    assert "© 2026 신세계디에프" in _all_markdown(at)
+    at2 = _at(monkeypatch)
+    at2.session_state["messages"] = [
+        {"role": "user", "content": "q"}, _entry(cite_n=1)]
+    at2.run()
+    assert "© 2026 신세계디에프" in _all_markdown(at2)
+
+
+def test_history_render_window(monkeypatch):
+    """트랙A ②: 최근 30건만 렌더 + 생략 캡션 (v1 :1698-1707 — 성능 가드 겸)."""
+    at = _at(monkeypatch)
+    msgs = []
+    for i in range(17):                       # 34건 → 4건 생략
+        msgs.append({"role": "user", "content": f"질문{i}번입니다"})
+        msgs.append(_entry(cite_n=1, answer=f"답변{i}번입니다"))
+    at.session_state["messages"] = msgs
+    at.run()
+    assert not at.exception
+    caps = " ".join(str(c.value) for c in at.caption)
+    assert "이전 4건은 표시 생략" in caps and "최근 30건만 표시" in caps
+    html = _all_markdown(at)
+    assert "질문0번입니다" not in html         # 윈도우 밖
+    assert "질문16번입니다" in html            # 윈도우 안
+
+
+def test_nomatch_and_transient_notices_render(monkeypatch):
+    """트랙A ③·④ 문안 렌더 고정 (분기 자체는 라이브 경로 — 무매칭은 검색
+    0건, 일시 장애는 503/429 신호에서 발동. 여기선 영속 엔트리 표출 검증)."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q1"},
+        {"role": "assistant", "notice":
+         "💡 질문하신 내용에 직접 해당하는 사규를 찾지 못했습니다. ..."},
+        {"role": "user", "content": "q2"},
+        {"role": "assistant", "notice_error":
+         "⏳ Gemini 모델이 일시적으로 트래픽 폭주 상태입니다 (HTTP 503 / 429)."},
+    ]
+    at.run()
+    assert not at.exception
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "직접 해당하는 사규를 찾지 못했습니다" in warns
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "트래픽 폭주" in errs
+
+
 def test_sidebar_admin_link(monkeypatch):
     """사이드바 ADMIN 연결 (사용자 의결 — v1 콘솔 링크. 완전 이식은 ADR-8
     심의 후): expander 라벨 v1 정합 + href = v1 admin URL."""

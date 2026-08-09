@@ -1192,6 +1192,17 @@ def _ask(question: str, status_cb=None) -> dict:
     intake = run_intake(sb, question)
     cb("search", None)
     res = retriever.retrieve(intake, {"tracks": ["rule"], "intent": "ui"})
+    # 무매칭 방어 표면 (트랙A ③ — v1 render.py:15·prompts.py:305 문안 기반):
+    # 검색 0건이면 합성을 호출하지 않는다 (근거 없는 생성 방지 — 표시 분기만)
+    if not res["chunks"]:
+        print(f"[ui:trace] no-match q_len={len(question)}",
+              file=sys.stderr, flush=True)
+        return {"role": "assistant", "notice":
+                "💡 질문하신 내용에 직접 해당하는 사규를 찾지 못했습니다. "
+                "질문을 조금 더 구체적으로 바꿔 다시 시도해 주세요.\n\n"
+                "인사 규정·복리후생 등 인사 행정 사항은 인사교육팀에, "
+                "신고·조사 사항은 CSR팀 또는 신세계면세점 핫라인으로 "
+                "문의해 주시기 바랍니다."}
     _seen: set[str] = set()
     _titles = [t for c in res["chunks"]
                if (t := (c.get("breadcrumb") or "").split(">")[0])
@@ -1357,13 +1368,33 @@ if not st.session_state["messages"] and not question:
                 st.session_state["pending_q"] = pq
                 st.rerun()
 
-for i, m in enumerate(st.session_state["messages"]):
+# 히스토리 렌더 윈도우 (트랙A ② — v1 app.py:1698-1707: 표면이자 성능 가드.
+# 장기 세션에서 rerun 마다 전체 재렌더 → lag 방지. idx 는 절대값 유지)
+_history = st.session_state["messages"]
+_RENDER_WINDOW = 30
+if len(_history) > _RENDER_WINDOW:
+    st.caption(f"⋯ 이전 {len(_history) - _RENDER_WINDOW}건은 표시 생략 "
+               f"(최근 {_RENDER_WINDOW}건만 표시)")
+    _start = len(_history) - _RENDER_WINDOW
+else:
+    _start = 0
+for i, m in enumerate(_history[_start:], start=_start):
     if m["role"] == "user":
         with st.chat_message("user"):
             st.markdown(m["content"])
     else:
         with st.chat_message("assistant", avatar="🧭"):
             _render_assistant(m, idx=i)
+
+# 푸터 (트랙A ① — v1 app.py:1885-1893 원문)
+st.markdown(
+    '<div style="text-align:center; color:#888; font-size:11px; '
+    'padding:24px 0 8px 0; border-top:1px solid var(--c-border); margin-top:32px;">'
+    "© 2026 신세계디에프 (Shinsegae Duty Free) · 인사담당 CSR팀<br>"
+    "본 답변은 사규 해석 보조 도구이며 법적 효력은 없습니다. "
+    "인사·신고 행정 사항은 인사교육팀에 직접 문의하세요."
+    "</div>",
+    unsafe_allow_html=True)
 
 if question:
     # 질의 범위 (표시 계층 조립 — 선택 시 범위 문구 부가, 엔진 코드 무접촉)
@@ -1424,13 +1455,23 @@ if question:
             try:
                 entry = _ask(engine_q, status_cb=_stage)
             except Exception as e:
-                print(f"[ui:error] {type(e).__name__}: {e}",
-                      file=sys.stderr, flush=True)
-                # 영속 안내 엔트리 — 아래 마무리 rerun 후에도 replay 로 표출
-                entry = {"role": "assistant", "notice_error":
-                         "일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 "
-                         "다시 시도해 주세요. 계속되면 담당 부서(CSR팀)에 "
-                         "알려주세요."}
+                err_text = f"{type(e).__name__}: {e}"
+                print(f"[ui:error] {err_text}", file=sys.stderr, flush=True)
+                # 일시 장애(503/429) 특화 안내 (트랙A ④ — v1 app.py:1112-1121
+                # 신호·문안 이식). 영속 엔트리 — 마무리 rerun 후 replay 표출.
+                if (any(k in err_text for k in
+                        ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED",
+                         "ResourceExhausted"))
+                        or "high demand" in err_text.lower()):
+                    msg = ("⏳ Gemini 모델이 일시적으로 트래픽 폭주 상태입니다 "
+                           "(HTTP 503 / 429).\n\n**잠시 후 같은 질문을 다시 "
+                           "시도해 주세요.** 수 분 내 자동 회복되는 일시 "
+                           "장애로, 코드/설정 문제가 아닙니다.")
+                else:
+                    msg = ("일시적인 오류로 답변을 만들지 못했습니다. 잠시 후 "
+                           "다시 시도해 주세요. 계속되면 담당 부서(CSR팀)에 "
+                           "알려주세요.")
+                entry = {"role": "assistant", "notice_error": msg}
             finally:
                 timer_ph.empty()
                 prog_ph.empty()
