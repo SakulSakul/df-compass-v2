@@ -291,6 +291,7 @@ def test_theme_pinned_light():
 
 
 _HIDE_CSS = '[data-testid="stChatInput"]{display:none !important;}'
+_WIDTH_CSS = "max-width:960px !important"    # 빈 홈 한정 폭 제한 (v1 home.py:45)
 
 
 def test_single_input_state_machine(monkeypatch):
@@ -301,15 +302,17 @@ def test_single_input_state_machine(monkeypatch):
     at.run()
     html = _all_markdown(at)
     assert _HIDE_CSS in html                       # 빈 홈: 하단 입력 숨김 마커
+    assert _WIDTH_CSS in html                      # 빈 홈: 960px 폭 제한 마커
     assert "무엇을 확인해 드릴까요" in html          # 히어로 존재
     assert len(at.chat_input) == 1                 # 항상 호출 (제거 아님)
-    # 1문답 후 — 숨김 CSS 미주입(자동 원복) + 히어로 부재 + chat_input 존재
+    # 1문답 후 — 숨김·폭 CSS 미주입(자동 원복) + 히어로 부재 + chat_input 존재
     at2 = _at(monkeypatch)
     at2.session_state["messages"] = [
         {"role": "user", "content": "q"}, _entry(cite_n=1)]
     at2.run()
     html2 = _all_markdown(at2)
     assert _HIDE_CSS not in html2
+    assert _WIDTH_CSS not in html2
     assert "무엇을 확인해 드릴까요" not in html2
     assert len(at2.chat_input) == 1
     assert not at2.chat_input[0].disabled

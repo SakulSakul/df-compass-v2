@@ -1287,11 +1287,17 @@ question = st.session_state.pop("pending_q", None)
 _home_ph = st.empty()
 if not st.session_state["messages"] and not question:
     with _home_ph.container():
-        # 빈 홈 한정: 하단 chat_input 숨김 (v1 ui/home.py:40-50 — 중앙 입력과
-        # 중복 방지. 본 블록 미렌더 시 CSS 미주입 → 자동 원복, 조건부 분기 없음)
-        st.markdown('<style>[data-testid="stChatInput"]'
-                    "{display:none !important;}</style>",
-                    unsafe_allow_html=True)
+        # 빈 홈 한정 CSS (v1 ui/home.py:40-50): 본문 960px 가운데 정렬(칩·입력
+        # 폭 제한) + 하단 chat_input 숨김(중앙 입력과 중복 방지). 본 블록
+        # 미렌더 시 CSS 미주입 → 자동 원복 — 답변 화면 880px 채팅 제한 무접촉.
+        st.markdown(
+            "<style>"
+            '[data-testid="stMainBlockContainer"], .block-container'
+            "{max-width:960px !important;margin-left:3rem !important;"
+            "margin-right:auto !important;}"
+            '[data-testid="stChatInput"]{display:none !important;}'
+            "</style>",
+            unsafe_allow_html=True)
         st.markdown(
             '<div class="nx-beta-bar">🛡️ 베타 서비스 — 입력 내용은 학습에 '
             "사용되지 않습니다. 자세한 안내는 좌측 사이드바 참조."
