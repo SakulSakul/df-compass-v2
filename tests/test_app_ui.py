@@ -375,6 +375,51 @@ def test_processing_run_recovers_input(monkeypatch):
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
 
 
+def test_interrupt_recovery_banner(monkeypatch):
+    """중단 복구 간소안: 잔존 inflight + 댕글링 user 턴 → 배너+재실행 버튼,
+    클릭 = pending_q 단일 경로 재실행 + 멱등(rerun_done — 버튼 1회 한정)."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "법인카드 사용 기준이 어떻게 되나요?"}]
+    at.session_state["_inflight"] = "법인카드 사용 기준이 어떻게 되나요?"
+    at.run()
+    assert not at.exception
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "직전 답변 생성이 중단되었습니다" in warns
+    assert "_inflight" not in at.session_state            # 마커 소거
+    btn = next(b for b in at.button if "이 질문 다시 실행" in str(b.label))
+    btn.click().run()
+    # 재실행 → 처리 경로 진입(오프라인 에러 표면) + 멱등(버튼 소멸·캡션 전환)
+    errs = " ".join(str(e.value) for e in at.error)
+    assert "일시적인 오류" in errs
+    assert not any("이 질문 다시 실행" in str(b.label) for b in at.button)
+    caps = " ".join(str(c.value) for c in at.caption)
+    assert "다시 실행됨" in caps
+
+
+def test_no_false_banner_after_completion(monkeypatch):
+    """정상 완주 시 inflight 소거 — 허위 배너 없음 (D 조건)."""
+    at = _at(monkeypatch)
+    at.run()
+    at.chat_input[0].set_value("법인카드 사용 기준이 어떻게 되나요?").run()
+    assert "_inflight" not in at.session_state
+    assert "직전 답변 생성이 중단되었습니다" not in \
+        " ".join(str(w.value) for w in at.warning)
+
+
+def test_stop_suppresses_interrupt_banner(monkeypatch):
+    """⏹ 의도된 중지는 중지 안내만 — 중단 배너 중복 없음."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [{"role": "user", "content": "질문"}]
+    at.session_state["_stop_requested"] = True
+    at.session_state["_inflight"] = "질문"
+    at.run()
+    assert not at.exception
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "생성이 중지되었습니다" in warns
+    assert "직전 답변 생성이 중단되었습니다" not in warns
+
+
 def test_footer_present(monkeypatch):
     """트랙A ①: v1 app.py:1885-1893 푸터 원문 — 빈 홈·대화 후 공통."""
     at = _at(monkeypatch)

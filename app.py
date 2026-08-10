@@ -975,6 +975,18 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     if entry.get("notice_error"):
         st.error(entry["notice_error"])
         return
+    # 중단 복구 배너 (간소안) — [다시 실행]은 1회 한정 멱등 (마커 소거 선행)
+    if entry.get("interrupted"):
+        st.warning("⚠️ 직전 답변 생성이 중단되었습니다. 아래 버튼으로 같은 "
+                   "질문을 다시 실행할 수 있습니다.")
+        if entry.get("rerun_done"):
+            st.caption("🔁 다시 실행됨")
+        elif st.button("🔁 이 질문 다시 실행", key=f"rein_{idx}",
+                       use_container_width=True):
+            entry["rerun_done"] = True
+            st.session_state["pending_q"] = entry["interrupted"]
+            st.rerun()
+        return
     # 이해 확인 + 구체화 유도 표면 (파편 후속 질문 — 엔진 미호출 턴)
     if entry.get("coach"):
         st.markdown(f"질문을 이렇게 이해했어요: **‘{entry.get('frag', '')}’**")
@@ -1291,11 +1303,26 @@ if "messages" not in st.session_state:
 # ⏹ 생성 중지 처리 (v1 main() 상단 대응): 중지 클릭 → rerun 이 진행 런을
 # 중단시켜 결과는 자연 폐기 — 여기서 플래그를 안내 엔트리로 전환한다.
 if st.session_state.pop("_stop_requested", False):
+    st.session_state.pop("_inflight", None)   # 의도된 중지 — 중단 배너 중복 방지
     _msgs = st.session_state["messages"]
     if _msgs and _msgs[-1].get("role") == "user":
         _msgs.append({"role": "assistant", "notice":
                       "⏹ 생성이 중지되었습니다. 질문을 다시 입력해 주세요."})
     st.toast("⏹ 생성을 중지했습니다")
+
+# 중단 복구 간소안 (심의 의결 — 표시 계층 전용): 처리 run 이 완료 전에
+# 죽으면(위젯 인터랙션 킬·브라우저 복귀 등) inflight 마커가 잔존한다.
+# 마커는 질문 말풍선과 동일 수명 매체(session_state)에 기록 — 서버 재시작으로
+# 세션이 통째로 사라지는 경우는 질문 자체도 없으므로 배너 불요(생존성 등가).
+_dangling_q = st.session_state.pop("_inflight", None)
+if _dangling_q:
+    _msgs = st.session_state["messages"]
+    if (_msgs and _msgs[-1].get("role") == "user"
+            and _msgs[-1].get("content") == _dangling_q):
+        # 중단 카운터 — 30일 관측 데이터 생산 (stderr, ADR-8 준수)
+        print(f"[ui:interrupt] q_len={len(_dangling_q)}",
+              file=sys.stderr, flush=True)
+        _msgs.append({"role": "assistant", "interrupted": _dangling_q})
 
 try:
     _hotlines = _engine()[3]
@@ -1410,6 +1437,10 @@ if question:
                   if m.get("role") == "assistant"
                   and not m.get("coach") and not m.get("notice")), None)
     st.session_state["messages"].append({"role": "user", "content": question})
+    # inflight 마커 (중단 복구 간소안) — 처리 완료 시 아래에서 소거. 처리 run
+    # 이 죽으면 잔존 → 다음 run 상단이 중단 배너로 전환 (질문 말풍선과 동일
+    # 수명의 session_state 기록)
+    st.session_state["_inflight"] = question
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant", avatar="🧭"):
@@ -1488,6 +1519,7 @@ if question:
                 _render_assistant(entry, idx=len(st.session_state["messages"]),
                                   typing=True)
             st.session_state["messages"].append(entry)
+    st.session_state.pop("_inflight", None)   # 정상 완료 — 중단 마커 소거
     # 처리 완료 → 즉시 다음 cycle 복귀 (v1 app.py:1913) — pending_q 가 비워진
     # 상태로 재렌더되어 chat_input 잠금 해제. 잠금은 처리 run 프레임에만 존재.
     st.rerun()
