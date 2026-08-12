@@ -446,13 +446,31 @@ _V1_ADMIN_URL = "https://df-nexus-ai.streamlit.app/admin"
 _SCOPES = ("전체", "CSR", "공정거래", "공통", "안전", "영업", "인사",
            "재무", "정보보안", "총무", "환경")
 
-# conf 4등급 → 사용자 라벨 (심의 결정 3항 — UI 표기 의무. 산식 무접촉)
+# conf 4등급 사용자 표기 (지시서 002-C — 산식·action 무접촉):
+# HIGH/MEDIUM 은 하단 메타 행으로 통합(상단 라벨 제거 — 카테고리와 동일한
+# 상하단 중복 제거 원리), UNVERIFIED 중립·경고 상단 라벨과 LOW 강등 칩은
+# 현행 유지.
+_GRADE_META = {
+    "HIGH": "🟢 높은 신뢰도 — 사규 원문 대조 확인",
+    "MEDIUM": "🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장",
+}
 _GRADE_LABEL = {
-    "HIGH": ("high", "✓ 사규 원문 근거 확인"),
-    "MEDIUM": ("medium", "참고 문서 기반 — 원문 대조 권장"),
     "UNVERIFIED": ("unv", "조항 단위 근거 미확인 — 원문 확인 권장"),
     # LOW 는 기존 강등 칩(안전 표면)이 담당 — 중복 표기 안 함
 }
+
+
+# 지시서 002-B: 렌더 직전 비링크 독립 토큰 SRMS → 마크다운 링크 치환.
+# 저장 원문 불변(호출부에서만 적용 — verify·DOCK·카드 파서는 원문 소비),
+# 이중 치환 금지: 직전 문자가 [·영숫자·/·. 이거나 직후가 ]·영숫자·(·/ 면 제외
+# (기링크 [SRMS](…)·URL 내 출현·합성어). 한글 인접(조사)은 독립 토큰으로 간주.
+_SRMS_URL = "https://rms.shinsegae.com/"
+
+
+def _linkify_srms(text: str) -> str:
+    import re as _re
+    return _re.sub(r"(?<![A-Za-z0-9\[/.])SRMS(?![A-Za-z0-9\]/(])",
+                   f"[SRMS]({_SRMS_URL})", text)
 
 # personality (v1 core/personality.py:31-99 이식 — 표시 계층 결정론+random)
 _CLOSING_NORMAL = (
@@ -1013,7 +1031,9 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     if entry.get("degraded"):
         st.markdown('<span class="nx-chip-warn">⚠ 인용 일부 미검증 — '
                     "신뢰도 강등</span>", unsafe_allow_html=True)
-    # grade 라벨 (심의 3항 UI 표기 — LOW 는 위 강등 칩이 담당, 중복 없음)
+    # grade 상단 라벨 — UNVERIFIED 계열만 (002-C: HIGH/MEDIUM 은 하단 메타
+    # 행으로 통합, LOW 는 위 강등 칩. 카테고리 뱃지도 메타 행으로 이동 —
+    # 상하단 중복 제거)
     g = entry.get("grade")
     if g in _GRADE_LABEL and not entry.get("critical"):
         cls, label = _GRADE_LABEL[g]
@@ -1028,11 +1048,6 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
             label = "사규 문서 대조 확인 — 세부 조항은 원문 참조"
         st.markdown(f'<span class="nx-grade {cls}">{label}</span>',
                     unsafe_allow_html=True)
-    # 카테고리 뱃지 (v1 ui/render.py:142-165 — 접두어 최빈값)
-    cat = _category_of(entry.get("ctx_titles") or [])
-    if cat and not entry.get("critical"):
-        st.markdown(f'<span class="nx-doc-chip">{_CAT_ICON.get(cat, "📌")} '
-                    f'<b>{cat}</b> 카테고리</span>', unsafe_allow_html=True)
     # 판정 카드 (v1 verdict 표면 이식 — 결정론 파싱, critical 제외)
     card = entry.get("card")
     if card:
@@ -1053,10 +1068,12 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
         st.markdown('<p class="nx-refnote">※ 아래 인용은 질문에 대한 직접 '
                     "근거가 아닌 <b>참고 규정</b>입니다.</p>",
                     unsafe_allow_html=True)
+    # 본문 — 렌더 직전 SRMS 링크 치환 (002-B, 저장 원문 불변)
+    _body = _linkify_srms(entry["answer"])
     if typing:
-        st.write_stream(_typewriter(entry["answer"]))
+        st.write_stream(_typewriter(_body))
     else:
-        st.markdown(entry["answer"])
+        st.markdown(_body)
     # 출처 문서 칩
     if entry.get("ctx_titles") and not entry.get("blocked"):
         chips = "".join(f'<span class="nx-doc-chip">📄 {_h.escape(t)}</span>'
@@ -1088,11 +1105,21 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
                 st.markdown(f"**{_h.escape(r['crumb'])}**")
                 st.caption(_h.escape(r["snippet"]) + "…")
     # 응답 시간·피드백
+    # 하단 메타 행 (002-C — [카테고리 · 등급 · ⏱️응답 · 🤖모델], 상단 중복 0)
+    _meta: list = []
+    cat = _category_of(entry.get("ctx_titles") or [])
+    if cat and not entry.get("critical"):
+        _meta.append(f'{_CAT_ICON.get(cat, "📌")} <b>{_h.escape(cat)}</b> 카테고리')
+    if g in _GRADE_META and not entry.get("critical"):
+        _meta.append(_GRADE_META[g])
     if entry.get("elapsed_s"):
-        prov = str(entry.get("provider") or "").split(":")[-1]
-        st.markdown(f'<p class="nx-meta">⏱️ 응답 {entry["elapsed_s"]}초'
-                    + (f' · 🤖 {_h.escape(prov)}' if prov else "")
-                    + "</p>", unsafe_allow_html=True)
+        _meta.append(f'⏱️ 응답 {entry["elapsed_s"]}초')
+    prov = str(entry.get("provider") or "").split(":")[-1]
+    if prov:
+        _meta.append(f'🤖 {_h.escape(prov)}')
+    if _meta:
+        st.markdown(f'<p class="nx-meta">{" · ".join(_meta)}</p>',
+                    unsafe_allow_html=True)
     # PROACTIVE DOCK "다음 단계 예측" (v1 ui/feedback.py:112-140 이식)
     msgs = st.session_state.get("messages") or []
     orig_q = (msgs[idx - 1].get("content")
@@ -1314,13 +1341,15 @@ if st.session_state.pop("_stop_requested", False):
 # 죽으면(위젯 인터랙션 킬·브라우저 복귀 등) inflight 마커가 잔존한다.
 # 마커는 질문 말풍선과 동일 수명 매체(session_state)에 기록 — 서버 재시작으로
 # 세션이 통째로 사라지는 경우는 질문 자체도 없으므로 배너 불요(생존성 등가).
-_dangling_q = st.session_state.pop("_inflight", None)
+_inflight_rec = st.session_state.pop("_inflight", None)
+_dangling_q = (_inflight_rec or {}).get("q") if isinstance(_inflight_rec, dict) \
+    else _inflight_rec
 if _dangling_q:
     _msgs = st.session_state["messages"]
     if (_msgs and _msgs[-1].get("role") == "user"
             and _msgs[-1].get("content") == _dangling_q):
         # 중단 카운터 — 30일 관측 데이터 생산 (stderr, ADR-8 준수)
-        print(f"[ui:interrupt] q_len={len(_dangling_q)}",
+        print(f"[ui:abort] q_len={len(_dangling_q)}",
               file=sys.stderr, flush=True)
         _msgs.append({"role": "assistant", "interrupted": _dangling_q})
 
@@ -1384,8 +1413,8 @@ if not st.session_state["messages"] and not question:
 
         ic, bc = st.columns([9, 1])
         hero_q = ic.text_input("질문", key="hero_q", label_visibility="collapsed",
-                               placeholder="예: 협력사에서 선물을 받았는데 어떻게 해야 하나요?",
-                               on_change=_hero_submit)
+                               placeholder="사규·윤리 관련 무엇이든 물어보세요…",
+                               on_change=_hero_submit)   # 002-D: v1 home.py:99 원문
         if bc.button("↑", key="hero_go") and (hero_q or "").strip():
             st.session_state["pending_q"] = hero_q.strip()
             st.rerun()
@@ -1440,7 +1469,7 @@ if question:
     # inflight 마커 (중단 복구 간소안) — 처리 완료 시 아래에서 소거. 처리 run
     # 이 죽으면 잔존 → 다음 run 상단이 중단 배너로 전환 (질문 말풍선과 동일
     # 수명의 session_state 기록)
-    st.session_state["_inflight"] = question
+    st.session_state["_inflight"] = {"q": question, "ts": time.time()}
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant", avatar="🧭"):

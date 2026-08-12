@@ -118,7 +118,7 @@ def test_parity_surfaces_replay(monkeypatch):
     at.run()
     assert not at.exception
     html = _all_markdown(at)
-    assert "✓ 사규 원문 근거 확인" in html                 # HIGH 라벨
+    assert "🟢 높은 신뢰도" in html                        # HIGH — 메타 행 (002-C)
     assert "조건부로 가능합니다" in html                    # 판정 카드 pill
     assert "📕" in html and "제3조" in html               # 카드 출처
     # 결함1(08-07): UNVERIFIED + 인용 존재·비강등 → 중립 톤 라벨 (a)
@@ -127,6 +127,8 @@ def test_parity_surfaces_replay(monkeypatch):
     assert "참고 규정" in html                             # 참고 인용 구획 캡션
     assert "📄" in html                                    # 출처 문서 칩
     assert "응답 12.3초" in html and "🤖" in html          # ⏱·🤖 표기
+    # 002-C: 카테고리는 하단 메타 행에만 — 엔트리당 1회 (상단 뱃지 제거)
+    assert html.count("카테고리") == 2                     # 엔트리 2건 각 1회
     labels = [str(e.label) for e in at.expander]
     assert any("AI 검토 과정" in l for l in labels)
     assert any("참고 사규" in l for l in labels)             # 참고 사규 expander
@@ -168,7 +170,7 @@ def test_parity_absent_on_safety_paths(monkeypatch):
     assert not at.exception
     html = _all_markdown(at)
     assert "본문" not in html                              # blocked 미표출 불변
-    assert "✓ 사규 원문 근거 확인" not in html              # blocked 라벨 미표출
+    assert "높은 신뢰도" not in html                        # blocked 등급 미표출
     assert "심각 사안 감지" in html and "신뢰도 강등" in html  # 안전 표면 유지
 
 
@@ -373,6 +375,58 @@ def test_processing_run_recovers_input(monkeypatch):
     assert "무엇을 확인해 드릴까요" not in _all_markdown(at)   # 빈 홈 미복귀
     errs = " ".join(str(e.value) for e in at.error)
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
+
+
+def test_srms_linkify(monkeypatch):
+    """002-B: 비링크 독립 토큰 SRMS → 마크다운 링크 (렌더 직전 치환, 저장
+    원문 불변 — 히스토리 엔트리는 그대로), 기링크 입력 이중 치환 0."""
+    at = _at(monkeypatch)
+    raw1 = "**📋 1차 보고**: SRMS 시스템 즉시 등록 (인지 시점 24시간 內)"
+    raw2 = "이미 링크: [SRMS](https://rms.shinsegae.com/) 참조"
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q1"}, _entry(answer=raw1, cite_n=1),
+        {"role": "user", "content": "q2"}, _entry(answer=raw2, cite_n=1),
+    ]
+    at.run()
+    assert not at.exception
+    html = _all_markdown(at)
+    assert html.count("[SRMS](https://rms.shinsegae.com/)") == 2   # 각 1회
+    assert "[[SRMS]" not in html and "]([SRMS]" not in html        # 이중 치환 0
+    # 저장 원문 불변
+    assert at.session_state["messages"][1]["answer"] == raw1
+
+
+def test_grade_meta_row(monkeypatch):
+    """002-C: HIGH/MEDIUM 어휘 메타 행 + UNVERIFIED 중립·강등 칩 현행 유지."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q1"},
+        _entry(grade="HIGH", cite_n=1, ctx_titles=["(재무) 법인카드 관리 지침"],
+               elapsed_s=12.3, provider="gemini:g-3.6"),
+        {"role": "user", "content": "q2"},
+        _entry(grade="MEDIUM", cite_n=1),
+        {"role": "user", "content": "q3"},
+        _entry(grade="UNVERIFIED", cite_n=1),
+        {"role": "user", "content": "q4"},
+        _entry(grade="LOW", degraded=True, answer="강등 본문"),
+    ]
+    at.run()
+    assert not at.exception
+    html = _all_markdown(at)
+    assert "🟢 높은 신뢰도 — 사규 원문 대조 확인" in html
+    assert "🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장" in html
+    assert "사규 문서 대조 확인 — 세부 조항은 원문 참조" in html   # UNVERIFIED 중립
+    assert "신뢰도 강등" in html                                   # LOW 강등 칩
+    # HIGH 메타 행 4요소 공존 (카테고리·등급·⏱️·🤖)
+    assert "재무" in html and "응답 12.3초" in html and "g-3.6" in html
+
+
+def test_hero_placeholder_v1_exact(monkeypatch):
+    """002-D: 빈 홈 히어로 placeholder = v1 home.py:99 원문 바이트 일치."""
+    at = _at(monkeypatch)
+    at.run()
+    ph = at.text_input(key="hero_q").placeholder
+    assert ph == "사규·윤리 관련 무엇이든 물어보세요…"
 
 
 def test_interrupt_recovery_banner(monkeypatch):
