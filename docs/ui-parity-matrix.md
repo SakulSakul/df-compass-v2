@@ -47,7 +47,7 @@
 |---|---|---|---|
 | 카테고리 뱃지 (💳 재무 등) | render.py:142-165 | 이식됨 | `_category_of` 접두어 최빈값 + `_CAT_ICON` 10종, AppTest |
 | ⏱·🤖 표기 | app.py:709-713 (elapsed) + 모델 표기 | 이식됨 | "⏱️ 응답 N초 · 🤖 모델" 메타 라인 |
-| 참고 사규 expander | render.py:296-312 (_render_contexts) | 이식됨 | ctx_refs 발췌(escape — v1 XSS 교훈 승계) expander |
+| 참고 사규 expander | render.py:299-328 (_render_contexts) + styles nx-doc-* | 이식됨 (08-16 005 — 카드 구조 재이식) | ~~플랫 텍스트~~ → v1 카드 구조: nx-doc-card(테두리)+배지(사규/징계기준/DOC — doc_kind 미탑재라 문서명 결정론 매핑)+제목+조번호 우측(article_no 파서 검증값만·환각 0)+스니펫 480자 escape. **시각 구조 계층 사각 보완 기록**(문자열 스캔이 미포착 — 원장 CSV 수신 시 동일 행 등재) |
 | 💡 이런 질문도 해볼 수 있어요 | render.py:207 | 이식됨 | 동일 문구 + grounded 제안(auto_query_examples SELECT) |
 | 다음 단계 예측 (PROACTIVE DOCK) | ui/feedback.py:112-140 (grep 누락 정정) + core/nexus_button_branch.py | 이식됨 (08-07 결함4 재설계) | 라벨 div 원문 + 분기 주 액션 + 패널 4종(신고/클린신고/인사/재무=경리팀·경영관리팀) + 🔄 다시 답변(1회 한정). **오분기 근본원인**: v1 confidence="low"(희귀)를 v2 grade UNVERIFIED(C-class 76/101 → 대다수)로 대응시켜 hr fallback 광역 오발동 → 재설계 = 답변 내 명시 신고 신호 + 카테고리(뱃지 동일 산출) 결정론 매핑만, 질문 키워드 휴리스틱·low fallback 제거, 무매핑 카테고리는 주 액션 생략(오안내<무안내). AppTest |
 | personality 클로징 (시간·요일) | personality.py:31-50 (closing_remark 풀) | 이식됨 | `_closing_line` — NORMAL/CRITICAL 풀 원문, 세션 결정론 pick |

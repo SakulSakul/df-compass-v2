@@ -377,6 +377,40 @@ def test_processing_run_recovers_input(monkeypatch):
     assert "일시적인 오류" in errs                  # 오프라인 — 처리 경로 진입 증명
 
 
+def test_context_cards_v1_parity(monkeypatch):
+    """005: 참고 사규 카드 — 테두리 카드+배지+제목+조번호 우측+스니펫,
+    징계기준 배지 분기, 조번호 무단 표기 0, DB 값 escape, 구 형식 폴백."""
+    at = _at(monkeypatch)
+    at.session_state["messages"] = [
+        {"role": "user", "content": "q1"},
+        _entry(cite_n=1, ctx_refs=[
+            {"title": "(재무) 법인카드 관리 지침", "cite": "제3조",
+             "kind": "사규", "snippet": "제3조(사용) 업무 목적에 한한다"},
+            {"title": "(공통) 임직원 징계기준", "cite": "",
+             "kind": "징계기준", "snippet": "<script>alert(1)</script> 징계 양정"},
+        ]),
+        {"role": "user", "content": "q2"},
+        # 구 형식 폴백 (crumb/snippet)
+        _entry(cite_n=1, ctx_refs=[
+            {"crumb": "(안전) 공기질 유지관리 지침", "snippet": "관리 기준"}]),
+    ]
+    at.run()
+    assert not at.exception
+    html = _all_markdown(at)
+    # CSS 주입 문자열과 구분되는 렌더 전용 마커로 판정 (기지 교훈)
+    assert html.count('<div class="nx-doc-card">') == 3   # (a) 청크당 카드
+    assert 'class="nx-doc-badge">징계기준<' in html        # (b) 징계기준 배지
+    assert 'class="nx-doc-badge">사규<' in html            # 일반 사규 배지
+    assert 'class="nx-doc-cite">제3조<' in html            # (c) 실재 조번호 우측
+    # (c) 조번호 없는 카드는 cite 스팬 자체가 없음 — 카드 3, cite 1
+    assert html.count('class="nx-doc-cite">') == 1
+    # (d) escape — 스크립트 원문이 태그로 살아있지 않음
+    assert "<script>alert(1)</script>" not in html
+    assert "&lt;script&gt;" in html
+    # 구 형식 폴백도 카드 렌더 (제목 + 결정론 배지 '사규')
+    assert "(안전) 공기질 유지관리 지침" in html
+
+
 def test_srms_linkify(monkeypatch):
     """002-B: 비링크 독립 토큰 SRMS → 마크다운 링크 (렌더 직전 치환, 저장
     원문 불변 — 히스토리 엔트리는 그대로), 기링크 입력 이중 치환 0."""

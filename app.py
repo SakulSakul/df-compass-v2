@@ -354,6 +354,21 @@ p.nx-hero-sub { font-size: 15px !important; }
   background: var(--c-surface); border: 1px solid var(--c-border);
   border-radius: 999px; padding: 3px 11px; margin: 2px 6px 2px 0;
 }
+/* ── 참고 사규 카드 (지시서 005 — v1 ui/styles.py nx-doc-* 원문) ── */
+.nx-doc-card {
+  border: 1px solid #E0E0E0; border-top: 4px solid #1A1A1A;
+  padding: 16px; margin-bottom: 4px; background: #FFFFFF;
+}
+.nx-doc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.nx-doc-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; background: #1A1A1A; color: #FFFFFF;
+  padding: 2px 7px; flex-shrink: 0;
+}
+.nx-doc-title { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+.nx-doc-cite { font-size: 11px; color: #767676; margin-left: auto; flex-shrink: 0; }
+.nx-doc-text { font-size: 12px; color: #767676; line-height: 1.65; margin: 0; }
+
 .nx-refnote { font-size: 12px; color: var(--c-caption); margin: 6px 0 2px; }
 .nx-meta { font-size: 11.5px; color: var(--c-caption); margin-top: 8px; }
 
@@ -537,6 +552,21 @@ def _category_of(ctx_titles: list) -> str | None:
     cats = [m.group(1) for t in (ctx_titles or [])
             if (m := _re.match(r"\((.+?)\)", t))]
     return _C(cats).most_common(1)[0][0] if cats else None
+
+
+# 참고 사규 배지 (지시서 005): v2 청크 메타에 doc_kind 부재(RetrievedChunk 는
+# RPC 의 doc_kind 를 실어오지 않음 — 엔진 무접촉이라 확장 불가) → 문서명 기반
+# 결정론 매핑. 추측성 배지 금지 — 판별 불가는 "DOC".
+_PENALTY_DOCS = {"(공통) 임직원 징계기준"}
+
+
+def _doc_kind_of(title: str) -> str:
+    import re as _re
+    if title in _PENALTY_DOCS:
+        return "징계기준"
+    if _re.match(r"^\([^)]{1,12}\)\s", title):
+        return "사규"          # 원장 명명 규약 "(카테고리) 문서명"
+    return "DOC"
 
 
 def _has_citation_form(answer: str) -> bool:
@@ -1098,12 +1128,29 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
                 st.markdown(f"- {s_}")
             st.caption("AI가 답변을 생성한 검토 단계입니다. 답변 신뢰도 판단에 "
                        "참고하세요.")   # v1 app.py:1157 원문
-    # 참고 사규 expander (v1 ui/render.py:296-312 — 발췌 escape)
+    # 참고 사규 카드 (지시서 005 — v1 ui/render.py:299-328 구조 이식:
+    # 테두리 카드+배지+제목+조번호 우측+스니펫. DB 출처 값 전부 escape —
+    # v1 stored XSS 교훈 승계. 구 히스토리 {crumb,snippet} 형식 폴백 지원)
     if entry.get("ctx_refs") and not entry.get("blocked"):
         with st.expander("참고 사규", expanded=False):
             for r in entry["ctx_refs"]:
-                st.markdown(f"**{_h.escape(r['crumb'])}**")
-                st.caption(_h.escape(r["snippet"]) + "…")
+                if "title" in r:
+                    title_raw, cite_raw = r.get("title") or "문서", r.get("cite") or ""
+                    kind_raw = r.get("kind") or _doc_kind_of(title_raw)
+                else:   # 구 형식: crumb = "문서명[>제N조]"
+                    parts = (r.get("crumb") or "문서").split(">")
+                    title_raw = parts[0]
+                    cite_raw = parts[1] if len(parts) > 1 else ""
+                    kind_raw = _doc_kind_of(title_raw)
+                cite_html = (f'<span class="nx-doc-cite">{_h.escape(cite_raw)}'
+                             "</span>" if cite_raw else "")
+                st.markdown(
+                    '<div class="nx-doc-card"><div class="nx-doc-header">'
+                    f'<span class="nx-doc-badge">{_h.escape(kind_raw)}</span>'
+                    f'<span class="nx-doc-title">{_h.escape(title_raw)}</span>'
+                    f'{cite_html}</div>'
+                    f'<p class="nx-doc-text">{_h.escape(r.get("snippet") or "")}</p>'
+                    "</div>", unsafe_allow_html=True)
     # 응답 시간·피드백
     # 하단 메타 행 (002-C — [카테고리 · 등급 · ⏱️응답 · 🤖모델], 상단 중복 0)
     _meta: list = []
@@ -1291,8 +1338,12 @@ def _ask(question: str, status_cb=None) -> dict:
             followups = []
     ctx_titles = sorted({c["breadcrumb"].split(">")[0] for c in res["chunks"]
                          if c.get("breadcrumb")})
-    ctx_refs = [{"crumb": c.get("breadcrumb") or "문서",
-                 "snippet": (c.get("text") or "")[:180]}
+    # 참고 사규 카드 데이터 (005): cite 는 청크 article_no(파서 검증 canonical)
+    # 만 — 환각 조번호 0. 스니펫 480자(v1 render.py:316)
+    ctx_refs = [{"title": (c.get("breadcrumb") or "문서").split(">")[0],
+                 "cite": c.get("article_no") or "",
+                 "kind": _doc_kind_of((c.get("breadcrumb") or "문서").split(">")[0]),
+                 "snippet": (c.get("text") or "")[:480]}
                 for c in res["chunks"][:8]]
     card = None
     if not blocked and not intake["is_critical"]:
