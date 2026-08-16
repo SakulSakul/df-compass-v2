@@ -7,8 +7,9 @@ critical 변형·칩·SUGGESTIONS 는 ⑧·⑨ 범위 — 여기 없음.
 인용 원칙 (golden 교훈 2026-07-22): 발췌에 조항 번호가 명시된 경우에만
 (문서명, 제N조), 아니면 문서명만. 발췌 밖 내용 금지("확인 필요").
 
-Provider: Gemini primary (env NEXUS_CHAT_MODEL, 기본 gemini-3.6-flash —
-2026-07-22 채택 확정) / Claude fallback (ANTHROPIC_API_KEY 있을 때).
+Provider: Gemini primary (env NEXUS_CHAT_MODEL, 기본 gemini-3.7-flash —
+지시서 004, 사용자 결정 2026-08-16. 구 기본 3.6-flash 는 2026-07-22 채택분)
+/ Claude fallback (ANTHROPIC_API_KEY 있을 때).
 둘 다 실패 시 raise — 결정적 거절(answer_guard)은 ⑧ 에서 앞단에 선다.
 """
 from __future__ import annotations
@@ -20,6 +21,9 @@ from dataclasses import dataclass
 from typing import Callable, Sequence
 
 from .stages import RetrievedChunk
+
+# 합성 기본 모델 (지시서 004 — 롤백 = 이 커밋 revert)
+_DEFAULT_CHAT_MODEL = "gemini-3.7-flash"
 
 SYSTEM_CONTRACT = """당신은 신세계디에프 사규 안내 챗봇 DF COMPASS 입니다.
 아래 [사규 발췌]만 근거로 답하며, 반드시 다음 섹션 구조로 출력합니다.
@@ -90,7 +94,7 @@ class TruncatedCompletion(RuntimeError):
 def _gemini_gen(system: str, user: str) -> str:
     from google import genai
     cli = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    model = os.environ.get("NEXUS_CHAT_MODEL", "gemini-3.6-flash")
+    model = os.environ.get("NEXUS_CHAT_MODEL", _DEFAULT_CHAT_MODEL)
     res = cli.models.generate_content(
         model=model, contents=user,
         config={"system_instruction": system, "temperature": 0.0,
@@ -165,7 +169,7 @@ def synthesize(question: str, chunks: Sequence[RetrievedChunk], *,
     def _gen_once() -> tuple[str, str, bool]:
         try:
             return (primary(SYSTEM_CONTRACT, user),
-                    f"gemini:{os.environ.get('NEXUS_CHAT_MODEL', 'gemini-3.6-flash')}",
+                    f"gemini:{os.environ.get('NEXUS_CHAT_MODEL', _DEFAULT_CHAT_MODEL)}",
                     False)
         except Exception as e:
             print(f"[synthesis] primary FAILED → fallback: {type(e).__name__}: {e}",
