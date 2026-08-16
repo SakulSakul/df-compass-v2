@@ -431,7 +431,8 @@ def test_srms_linkify(monkeypatch):
 
 
 def test_grade_meta_row(monkeypatch):
-    """002-C: HIGH/MEDIUM 어휘 메타 행 + UNVERIFIED 중립·강등 칩 현행 유지."""
+    """006: 전 등급 상단 라벨 + 하단 메타 행 이중 표시(v1 정합) —
+    UNVERIFIED 중립 분기·강등 칩 현행 유지, 산식·action 무접촉."""
     at = _at(monkeypatch)
     at.session_state["messages"] = [
         {"role": "user", "content": "q1"},
@@ -447,11 +448,15 @@ def test_grade_meta_row(monkeypatch):
     at.run()
     assert not at.exception
     html = _all_markdown(at)
-    assert "🟢 높은 신뢰도 — 사규 원문 대조 확인" in html
-    assert "🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장" in html
+    # (a) 상단 라벨 (nx-grade 캡슐) + (b) 하단 메타 행 — 이중 표시 = 문구 2회
+    assert html.count("🟢 높은 신뢰도 — 사규 원문 대조 확인") == 2
+    assert html.count("🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장") == 2
+    assert 'class="nx-grade high">🟢' in html              # 상단 캡슐 실재
+    assert 'class="nx-grade medium">🟡' in html
+    assert 'class="nx-grade unv">' in html                 # UNVERIFIED 상단
     assert "사규 문서 대조 확인 — 세부 조항은 원문 참조" in html   # UNVERIFIED 중립
-    assert "신뢰도 강등" in html                                   # LOW 강등 칩
-    # HIGH 메타 행 4요소 공존 (카테고리·등급·⏱️·🤖)
+    assert "신뢰도 강등" in html                                   # (c) LOW 강등 칩
+    # (b) HIGH 메타 행 4요소 공존 (카테고리·등급·⏱️·🤖)
     assert "재무" in html and "응답 12.3초" in html and "g-3.6" in html
 
 

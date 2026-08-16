@@ -461,17 +461,18 @@ _V1_ADMIN_URL = "https://df-nexus-ai.streamlit.app/admin"
 _SCOPES = ("전체", "CSR", "공정거래", "공통", "안전", "영업", "인사",
            "재무", "정보보안", "총무", "환경")
 
-# conf 4등급 사용자 표기 (지시서 002-C — 산식·action 무접촉):
-# HIGH/MEDIUM 은 하단 메타 행으로 통합(상단 라벨 제거 — 카테고리와 동일한
-# 상하단 중복 제거 원리), UNVERIFIED 중립·경고 상단 라벨과 LOW 강등 칩은
-# 현행 유지.
+# conf 4등급 사용자 표기 (지시서 006 — v1 이중 표시 정합, 산식·action 무접촉):
+# 전 등급 상단 라벨(판단 정보는 답변을 읽기 전에) + 하단 메타 행 병기.
+# 002-C 의 "상단 중복 0" 은 지시서 결함 판정(규약 2조)으로 006 에서 복원.
+# LOW 는 기존 강등 칩(안전 표면)이 담당 — 중복 표기 안 함.
 _GRADE_META = {
     "HIGH": "🟢 높은 신뢰도 — 사규 원문 대조 확인",
     "MEDIUM": "🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장",
 }
 _GRADE_LABEL = {
+    "HIGH": ("high", "🟢 높은 신뢰도 — 사규 원문 대조 확인"),
+    "MEDIUM": ("medium", "🟡 보통 신뢰도 — 참고 문서 기반, 원문 대조 권장"),
     "UNVERIFIED": ("unv", "조항 단위 근거 미확인 — 원문 확인 권장"),
-    # LOW 는 기존 강등 칩(안전 표면)이 담당 — 중복 표기 안 함
 }
 
 
@@ -1061,9 +1062,8 @@ def _render_assistant(entry: dict, idx: int = 0, typing: bool = False) -> None:
     if entry.get("degraded"):
         st.markdown('<span class="nx-chip-warn">⚠ 인용 일부 미검증 — '
                     "신뢰도 강등</span>", unsafe_allow_html=True)
-    # grade 상단 라벨 — UNVERIFIED 계열만 (002-C: HIGH/MEDIUM 은 하단 메타
-    # 행으로 통합, LOW 는 위 강등 칩. 카테고리 뱃지도 메타 행으로 이동 —
-    # 상하단 중복 제거)
+    # grade 상단 라벨 — 전 등급 (006: v1 이중 표시 정합 — 하단 메타 행 병기.
+    # LOW 는 위 강등 칩. 카테고리 뱃지는 메타 행 단독 유지)
     g = entry.get("grade")
     if g in _GRADE_LABEL and not entry.get("critical"):
         cls, label = _GRADE_LABEL[g]
