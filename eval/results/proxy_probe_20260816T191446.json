@@ -1,0 +1,178 @@
+{
+ "timestamp": "2026-08-16T19:14:37.640521",
+ "rpc": "nexus_hybrid_search_v4_ctx",
+ "top_n": 50,
+ "rerank_pool_param": 25,
+ "note_008": "008 승격 선완료 상태 — 검색 진입 여부 관측",
+ "records": [
+  {
+   "id": "Q1",
+   "question": "법인카드를 개인 용도로 사용해도 되나요?",
+   "top50_total": 41,
+   "penalty_chunks_in_top50": 9,
+   "best_rank": 4,
+   "in_rerank_pool": true,
+   "penalty_ranks": [
+    4,
+    5,
+    9,
+    13,
+    22,
+    34,
+    35,
+    37,
+    39
+   ],
+   "penalty_chunk_ids": [
+    "68facdb8-20c3-4141-b053-1eb866acfa43",
+    "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+    "4ce3c07b-e622-477f-8d5c-890030199a74",
+    "9008fffe-1086-4ea8-883e-f2701a306989",
+    "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+    "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+    "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+    "cdb537c2-d119-4233-b59d-150adb479656",
+    "766baa0e-a2cb-466e-8c0f-38538c026530"
+   ]
+  },
+  {
+   "id": "Q2",
+   "question": "회사 비품을 집에 가져가면 어떻게 되나요?",
+   "top50_total": 40,
+   "penalty_chunks_in_top50": 11,
+   "best_rank": 1,
+   "in_rerank_pool": true,
+   "penalty_ranks": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    8,
+    9,
+    10,
+    11,
+    14,
+    16
+   ],
+   "penalty_chunk_ids": [
+    "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+    "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+    "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+    "4b4863f7-a5fb-443d-8927-e9b8e187768f",
+    "4ce3c07b-e622-477f-8d5c-890030199a74",
+    "cdb537c2-d119-4233-b59d-150adb479656",
+    "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+    "766baa0e-a2cb-466e-8c0f-38538c026530",
+    "68facdb8-20c3-4141-b053-1eb866acfa43",
+    "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+    "9008fffe-1086-4ea8-883e-f2701a306989"
+   ]
+  },
+  {
+   "id": "Q3",
+   "question": "경비를 허위로 청구하면 어떻게 되나요?",
+   "top50_total": 40,
+   "penalty_chunks_in_top50": 12,
+   "best_rank": 1,
+   "in_rerank_pool": true,
+   "penalty_ranks": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    12,
+    14,
+    16,
+    19,
+    21,
+    24,
+    25
+   ],
+   "penalty_chunk_ids": [
+    "68facdb8-20c3-4141-b053-1eb866acfa43",
+    "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+    "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+    "766baa0e-a2cb-466e-8c0f-38538c026530",
+    "4b4863f7-a5fb-443d-8927-e9b8e187768f",
+    "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+    "4ce3c07b-e622-477f-8d5c-890030199a74",
+    "cdb537c2-d119-4233-b59d-150adb479656",
+    "838a79d7-02c9-4e9f-b200-edf4eaca8c21",
+    "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+    "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+    "9008fffe-1086-4ea8-883e-f2701a306989"
+   ]
+  },
+  {
+   "id": "Q4",
+   "question": "회사 공금을 개인 용도로 쓴 경우 징계 수위는 어떻게 되나요?",
+   "top50_total": 40,
+   "penalty_chunks_in_top50": 13,
+   "best_rank": 1,
+   "in_rerank_pool": true,
+   "penalty_ranks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    15
+   ],
+   "penalty_chunk_ids": [
+    "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+    "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+    "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+    "766baa0e-a2cb-466e-8c0f-38538c026530",
+    "4ce3c07b-e622-477f-8d5c-890030199a74",
+    "68facdb8-20c3-4141-b053-1eb866acfa43",
+    "cdb537c2-d119-4233-b59d-150adb479656",
+    "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+    "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+    "4b4863f7-a5fb-443d-8927-e9b8e187768f",
+    "9008fffe-1086-4ea8-883e-f2701a306989",
+    "20302bba-98b3-4347-a860-4663b24e77b8",
+    "838a79d7-02c9-4e9f-b200-edf4eaca8c21"
+   ]
+  },
+  {
+   "id": "Q5",
+   "question": "국내 출장 시 숙박비 한도가 궁금합니다.",
+   "top50_total": 40,
+   "penalty_chunks_in_top50": 5,
+   "best_rank": 21,
+   "in_rerank_pool": true,
+   "penalty_ranks": [
+    21,
+    22,
+    27,
+    33,
+    38
+   ],
+   "penalty_chunk_ids": [
+    "68facdb8-20c3-4141-b053-1eb866acfa43",
+    "cdb537c2-d119-4233-b59d-150adb479656",
+    "4b4863f7-a5fb-443d-8927-e9b8e187768f",
+    "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+    "2cb2339a-1e15-4cef-afe9-dc451a8a0f06"
+   ]
+  }
+ ],
+ "p0_verdict": {
+  "rule": "Q1~Q3 중 1건 이상 리랭크 풀 진입 → P0 통과",
+  "entered": [
+   "Q1",
+   "Q2",
+   "Q3"
+  ],
+  "pass": true
+ }
+}
