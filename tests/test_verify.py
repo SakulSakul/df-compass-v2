@@ -48,18 +48,32 @@ def test_block_wins_over_degrade():
     assert verify_answer(ans, LEDGER)["action"] == "block"
 
 
-def test_proxy_citation_caps_at_medium():
-    # 프록시(CREDO) 앵커 ok 여도 HIGH 금지 — MEDIUM 상한 (심의 2·3항)
+def test_proxy_citation_caps_at_medium(monkeypatch):
+    # 프록시 기제 검증 (009 이후 운영 명단은 공집합 — 합성 명단 주입으로
+    # 기제 자체가 살아있음을 계속 검증. verify 는 모듈 상단 import 라
+    # verify.PROXY_DOCS 를 패치)
+    monkeypatch.setattr("compass_engine.verify.PROXY_DOCS",
+                        frozenset({"(공통) 신세계그룹 CREDO"}))
     ans = "((공통) 신세계그룹 CREDO, 제1조) 에 따라." + _SECTIONS
     r = verify_answer(ans, LEDGER)
     assert r["action"] == "pass" and r["grade"] == "MEDIUM"
 
 
-def test_proxy_doc_mention_caps_high():
-    # 원문 앵커 ok + 프록시 문서수준 출현 → 넓게 잡아 MEDIUM (안전 측)
+def test_proxy_doc_mention_caps_high(monkeypatch):
+    # 원문 앵커 ok + 프록시 문서수준 출현 → 넓게 잡아 MEDIUM (합성 명단)
+    monkeypatch.setattr("compass_engine.verify.PROXY_DOCS",
+                        frozenset({"(공통) 신세계그룹 CREDO"}))
     ans = ("((CSR) 대외출강 운영 지침, 제5조) 근거. (공통) 신세계그룹 CREDO 참고."
            + _SECTIONS)
     assert verify_answer(ans, LEDGER)["grade"] == "MEDIUM"
+
+
+def test_proxy_list_empty_dormant():
+    # 009 승격 실증: 운영 명단 공집합 → CREDO 앵커 인용이 상한 없이 HIGH
+    # (any() over empty = False — 전 기제 안전 휴면)
+    ans = "((공통) 신세계그룹 CREDO, 제1조) 에 따라." + _SECTIONS
+    r = verify_answer(ans, LEDGER)
+    assert r["action"] == "pass" and r["grade"] == "HIGH"
 
 
 def test_law_ref_excluded_not_fabrication():

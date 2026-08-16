@@ -98,8 +98,12 @@ def test_reserved_seat_injects_and_exempts_cut():
     assert len(res["chunks"]) <= 8
 
 
-def test_proxy_demotion_and_quota():
+def test_proxy_demotion_and_quota(monkeypatch):
     # 풀 상위가 프록시 도배 → 감점으로 비프록시 우선, 최종 프록시 ≤1
+    # (009 이후 운영 명단 공집합 — 합성 명단 주입으로 기제 검증 유지.
+    # retriever._is_proxy 는 호출 시점 import 라 proxies 모듈 패치가 유효)
+    import compass_engine.proxies as _px
+    monkeypatch.setattr(_px, "PROXY_DOCS", frozenset({PROXY}))
     rows = ([_row(i, PROXY, "dP") for i in range(3)]
             + [_row(10 + i, RULE_A, "dA") for i in range(3)])
     sb = _FakeSb(rows)
