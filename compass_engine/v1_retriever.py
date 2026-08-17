@@ -142,6 +142,14 @@ class V1RpcRetriever:
                 text=str(r.get("text") or ""),
                 score=float(r.get("rrf_score") or 0.0),
             ))
+        # ── P1 계장 (지시서 010 — 관측 전용, 반환 청크·동작 무영향): 원 RRF
+        # 순위는 RPC 반환 인덱스로 캡처 (라우터 풀 주입 **이전** 시점.
+        # score(rrf_score) 역산 금지 — 양 leg 동점 시 비결정) ──
+        _rank_trace: dict = {
+            "rpc_returned": len(rows),
+            "rrf_rank": {c["chunk_id"]: i + 1 for i, c in enumerate(chunks)},
+        }
+
         # ── wave 3 보장 계층 ①: 라우팅 + 풀 주입 (rerank 전, add-only) ──
         router_hit: bool | None = None
         routed_titles: list[str] = []
@@ -169,6 +177,9 @@ class V1RpcRetriever:
             timings["rerank_ms"] = int((time.perf_counter() - _t) * 1000)
         else:
             ranked = list(chunks)
+        # P1 계장: 리랭크 후 순위 (라우팅 주입 청크는 rrf_rank 부재 → None 구분)
+        _rank_trace["rerank_rank"] = {c["chunk_id"]: i + 1
+                                      for i, c in enumerate(ranked)}
 
         # ── wave 3 보장 계층 ②: 프록시 감점 (결정론 stable 재정렬) ──
         if self.proxy_quota is not None:
@@ -224,5 +235,15 @@ class V1RpcRetriever:
             "+rerank" if self.reranker is not None else ""
         ) + ("+router" if self.router is not None else ""
         ) + ("+neighbors" if self.expand_neighbors else "")
-        return RetrieveResult(chunks=chunks, query_set=[q], provider=provider,
-                              timings=timings, router_hit=router_hit)
+        # P1 계장: 최종 컨텍스트(이웃 포함) 3층 기록 — 이웃·주입 청크는 해당
+        # 층 순위 None 으로 구분
+        _rank_trace["final"] = [
+            {"chunk_id": c["chunk_id"],
+             "doc": (c.get("breadcrumb") or "").split(">")[0],
+             "rrf": _rank_trace["rrf_rank"].get(c["chunk_id"]),
+             "rerank": _rank_trace["rerank_rank"].get(c["chunk_id"])}
+            for c in chunks]
+        res = RetrieveResult(chunks=chunks, query_set=[q], provider=provider,
+                             timings=timings, router_hit=router_hit)
+        res["rank_trace"] = _rank_trace   # 관측 전용 추가 키 (기존 소비처 무영향)
+        return res

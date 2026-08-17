@@ -1,0 +1,3961 @@
+{
+ "timestamp": "2026-08-17T12:18:44.558517",
+ "n_provisional": 10,
+ "note": "운영 동일 경로(retrieve 내부 계장) — 프로브 편향 계기 아님",
+ "aggregates": {
+  "errors": [],
+  "rescue_candidates_rel_questions": [
+   {
+    "id": "g01",
+    "deep_entries": [
+     {
+      "chunk_id": "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 15,
+      "rerank": 5
+     },
+     {
+      "chunk_id": "930f085d-109c-4ed3-a4e7-9666b0823a34",
+      "doc": "(인사) 건전한 조직문화 조성을 위한 자율준수 지침",
+      "rrf": 14,
+      "rerank": 18
+     }
+    ]
+   },
+   {
+    "id": "g03",
+    "deep_entries": [
+     {
+      "chunk_id": "bfde700f-c656-470a-83b1-9fe27eef0967",
+      "doc": "(재무) 내부회계관리규정",
+      "rrf": 25,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "b05ca2a4-1ba6-4ca6-8780-7e9bb4f5291d",
+      "doc": "(공통) 신세계그룹 CREDO",
+      "rrf": 18,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "aad84471-4019-4adf-9df1-d5c534a354d4",
+      "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+      "rrf": 11,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "26f271d3-bb3c-4425-89df-1cf451a1b4db",
+      "doc": "(영업) CSR경영방침",
+      "rrf": 17,
+      "rerank": 19
+     }
+    ]
+   },
+   {
+    "id": "g04",
+    "deep_entries": [
+     {
+      "chunk_id": "cd7ea782-9b32-405b-be64-eada3b87fe33",
+      "doc": "(안전) 중대재해 대응 지침",
+      "rrf": 22,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g05",
+    "deep_entries": [
+     {
+      "chunk_id": "a4f9e8a4-188c-4303-a5c2-16947b553441",
+      "doc": "(안전) 중대재해 대응 지침",
+      "rrf": 11,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "1dc7467c-955b-4a52-b13d-17388903716e",
+      "doc": "(안전) 중대재해 대응 지침",
+      "rrf": 13,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g06",
+    "deep_entries": [
+     {
+      "chunk_id": "41cf31b3-8bdb-416e-b7f3-2e79f72c13bd",
+      "doc": "(정보보안) 정보보호 업무지침",
+      "rrf": 14,
+      "rerank": 3
+     }
+    ]
+   },
+   {
+    "id": "g08",
+    "deep_entries": [
+     {
+      "chunk_id": "838a79d7-02c9-4e9f-b200-edf4eaca8c21",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 16,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "6933cb6a-5bb8-4aff-940b-ece8ee9405d4",
+      "doc": "(공통) 일반 사건사고 보고지침",
+      "rrf": 21,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "e544ccea-7f34-4f03-94cb-7a78b8520fe4",
+      "doc": "(공통) 신세계그룹 CREDO",
+      "rrf": 17,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g09",
+    "deep_entries": [
+     {
+      "chunk_id": "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 16,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g11",
+    "deep_entries": [
+     {
+      "chunk_id": "83f4ffde-8227-41fa-b98d-b6c1272842e7",
+      "doc": "(재무) 해외출장비 관리 지침",
+      "rrf": 18,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g12",
+    "deep_entries": [
+     {
+      "chunk_id": "f6b1b6cf-5774-470c-be6b-581ea5e1aea2",
+      "doc": "(CSR) 클린뱅크 운영 지침",
+      "rrf": 12,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g13",
+    "deep_entries": [
+     {
+      "chunk_id": "9008fffe-1086-4ea8-883e-f2701a306989",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 17,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g14",
+    "deep_entries": [
+     {
+      "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 12,
+      "rerank": 1
+     }
+    ]
+   },
+   {
+    "id": "g15",
+    "deep_entries": [
+     {
+      "chunk_id": "9dcefede-4ea2-467d-9a17-19661d9c12c6",
+      "doc": "(재무) 법인카드 관리 지침",
+      "rrf": 15,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "7ab904d8-81f6-4f9b-9449-14b026e97d8b",
+      "doc": "(재무) 국내출장비 관리 지침",
+      "rrf": 24,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g18",
+    "deep_entries": [
+     {
+      "chunk_id": "8dcb99da-15d8-4676-81c6-ebaeba061ca7",
+      "doc": "(공정거래) 협력회사 판촉사원 파견 지침",
+      "rrf": 14,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "de5e9d1e-c190-43dd-aa33-9445d2867016",
+      "doc": "(안전) 매장 안전보건관리 지침",
+      "rrf": 23,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "498626dc-36c9-4c20-8e15-ba0cb4d9e61f",
+      "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+      "rrf": 17,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g19",
+    "deep_entries": [
+     {
+      "chunk_id": "498626dc-36c9-4c20-8e15-ba0cb4d9e61f",
+      "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+      "rrf": 25,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "9dffc95b-b3e0-46d0-aa62-1e7c2f9f570d",
+      "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+      "rrf": 13,
+      "rerank": 3
+     }
+    ]
+   },
+   {
+    "id": "g20",
+    "deep_entries": [
+     {
+      "chunk_id": "5df27e16-6a1b-486a-91e2-29aa3f2d438d",
+      "doc": "(총무) 이사회 운영규정",
+      "rrf": 15,
+      "rerank": 2
+     }
+    ]
+   },
+   {
+    "id": "g21",
+    "deep_entries": [
+     {
+      "chunk_id": "40aeec0b-3890-44ed-b36d-59fff5e2f0d8",
+      "doc": "(재무) 내부회계관리제도 업무지침",
+      "rrf": 14,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "0917d55b-7e35-4683-b202-6f1b9fc12755",
+      "doc": "(재무) 내부회계관리규정",
+      "rrf": 15,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "c3b2b10c-565d-4a7d-9b3a-1ea27172519c",
+      "doc": "(재무) 내부거래 협의체 운영 규정",
+      "rrf": 12,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g22",
+    "deep_entries": [
+     {
+      "chunk_id": "d9d9c446-c2b6-4ad4-b502-bbfc54b1d35b",
+      "doc": "(총무) 인감 관리지침",
+      "rrf": 15,
+      "rerank": 1
+     },
+     {
+      "chunk_id": "a8a38709-e806-422b-b244-451472d74ea2",
+      "doc": "(총무) 인감 관리지침",
+      "rrf": 13,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "ad535808-77d0-44ef-b1e4-e0a2644fdc5d",
+      "doc": "(총무) 인감 관리지침",
+      "rrf": 22,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g23",
+    "deep_entries": [
+     {
+      "chunk_id": "0dc1e8b0-c7e9-4cc2-864d-7444d3db4d70",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 19,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g24",
+    "deep_entries": [
+     {
+      "chunk_id": "716496ac-b9aa-44d6-b1a1-d459ce9265ab",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 21,
+      "rerank": 1
+     },
+     {
+      "chunk_id": "7f98e63d-383e-4a65-ad83-1cf4c3a5d3a3",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 23,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "75c7e406-7bd2-40a1-8693-2e357c8fb17b",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 13,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g25",
+    "deep_entries": [
+     {
+      "chunk_id": "a76541a2-979e-4ad6-822b-e142b0d08115",
+      "doc": "(공통) 중대 사건사고 보고지침",
+      "rrf": 11,
+      "rerank": 1
+     },
+     {
+      "chunk_id": "3822b0bd-8f85-45ae-8e33-5e8d7e81921e",
+      "doc": "(재무) 내부회계관리규정",
+      "rrf": 18,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "f00daa46-7012-4b66-ae32-2300be5af688",
+      "doc": "(재무) 내부회계관리제도 업무지침",
+      "rrf": 19,
+      "rerank": 3
+     }
+    ]
+   },
+   {
+    "id": "g28",
+    "deep_entries": [
+     {
+      "chunk_id": "af3a3439-1576-444d-8426-20bd33fdf05d",
+      "doc": "(재무) 내부거래 협의체 운영 규정",
+      "rrf": 23,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g29",
+    "deep_entries": [
+     {
+      "chunk_id": "3e51cc4c-1ebc-4380-919a-b1715ee0183e",
+      "doc": "(안전) 공기질 유지관리 지침",
+      "rrf": 24,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g30",
+    "deep_entries": [
+     {
+      "chunk_id": "b6a6334c-c3f7-4766-866e-998aa47cc40f",
+      "doc": "(안전) 중대재해 대응 지침",
+      "rrf": 19,
+      "rerank": 3
+     }
+    ]
+   },
+   {
+    "id": "g31",
+    "deep_entries": [
+     {
+      "chunk_id": "903b5661-64d7-470d-bdeb-bf35943896d8",
+      "doc": "(안전) 위험성평가 지침",
+      "rrf": 22,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "630136ac-4615-44e5-8904-d23b2e3395a5",
+      "doc": "(안전) 안전보건경영매뉴얼",
+      "rrf": 13,
+      "rerank": 19
+     }
+    ]
+   },
+   {
+    "id": "g32",
+    "deep_entries": [
+     {
+      "chunk_id": "3bd4913a-c2fb-40f9-a4e6-da97cb263a6f",
+      "doc": "(영업) 매장 습득물 처리지침",
+      "rrf": 15,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "714832d9-e61b-4a37-92f7-0c9ba92798eb",
+      "doc": "(영업) 매장 습득물 처리지침",
+      "rrf": 21,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "baafe208-87d4-4b1b-8b7a-b2055a3030fb",
+      "doc": "(영업) 매장 습득물 처리지침",
+      "rrf": 17,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g35",
+    "deep_entries": [
+     {
+      "chunk_id": "729be9e0-0715-4fbf-968b-551f05830a6c",
+      "doc": "(영업) AEO 업무절차서 (본점)",
+      "rrf": 11,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "d08f76c1-afe0-4fa7-9a82-aa925972e17c",
+      "doc": "(재무) 상품재고 관리 지침",
+      "rrf": 17,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g36",
+    "deep_entries": [
+     {
+      "chunk_id": "1d7de30a-5480-4342-a64e-377f5dd50fe0",
+      "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+      "rrf": 11,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "bbd0032c-8549-4aa9-9f4b-cb3e9247d632",
+      "doc": "(영업) 보세화물운송 관리규정",
+      "rrf": 22,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "c09339ff-4de1-4727-b7d3-cf605124f963",
+      "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+      "rrf": 13,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g38",
+    "deep_entries": [
+     {
+      "chunk_id": "20302bba-98b3-4347-a860-4663b24e77b8",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 21,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g39",
+    "deep_entries": [
+     {
+      "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+      "doc": "(CSR) 클린뱅크 운영 지침",
+      "rrf": 19,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g40",
+    "deep_entries": [
+     {
+      "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+      "doc": "(CSR) 대외출강 운영 지침",
+      "rrf": 17,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 12,
+      "rerank": 3
+     }
+    ]
+   },
+   {
+    "id": "g41",
+    "deep_entries": [
+     {
+      "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+      "doc": "(공통) 신세계그룹 CREDO",
+      "rrf": 23,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "4ce3c07b-e622-477f-8d5c-890030199a74",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 11,
+      "rerank": 4
+     },
+     {
+      "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+      "doc": "(공통) 신세계그룹 CREDO",
+      "rrf": 25,
+      "rerank": 5
+     }
+    ]
+   },
+   {
+    "id": "g42",
+    "deep_entries": [
+     {
+      "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+      "doc": "(공통) 신세계그룹 CREDO",
+      "rrf": 17,
+      "rerank": 2
+     },
+     {
+      "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+      "doc": "(공통) 임직원 징계기준",
+      "rrf": 13,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g43",
+    "deep_entries": [
+     {
+      "chunk_id": "ca151e91-1193-42c4-b14b-71c9656735d0",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 17,
+      "rerank": 3
+     },
+     {
+      "chunk_id": "716496ac-b9aa-44d6-b1a1-d459ce9265ab",
+      "doc": "(총무) 영상정보기기 설치운영 지침",
+      "rrf": 18,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g44",
+    "deep_entries": [
+     {
+      "chunk_id": "3bd4913a-c2fb-40f9-a4e6-da97cb263a6f",
+      "doc": "(영업) 매장 습득물 처리지침",
+      "rrf": 16,
+      "rerank": 4
+     }
+    ]
+   },
+   {
+    "id": "g45",
+    "deep_entries": [
+     {
+      "chunk_id": "d47506c3-ddfb-4eff-b990-5a9903a8d382",
+      "doc": "(공정거래) SNS 인플루언서 표시광고 지침",
+      "rrf": 11,
+      "rerank": 2
+     }
+    ]
+   },
+   {
+    "id": "g46",
+    "deep_entries": [
+     {
+      "chunk_id": "bebe3803-f27b-4a08-987e-b040df25921b",
+      "doc": "(CSR) 대외출강 운영 지침",
+      "rrf": 17,
+      "rerank": 4
+     }
+    ]
+   }
+  ],
+  "irrelevant_promoted_entries": [
+   {
+    "id": "g10",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   },
+   {
+    "id": "g47",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": true,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {
+     "(공통) 임직원 징계기준": [
+      {
+       "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 15,
+       "rerank": 2
+      }
+     ]
+    }
+   },
+   {
+    "id": "g48",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   },
+   {
+    "id": "g49",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   },
+   {
+    "id": "g50",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   },
+   {
+    "id": "g51",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   },
+   {
+    "id": "g52",
+    "promoted_in_final": {
+     "(공통) 임직원 징계기준": false,
+     "(공통) 신세계그룹 CREDO": false
+    },
+    "chunks": {}
+   }
+  ]
+ },
+ "records": [
+  {
+   "id": "g01",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "486189e2-3529-4948-8f13-423e38d1ddb6",
+     "doc": "(인사) 성희롱 예방 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d505f66b-d40a-4488-9c63-91fe5e9db4ea",
+     "doc": "(인사) 성희롱 예방 지침",
+     "rrf": 4,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "dc39d8a0-f3fc-4edd-bb15-53ab31e1ada0",
+     "doc": "(인사) 성희롱 예방 지침",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "9881e9c6-86cc-48f8-8434-3d6bfd456044",
+     "doc": "(인사) 성희롱 예방 지침",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 15,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "930f085d-109c-4ed3-a4e7-9666b0823a34",
+     "doc": "(인사) 건전한 조직문화 조성을 위한 자율준수 지침",
+     "rrf": 14,
+     "rerank": 18
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    4,
+    3,
+    2,
+    15,
+    14
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 15,
+       "rerank": 5
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g02",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "aad84471-4019-4adf-9df1-d5c534a354d4",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "fce09a5c-5aef-4b75-94c2-3685ae8a4e41",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "0488b308-73cb-4c76-b9fa-2e9f65ab564d",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "7d746994-6bc4-4c1f-ba50-b40e7084c81a",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "6933cb6a-5bb8-4aff-940b-ece8ee9405d4",
+     "doc": "(공통) 일반 사건사고 보고지침",
+     "rrf": 8,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    1,
+    4,
+    3,
+    8
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g03",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "54cdbd5f-e464-482e-8131-b2aafa9ed8a6",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 9,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "bfde700f-c656-470a-83b1-9fe27eef0967",
+     "doc": "(재무) 내부회계관리규정",
+     "rrf": 25,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "b05ca2a4-1ba6-4ca6-8780-7e9bb4f5291d",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 18,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "aad84471-4019-4adf-9df1-d5c534a354d4",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 11,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "486189e2-3529-4948-8f13-423e38d1ddb6",
+     "doc": "(인사) 성희롱 예방 지침",
+     "rrf": 5,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "26f271d3-bb3c-4425-89df-1cf451a1b4db",
+     "doc": "(영업) CSR경영방침",
+     "rrf": 17,
+     "rerank": 19
+    }
+   ],
+   "final_topk_rrf": [
+    9,
+    25,
+    18,
+    11,
+    5,
+    17
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "b05ca2a4-1ba6-4ca6-8780-7e9bb4f5291d",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 18,
+       "rerank": 3
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g04",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "0e5755e0-f8bd-4138-8803-c8bd0a19533e",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 7,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "7a6ffb89-e244-41bd-a30b-28753b90fed6",
+     "doc": "(공통) 일반 사건사고 보고지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d7b45c21-6917-487a-a19a-7f0f874b2e87",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 5,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "cd7ea782-9b32-405b-be64-eada3b87fe33",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 22,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "7e85fe80-0bc7-473a-a8f9-18231f26df94",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 3,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "5f628bb7-f66b-487e-9128-ac52dc9c6f68",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 4,
+     "rerank": 6
+    }
+   ],
+   "final_topk_rrf": [
+    7,
+    2,
+    5,
+    22,
+    3,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g05",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "ef6be43b-6e75-4e37-9a39-3601d85abd51",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "0e5755e0-f8bd-4138-8803-c8bd0a19533e",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "a4f9e8a4-188c-4303-a5c2-16947b553441",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 11,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "1dc7467c-955b-4a52-b13d-17388903716e",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 13,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "fc810fc4-e7e3-4e87-baa7-08e14c0355a3",
+     "doc": "(안전) 안전보건관리규정",
+     "rrf": 4,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    11,
+    13,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g06",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "a84b9540-fc06-46b8-96e1-d9faea188e75",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f10c46b1-ac60-455b-99ae-a06c4a1b9fff",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 5,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "41cf31b3-8bdb-416e-b7f3-2e79f72c13bd",
+     "doc": "(정보보안) 정보보호 업무지침",
+     "rrf": 14,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "327c547f-6497-4a0d-8128-df1969b5a856",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 9,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "ea23da24-4c61-4cd8-ae02-ba58db6a640c",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 2,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    5,
+    14,
+    9,
+    2
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g07",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "0c7a4f31-0182-4c5c-9bed-6c0f4949ae63",
+     "doc": "(안전) 실종아동 등 조기발견 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "ac819420-4cc6-4e52-ba62-64dba8f75c74",
+     "doc": "(안전) 실종아동 등 조기발견 지침",
+     "rrf": 6,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "15ad50df-bc59-4e3b-82d9-69b6a9107702",
+     "doc": "(안전) 어린이 안전관리 지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "29ab423f-e951-4856-9c03-999bb2325aee",
+     "doc": "(안전) 어린이 안전관리 지침",
+     "rrf": 8,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "5f628bb7-f66b-487e-9128-ac52dc9c6f68",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 7,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    6,
+    2,
+    8,
+    7
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g08",
+   "category": "critical",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "2d8dcfcb-a9d1-46b0-8d5f-4f4eea5f0344",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "9dc957e8-19dc-450b-a05f-7b4937b003a4",
+     "doc": "(공통) 일반 사건사고 보고지침",
+     "rrf": 6,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "838a79d7-02c9-4e9f-b200-edf4eaca8c21",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 16,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "6933cb6a-5bb8-4aff-940b-ece8ee9405d4",
+     "doc": "(공통) 일반 사건사고 보고지침",
+     "rrf": 21,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "e544ccea-7f34-4f03-94cb-7a78b8520fe4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 17,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    6,
+    16,
+    21,
+    17
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "838a79d7-02c9-4e9f-b200-edf4eaca8c21",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 16,
+       "rerank": 3
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "e544ccea-7f34-4f03-94cb-7a78b8520fe4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 17,
+       "rerank": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g09",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 10,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "c7565ad5-85b6-418e-bff6-4e8a1691a3bb",
+     "doc": "(재무) 법인카드 관리 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "9dcefede-4ea2-467d-9a17-19661d9c12c6",
+     "doc": "(재무) 법인카드 관리 지침",
+     "rrf": 5,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 16,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 4,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    10,
+    2,
+    5,
+    16,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 10,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 16,
+       "rerank": 4
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 4,
+       "rerank": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g10",
+   "category": "standard",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "7ab904d8-81f6-4f9b-9449-14b026e97d8b",
+     "doc": "(재무) 국내출장비 관리 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d896d19d-b9d9-43b0-bd03-e6533550b999",
+     "doc": "(재무) 국내출장비 관리 지침",
+     "rrf": 4,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "95a08ddd-334c-4d3a-a0b0-44d7b0633bf5",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "72cc6bc7-8773-49b4-a475-d8dba163769a",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "8961bfe1-955f-46da-8fa9-215f6b19605a",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 12,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    4,
+    2,
+    3,
+    12
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g11",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "95a08ddd-334c-4d3a-a0b0-44d7b0633bf5",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "72cc6bc7-8773-49b4-a475-d8dba163769a",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "8961bfe1-955f-46da-8fa9-215f6b19605a",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 7,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "83f4ffde-8227-41fa-b98d-b6c1272842e7",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 18,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "7ab904d8-81f6-4f9b-9449-14b026e97d8b",
+     "doc": "(재무) 국내출장비 관리 지침",
+     "rrf": 3,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    7,
+    18,
+    3
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g12",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 7,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 10,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f6b1b6cf-5774-470c-be6b-581ea5e1aea2",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 12,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "f6771595-353e-44c9-9b44-81d850753ded",
+     "doc": "(영업) CSR경영방침",
+     "rrf": null,
+     "rerank": 26
+    }
+   ],
+   "final_topk_rrf": [
+    7,
+    2,
+    10,
+    4,
+    12,
+    null
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 4,
+       "rerank": 4
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 7,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 10,
+       "rerank": 3
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g13",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 9,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "9008fffe-1086-4ea8-883e-f2701a306989",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 17,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 6,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "f6771595-353e-44c9-9b44-81d850753ded",
+     "doc": "(영업) CSR경영방침",
+     "rrf": 7,
+     "rerank": 12
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    9,
+    17,
+    6,
+    7
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 1,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 9,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "9008fffe-1086-4ea8-883e-f2701a306989",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 17,
+       "rerank": 4
+      },
+      {
+       "chunk_id": "2cb2339a-1e15-4cef-afe9-dc451a8a0f06",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 6,
+       "rerank": 5
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 2,
+       "rerank": 2
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g14",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 12,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 7,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 8,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 1,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 2,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    12,
+    7,
+    8,
+    1,
+    2
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 12,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 7,
+       "rerank": 2
+      },
+      {
+       "chunk_id": "31bb7a1a-ffb7-4b71-ae43-bd789f74dc14",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 8,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "f0f4650a-4b4b-4102-b9df-f3cf296beed9",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 1,
+       "rerank": 4
+      },
+      {
+       "chunk_id": "f18bb39b-dce4-45f3-bc05-8c9d3affd8f7",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 2,
+       "rerank": 5
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g15",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "824396a1-deee-4ab5-ba5b-a8cac14f5062",
+     "doc": "(재무) 시내교통비 관리 지침",
+     "rrf": 7,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d0e8e093-9fbc-407b-a5b8-d40a8603d1f2",
+     "doc": "(재무) 시내교통비 관리 지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d896d19d-b9d9-43b0-bd03-e6533550b999",
+     "doc": "(재무) 국내출장비 관리 지침",
+     "rrf": 5,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "9dcefede-4ea2-467d-9a17-19661d9c12c6",
+     "doc": "(재무) 법인카드 관리 지침",
+     "rrf": 15,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "7ab904d8-81f6-4f9b-9449-14b026e97d8b",
+     "doc": "(재무) 국내출장비 관리 지침",
+     "rrf": 24,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    7,
+    1,
+    5,
+    15,
+    24
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g16",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "32c6c48b-7fd3-4fd8-bc50-111bd94abbc0",
+     "doc": "(공정거래) 반품관리 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d6e61cdb-55c2-492d-b699-51ce05dfe71d",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 5,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "f15978d6-f0b9-4747-a8b4-49a99cc28a48",
+     "doc": "(공정거래) 반품관리 지침",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "1e2ce413-62e7-4512-b82d-904977706521",
+     "doc": "(공정거래) 반품관리 지침",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f7420d55-1462-4729-a9c3-f158d373e22d",
+     "doc": "(재무) 상품반출입 관리 지침",
+     "rrf": 8,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    5,
+    3,
+    2,
+    8
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g17",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "854249ee-d519-4efa-9fe2-587deb57aed7",
+     "doc": "(공정거래) 협력회사 판촉비용 분담 지침",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "7ea9d3bc-d2b3-4e13-840a-ea9f844e9303",
+     "doc": "(공정거래) 협력회사 판촉비용 분담 지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "65c0cb88-3d50-468a-b543-32545963da60",
+     "doc": "(공정거래) 특약매입거래 부당성 심사 기준에 따른 비용부담 지침",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "5ed40326-7a93-4d75-905a-a7ab65abc0b8",
+     "doc": "(공정거래) 매장 위치이동 및 인테리어 비용 분담 지침",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "e4a1e3a2-be02-4d2e-9336-935497a245d0",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    1,
+    4,
+    2,
+    5
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g18",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "4ffec72d-85c5-4b2d-896d-686397512aaa",
+     "doc": "(공정거래) 협력회사 판촉사원 파견 지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "8dcb99da-15d8-4676-81c6-ebaeba061ca7",
+     "doc": "(공정거래) 협력회사 판촉사원 파견 지침",
+     "rrf": 14,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "1f92b3c1-37aa-4f58-a225-79eb9e2d263e",
+     "doc": "(안전) 매장 안전보건관리 지침",
+     "rrf": 1,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "de5e9d1e-c190-43dd-aa33-9445d2867016",
+     "doc": "(안전) 매장 안전보건관리 지침",
+     "rrf": 23,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "498626dc-36c9-4c20-8e15-ba0cb4d9e61f",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 17,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    14,
+    1,
+    23,
+    17
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g19",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "e4a1e3a2-be02-4d2e-9336-935497a245d0",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "498626dc-36c9-4c20-8e15-ba0cb4d9e61f",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 25,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "9dffc95b-b3e0-46d0-aa62-1e7c2f9f570d",
+     "doc": "(공정거래) 협력회사 입점 및 퇴점 지침",
+     "rrf": 13,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "cd89a16e-8c3d-4ab2-bd22-d00df90aad71",
+     "doc": "(공정거래) 판매수수료 결정 및 변경 지침",
+     "rrf": 1,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "5ed40326-7a93-4d75-905a-a7ab65abc0b8",
+     "doc": "(공정거래) 매장 위치이동 및 인테리어 비용 분담 지침",
+     "rrf": 6,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    25,
+    13,
+    1,
+    6
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g20",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "7ee88a2f-0c24-4d6d-bc68-f26c93db2649",
+     "doc": "(공통) 기부금 집행 관리지침",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "5df27e16-6a1b-486a-91e2-29aa3f2d438d",
+     "doc": "(총무) 이사회 운영규정",
+     "rrf": 15,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 1,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "60901957-ed52-4d3f-a988-dbe196e2bfc4",
+     "doc": "(공통) 대외 민감정보 요구 대응 지침",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "3ac61a53-b1bc-41a1-badf-5915dec6d783",
+     "doc": "(공통) 사규 관리지침",
+     "rrf": 4,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    15,
+    1,
+    2,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g21",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "3ac61a53-b1bc-41a1-badf-5915dec6d783",
+     "doc": "(공통) 사규 관리지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "0cf5aaea-1717-4cec-9abe-d91d0876a869",
+     "doc": "(공통) 사규 관리지침",
+     "rrf": 3,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "40aeec0b-3890-44ed-b36d-59fff5e2f0d8",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 14,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "0917d55b-7e35-4683-b202-6f1b9fc12755",
+     "doc": "(재무) 내부회계관리규정",
+     "rrf": 15,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "c3b2b10c-565d-4a7d-9b3a-1ea27172519c",
+     "doc": "(재무) 내부거래 협의체 운영 규정",
+     "rrf": 12,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    3,
+    14,
+    15,
+    12
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g22",
+   "category": "standard",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "d9d9c446-c2b6-4ad4-b502-bbfc54b1d35b",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 15,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "a8a38709-e806-422b-b244-451472d74ea2",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 13,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "00a04a6a-a497-4913-a11b-55c67184cb02",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "df790dc9-f0d0-4408-ae4b-d19441172882",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 5,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "ad535808-77d0-44ef-b1e4-e0a2644fdc5d",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 22,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    15,
+    13,
+    2,
+    5,
+    22
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g23",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "ca151e91-1193-42c4-b14b-71c9656735d0",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "716496ac-b9aa-44d6-b1a1-d459ce9265ab",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 3,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "7f98e63d-383e-4a65-ad83-1cf4c3a5d3a3",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 6,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "b3e56ea9-0eb4-4c70-b113-0455830c5634",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 9,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "0dc1e8b0-c7e9-4cc2-864d-7444d3db4d70",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 19,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    3,
+    6,
+    9,
+    19
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g24",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "716496ac-b9aa-44d6-b1a1-d459ce9265ab",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 21,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "ca151e91-1193-42c4-b14b-71c9656735d0",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 9,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "7f98e63d-383e-4a65-ad83-1cf4c3a5d3a3",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 23,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "dd8f15df-839d-4ee9-a766-c5e32b71e407",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 1,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "75c7e406-7bd2-40a1-8693-2e357c8fb17b",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 13,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "60901957-ed52-4d3f-a988-dbe196e2bfc4",
+     "doc": "(공통) 대외 민감정보 요구 대응 지침",
+     "rrf": 2,
+     "rerank": 7
+    }
+   ],
+   "final_topk_rrf": [
+    21,
+    9,
+    23,
+    1,
+    13,
+    2
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g25",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "a76541a2-979e-4ad6-822b-e142b0d08115",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 11,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "3822b0bd-8f85-45ae-8e33-5e8d7e81921e",
+     "doc": "(재무) 내부회계관리규정",
+     "rrf": 18,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "f00daa46-7012-4b66-ae32-2300be5af688",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 19,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "5f628bb7-f66b-487e-9128-ac52dc9c6f68",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 1,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "2d8dcfcb-a9d1-46b0-8d5f-4f4eea5f0344",
+     "doc": "(공통) 중대 사건사고 보고지침",
+     "rrf": 2,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    11,
+    18,
+    19,
+    1,
+    2
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g26",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "f00daa46-7012-4b66-ae32-2300be5af688",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "5f7db8cd-5c93-49f9-b5c5-3c418ef86833",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "5d90d212-d887-432e-b150-77dd7ea59cae",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 6,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "823e8709-b635-4453-b683-eee776748bf3",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "fc5f9ce7-0e8d-4349-90b6-78814485cc35",
+     "doc": "(재무) 내부회계관리제도 업무지침",
+     "rrf": 9,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    1,
+    6,
+    3,
+    9
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g27",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "7a113aae-3bb7-4d26-bba8-b871747375aa",
+     "doc": "(안전) 휴게시설 관리지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "14584dfc-1bf4-4047-ae43-9b47a4706007",
+     "doc": "(안전) 휴게시설 관리지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "3356cd07-d265-43bb-b607-9b19b8da7b3f",
+     "doc": "(안전) 안전보건관리규정",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "d8cf9865-ebf0-41d3-b991-c940da15b7e5",
+     "doc": "(안전) 안전보건경영매뉴얼",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "89aa5da8-6b53-4340-a2b0-6f06fee2f036",
+     "doc": "(안전) 안전보건관리규정",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g28",
+   "category": "confusion",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "7ea9d3bc-d2b3-4e13-840a-ea9f844e9303",
+     "doc": "(공정거래) 협력회사 판촉비용 분담 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "854249ee-d519-4efa-9fe2-587deb57aed7",
+     "doc": "(공정거래) 협력회사 판촉비용 분담 지침",
+     "rrf": 7,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "174be1db-58e2-40ea-b574-92518b3744bc",
+     "doc": "(공정거래) 부당한 경영활동 간섭 및 경영정보 제공요구 금지 지침",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "de6310e3-e68f-449f-8c6f-33591392409c",
+     "doc": "(총무) 이사회 운영규정",
+     "rrf": 10,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "af3a3439-1576-444d-8426-20bd33fdf05d",
+     "doc": "(재무) 내부거래 협의체 운영 규정",
+     "rrf": 23,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    7,
+    4,
+    10,
+    23
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g29",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "990b5dbc-7045-40c0-afd4-9fda842f971a",
+     "doc": "(안전) 공기질 유지관리 지침",
+     "rrf": 5,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "036e9fb4-6176-4f07-bb98-4fb8b2b0e137",
+     "doc": "(안전) 공기질 유지관리 지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "f662ebbd-0819-4489-a092-0956585cdc9a",
+     "doc": "(안전) 공기질 유지관리 지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "86958d6e-7eb7-49da-bd7c-c11f5c621baf",
+     "doc": "(안전) 공기질 유지관리 지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "3e51cc4c-1ebc-4380-919a-b1715ee0183e",
+     "doc": "(안전) 공기질 유지관리 지침",
+     "rrf": 24,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    5,
+    1,
+    2,
+    3,
+    24
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g30",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "5750d8b6-a50c-4d91-ac78-d92f0f7dbe3d",
+     "doc": "(안전) 참여, 협의 및 의사소통지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "6c27e3a5-4e00-4dba-bcdf-d702b485e4bf",
+     "doc": "(안전) 참여, 협의 및 의사소통지침",
+     "rrf": 3,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "b6a6334c-c3f7-4766-866e-998aa47cc40f",
+     "doc": "(안전) 중대재해 대응 지침",
+     "rrf": 19,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "09065420-fb2b-4970-bec8-5e5a9a7d23d6",
+     "doc": "(안전) 안전보건경영매뉴얼",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f4481a96-77e5-49c4-a703-a1917dac3f21",
+     "doc": "(안전) 안전보건경영매뉴얼",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    3,
+    19,
+    2,
+    5
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g31",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "4ba48ac5-5027-4c25-85f9-7b5411f3fc2b",
+     "doc": "(안전) 안전보건관리규정",
+     "rrf": 5,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "2174c08b-0111-4754-955b-ad0d35ea7eca",
+     "doc": "(안전) 위험성평가 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "903b5661-64d7-470d-bdeb-bf35943896d8",
+     "doc": "(안전) 위험성평가 지침",
+     "rrf": 22,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "10718c1c-65b0-40c4-97de-82af30822713",
+     "doc": "(안전) 위험성평가 지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "3ddb5b1b-b8b1-4e7a-8420-241d9e7d0317",
+     "doc": "(안전) 위험성평가 지침",
+     "rrf": 6,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "630136ac-4615-44e5-8904-d23b2e3395a5",
+     "doc": "(안전) 안전보건경영매뉴얼",
+     "rrf": 13,
+     "rerank": 19
+    }
+   ],
+   "final_topk_rrf": [
+    5,
+    2,
+    22,
+    3,
+    6,
+    13
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g32",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "6db0617d-88ab-4869-9293-000b7be11442",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "3bd4913a-c2fb-40f9-a4e6-da97cb263a6f",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 15,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "714832d9-e61b-4a37-92f7-0c9ba92798eb",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 21,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "baafe208-87d4-4b1b-8b7a-b2055a3030fb",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 17,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "6e4a43ea-76e7-40de-ab14-9a5240080178",
+     "doc": "(영업) AEO 업무절차서 (본점)",
+     "rrf": 1,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    15,
+    21,
+    17,
+    1
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g33",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "5f3d3d76-005a-4faa-90b9-dc304b36a59e",
+     "doc": "(인사) 사내 동호회 운영지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "e422f3e9-9308-465a-9d4f-bf3c04799d80",
+     "doc": "(인사) 사내 동호회 운영지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "4ce3c07b-e622-477f-8d5c-890030199a74",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "2b1b0111-bd15-4344-803f-bd5f2f8f344e",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "4ce3c07b-e622-477f-8d5c-890030199a74",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 3,
+       "rerank": 3
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "2b1b0111-bd15-4344-803f-bd5f2f8f344e",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 4,
+       "rerank": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g34",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "5d0359a0-b4c0-4596-bb72-64c0b886d949",
+     "doc": "(인사) 업무 인수인계 지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d309aa6f-1042-4c4c-b910-89893f6c5e45",
+     "doc": "(인사) 업무 인수인계 지침",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "ef763d32-96fe-4e6e-8636-41aafe33c704",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "93e6aed5-6a54-4474-8688-ab62b40e67ff",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "699e1fec-5634-43b5-b26e-5ac01c682b3c",
+     "doc": "(영업) AEO 업무절차서 (인천공항점)",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    1,
+    3,
+    4,
+    5
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g35",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "84fbab4c-fd76-4317-8ef8-49559e329a18",
+     "doc": "(재무) 자산 실사 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "729be9e0-0715-4fbf-968b-551f05830a6c",
+     "doc": "(영업) AEO 업무절차서 (본점)",
+     "rrf": 11,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d936e746-5802-4ca0-83c4-bc336d89d602",
+     "doc": "(정보보안) 정보보호 업무지침",
+     "rrf": 9,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "d08f76c1-afe0-4fa7-9a82-aa925972e17c",
+     "doc": "(재무) 상품재고 관리 지침",
+     "rrf": 17,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "4ce779eb-bda7-41ca-86a2-e6d1ddaeee8c",
+     "doc": "(재무) 점포 출납 관리 지침",
+     "rrf": 10,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    11,
+    9,
+    17,
+    10
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g36",
+   "category": "mid_corpus",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "a0aad61d-cf17-4cc7-bf7a-c322994a67c2",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "1d7de30a-5480-4342-a64e-377f5dd50fe0",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 11,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "844eb3ad-dc74-492d-9ea4-c9a9f5ecbcf3",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 1,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "bbd0032c-8549-4aa9-9f4b-cb3e9247d632",
+     "doc": "(영업) 보세화물운송 관리규정",
+     "rrf": 22,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "c09339ff-4de1-4727-b7d3-cf605124f963",
+     "doc": "(영업) AEO 출입통제 및 시설관리 절차서",
+     "rrf": 13,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    11,
+    1,
+    22,
+    13
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g37",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 2,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f6b1b6cf-5774-470c-be6b-581ea5e1aea2",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 9,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 1,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 8,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    2,
+    9,
+    1,
+    4,
+    8
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 8,
+       "rerank": 5
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 1,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 4,
+       "rerank": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g38",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "3af81550-b78a-4b66-b34d-8e4dc045ab8c",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 7,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "20302bba-98b3-4347-a860-4663b24e77b8",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 21,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "e7a27483-0066-4ee7-8037-4a4d35593dba",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": null,
+     "rerank": 26
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    4,
+    7,
+    21,
+    null
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "20302bba-98b3-4347-a860-4663b24e77b8",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 21,
+       "rerank": 5
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 1,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 4,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "3af81550-b78a-4b66-b34d-8e4dc045ab8c",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 7,
+       "rerank": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g39",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f6b1b6cf-5774-470c-be6b-581ea5e1aea2",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 9,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 5,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 19,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    9,
+    2,
+    5,
+    19
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 2,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 5,
+       "rerank": 4
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g40",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 17,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 12,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 6,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 4,
+     "rerank": 8
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    17,
+    12,
+    2,
+    6,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "d6a3e61a-ee6d-490c-8d29-2f957c0211c8",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 12,
+       "rerank": 3
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 1,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 2,
+       "rerank": 4
+      },
+      {
+       "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 6,
+       "rerank": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g41",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 7,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 23,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "4ce3c07b-e622-477f-8d5c-890030199a74",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 11,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 25,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "e7a27483-0066-4ee7-8037-4a4d35593dba",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": null,
+     "rerank": 6
+    }
+   ],
+   "final_topk_rrf": [
+    7,
+    23,
+    4,
+    11,
+    25,
+    null
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 4,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "4ce3c07b-e622-477f-8d5c-890030199a74",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 11,
+       "rerank": 4
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 23,
+       "rerank": 2
+      },
+      {
+       "chunk_id": "5c172182-1510-484d-82ed-2c491e33e5d4",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 25,
+       "rerank": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g42",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 17,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "9008fffe-1086-4ea8-883e-f2701a306989",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 10,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 13,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "e7a27483-0066-4ee7-8037-4a4d35593dba",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": null,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "f6771595-353e-44c9-9b44-81d850753ded",
+     "doc": "(영업) CSR경영방침",
+     "rrf": 9,
+     "rerank": 13
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    17,
+    10,
+    13,
+    null,
+    9
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "9008fffe-1086-4ea8-883e-f2701a306989",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 10,
+       "rerank": 3
+      },
+      {
+       "chunk_id": "cdb537c2-d119-4233-b59d-150adb479656",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 13,
+       "rerank": 4
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 3,
+       "rerank": 1
+      },
+      {
+       "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 17,
+       "rerank": 2
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g43",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "0cee1ae2-4c49-4b90-8bb6-4d638fc22e31",
+     "doc": "(공통) 대외 민감정보 요구 대응 지침",
+     "rrf": 4,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "60901957-ed52-4d3f-a988-dbe196e2bfc4",
+     "doc": "(공통) 대외 민감정보 요구 대응 지침",
+     "rrf": 5,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "ca151e91-1193-42c4-b14b-71c9656735d0",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 17,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "716496ac-b9aa-44d6-b1a1-d459ce9265ab",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 18,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "dd8f15df-839d-4ee9-a766-c5e32b71e407",
+     "doc": "(총무) 영상정보기기 설치운영 지침",
+     "rrf": 1,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    4,
+    5,
+    17,
+    18,
+    1
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g44",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "6db0617d-88ab-4869-9293-000b7be11442",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 6,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 9,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "3bd4913a-c2fb-40f9-a4e6-da97cb263a6f",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 16,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "714832d9-e61b-4a37-92f7-0c9ba92798eb",
+     "doc": "(영업) 매장 습득물 처리지침",
+     "rrf": 7,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "fadabe45-cfbc-4d72-aea6-ea7f81629b46",
+     "doc": "(영업) CSR경영방침",
+     "rrf": null,
+     "rerank": 26
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    6,
+    9,
+    16,
+    7,
+    null
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "d6bc6cf6-a721-4ab4-80da-d6868d57a275",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 9,
+       "rerank": 3
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g45",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "2d885a7a-3726-4808-9c98-39fd7978dff6",
+     "doc": "(공정거래) SNS 인플루언서 표시광고 지침",
+     "rrf": 7,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "d47506c3-ddfb-4eff-b990-5a9903a8d382",
+     "doc": "(공정거래) SNS 인플루언서 표시광고 지침",
+     "rrf": 11,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "c3c46bef-a2ee-41ea-9740-ec4ce1f2a9ee",
+     "doc": "(공정거래) SNS 인플루언서 표시광고 지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "e47239aa-dd50-4dcf-86d7-80aaf6ea855c",
+     "doc": "(공정거래) 표시광고 지침",
+     "rrf": 3,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "59776739-f919-43c1-9ba2-a47ee07bf95f",
+     "doc": "(공정거래) 표시광고 지침",
+     "rrf": 4,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    7,
+    11,
+    2,
+    3,
+    4
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g46",
+   "category": "paraphrase",
+   "irrelevant_group": false,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "11aa21bc-f55f-4443-8ce1-19d9fb1204b5",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "f6b1b6cf-5774-470c-be6b-581ea5e1aea2",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": 3,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "c3c46bef-a2ee-41ea-9740-ec4ce1f2a9ee",
+     "doc": "(공정거래) SNS 인플루언서 표시광고 지침",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "bebe3803-f27b-4a08-987e-b040df25921b",
+     "doc": "(CSR) 대외출강 운영 지침",
+     "rrf": 17,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+     "doc": "(공통) 신세계그룹 CREDO",
+     "rrf": 10,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    3,
+    2,
+    17,
+    10
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "f2019b24-1e01-4861-b9dd-a57a06ca2bfd",
+       "doc": "(공통) 신세계그룹 CREDO",
+       "rrf": 10,
+       "rerank": 5
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "g47",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "930f085d-109c-4ed3-a4e7-9666b0823a34",
+     "doc": "(인사) 건전한 조직문화 조성을 위한 자율준수 지침",
+     "rrf": 3,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+     "doc": "(공통) 임직원 징계기준",
+     "rrf": 15,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "d309aa6f-1042-4c4c-b910-89893f6c5e45",
+     "doc": "(인사) 업무 인수인계 지침",
+     "rrf": 1,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "fafa7247-bf4d-415d-a975-62f14b8fcbab",
+     "doc": "(안전) 물류 안전보건관리 지침",
+     "rrf": 2,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "ea23da24-4c61-4cd8-ae02-ba58db6a640c",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 4,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    3,
+    15,
+    1,
+    2,
+    4
+   ],
+   "router_hit": null,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": true,
+     "final_chunks": [
+      {
+       "chunk_id": "68facdb8-20c3-4141-b053-1eb866acfa43",
+       "doc": "(공통) 임직원 징계기준",
+       "rrf": 15,
+       "rerank": 2
+      }
+     ]
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g48",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "a02cfa32-361c-45fa-969c-a1512c74f32e",
+     "doc": "(공정거래) 표시광고 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "0b69fccb-84f0-46ab-904a-44daea3804a5",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "839c8e8d-8a03-4a76-b6dc-3fb97eddb0cd",
+     "doc": "(정보보안) 정보보호 정책서",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "979be728-3b1d-4abf-a756-1ac648c31906",
+     "doc": "(정보보안) 개인정보보호 지침",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "7d746994-6bc4-4c1f-ba50-b40e7084c81a",
+     "doc": "(인사) 직장 내 괴롭힘 예방·대응지침",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "router_hit": null,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g49",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "95a08ddd-334c-4d3a-a0b0-44d7b0633bf5",
+     "doc": "(재무) 해외출장비 관리 지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "14584dfc-1bf4-4047-ae43-9b47a4706007",
+     "doc": "(안전) 휴게시설 관리지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "06eef30c-2ca4-4f35-9320-27db961c2166",
+     "doc": "(재무) 전결규정",
+     "rrf": 3,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "fafa7247-bf4d-415d-a975-62f14b8fcbab",
+     "doc": "(안전) 물류 안전보건관리 지침",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "a79847a7-4bba-40e4-b139-d8548254ce7e",
+     "doc": "(공정거래) 특약매입거래 부당성 심사 기준에 따른 비용부담 지침",
+     "rrf": 5,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "router_hit": null,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g50",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "a62e0d97-6320-44e2-be6c-629fdd7538c8",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "b77fe1e1-2b2f-4112-a2d9-179eaa9ea1a5",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 20,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "22d831d4-07e3-4019-b6d9-a8981e3aae0d",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 8,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "3a494083-1a58-4f43-9745-e56ce2cb0988",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 11,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "d9d9c446-c2b6-4ad4-b502-bbfc54b1d35b",
+     "doc": "(총무) 인감 관리지침",
+     "rrf": 16,
+     "rerank": 5
+    },
+    {
+     "chunk_id": "2c275717-7049-4729-9af1-c8341571f9c1",
+     "doc": "(CSR) 클린뱅크 운영 지침",
+     "rrf": null,
+     "rerank": 26
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    20,
+    8,
+    11,
+    16,
+    null
+   ],
+   "router_hit": true,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g51",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "d253f85c-7802-418e-a1f8-2c42e3c8b174",
+     "doc": "(정보보안) 생활보안 업무지침",
+     "rrf": 1,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "3f88c2d1-5b93-437f-b573-9e89ccc74c11",
+     "doc": "(정보보안) 정보보호 업무지침",
+     "rrf": 2,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "12520d28-a238-4308-98ca-cb1a9b05a047",
+     "doc": "(정보보안) 운영보안 업무지침",
+     "rrf": 4,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "77ed46b9-b8c2-4f79-8aa4-a8309138ee88",
+     "doc": "(정보보안) 생활보안 업무지침",
+     "rrf": 6,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "ba01ad33-fc25-479f-a14c-cae6a5b83b20",
+     "doc": "(정보보안) 생활보안 업무지침",
+     "rrf": 13,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    1,
+    2,
+    4,
+    6,
+    13
+   ],
+   "router_hit": null,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  },
+  {
+   "id": "g52",
+   "category": "negative",
+   "irrelevant_group": true,
+   "rpc_returned": 25,
+   "final": [
+    {
+     "chunk_id": "ad412fe7-acae-4f90-a191-050c20610b4d",
+     "doc": "(영업) AEO 업무절차서 (본점)",
+     "rrf": 12,
+     "rerank": 1
+    },
+    {
+     "chunk_id": "adc2c2d8-2c3a-46ce-a8a1-37b0f49e37e6",
+     "doc": "(영업) AEO 회계업무 매뉴얼",
+     "rrf": 1,
+     "rerank": 2
+    },
+    {
+     "chunk_id": "39134a3a-447b-4f76-912f-ca24de31d628",
+     "doc": "(영업) AEO 회계업무 매뉴얼",
+     "rrf": 2,
+     "rerank": 3
+    },
+    {
+     "chunk_id": "eb6efea9-1771-4ebd-8b2d-576067a37bf7",
+     "doc": "(영업) AEO 회계업무 매뉴얼",
+     "rrf": 4,
+     "rerank": 4
+    },
+    {
+     "chunk_id": "53d0f643-6b2d-4890-8c9b-189c4f574f8e",
+     "doc": "(영업) AEO 회계업무 매뉴얼",
+     "rrf": 3,
+     "rerank": 5
+    }
+   ],
+   "final_topk_rrf": [
+    12,
+    1,
+    2,
+    4,
+    3
+   ],
+   "router_hit": null,
+   "promoted": {
+    "(공통) 임직원 징계기준": {
+     "in_final": false,
+     "final_chunks": []
+    },
+    "(공통) 신세계그룹 CREDO": {
+     "in_final": false,
+     "final_chunks": []
+    }
+   }
+  }
+ ]
+}

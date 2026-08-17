@@ -117,3 +117,16 @@ def test_chunk_cap():
     sb = _FakeSb([_row(i, RULE_A, f"d{i}") for i in range(12)])
     res = _retr(sb, top_k=10, chunk_cap=8).retrieve(_INTAKE, _ROUTE)
     assert len(res["chunks"]) == 8
+
+
+def test_rank_trace_instrumentation():
+    # P1 계장 (010): 관측 전용 — 반환 청크 무영향 + 3층 기록 구조 실재
+    rows = [_row(i, RULE_A, f"d{i}") for i in range(6)]
+    sb = _FakeSb(rows)
+    res = _retr(sb, top_k=3).retrieve(_INTAKE, _ROUTE)
+    rt = res["rank_trace"]
+    assert rt["rpc_returned"] == 6
+    assert set(rt["rrf_rank"].values()) == {1, 2, 3, 4, 5, 6}
+    assert rt["rerank_rank"]                       # 리랭크 층 기록
+    assert len(rt["final"]) == len(res["chunks"])  # 최종층 = 반환 청크 1:1
+    assert all("rrf" in f and "rerank" in f for f in rt["final"])
