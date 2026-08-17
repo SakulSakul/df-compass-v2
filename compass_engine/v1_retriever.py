@@ -171,12 +171,17 @@ class V1RpcRetriever:
                             pool_docs.add(did)
             # 저확신·무지목 → no-op (router_hit=None 유지, 기존 흐름 그대로)
 
-        if self.reranker is not None and chunks:
+        # P2′ (010-r1): 라우터 무지목 시 리랭크 스킵 — RRF 순서 그대로 top_k.
+        # 근거: P1 실측 — 무관 오염(g47)과 관련 rescue(36/45)가 동일한 리랭크
+        # 급상승 메커니즘이라 순위 자격 창으로 분리 불능 (심의 정본 010-r1).
+        _rerank_skip = self.router is not None and not routed_titles
+        if self.reranker is not None and chunks and not _rerank_skip:
             _t = time.perf_counter()
             ranked = list(self.reranker(q, chunks))
             timings["rerank_ms"] = int((time.perf_counter() - _t) * 1000)
         else:
             ranked = list(chunks)
+        _rank_trace["rerank_skipped"] = _rerank_skip
         # P1 계장: 리랭크 후 순위 (라우팅 주입 청크는 rrf_rank 부재 → None 구분)
         _rank_trace["rerank_rank"] = {c["chunk_id"]: i + 1
                                       for i, c in enumerate(ranked)}

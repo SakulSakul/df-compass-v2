@@ -1,0 +1,130 @@
+{
+ "p1": "eval/results/rank_trace_20260817T121844.json",
+ "p2": "eval/results/rank_trace_20260817T130946.json",
+ "errors_p2": [],
+ "b1": {
+  "skip_ids": [
+   "g47",
+   "g48",
+   "g49",
+   "g50",
+   "g51",
+   "g52"
+  ],
+  "promoted_entered": [],
+  "pass": true
+ },
+ "b2": {
+  "p1": {
+   "q": 36,
+   "chunks": 66
+  },
+  "p2": {
+   "q": 38,
+   "chunks": 71
+  },
+  "pass": true
+ },
+ "b3": {
+  "g14": {
+   "expected_hit_p1": [
+    "(공통) 임직원 징계기준"
+   ],
+   "expected_hit_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "promoted_p1": [
+    "(공통) 임직원 징계기준"
+   ],
+   "promoted_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p1": [
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "pass": true
+  },
+  "g12": {
+   "expected_hit_p1": [
+    "(CSR) 클린뱅크 운영 지침"
+   ],
+   "expected_hit_p2": [
+    "(CSR) 클린뱅크 운영 지침"
+   ],
+   "promoted_p1": [
+    "(공통) 신세계그룹 CREDO",
+    "(공통) 임직원 징계기준"
+   ],
+   "promoted_p2": [
+    "(공통) 신세계그룹 CREDO",
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p1": [],
+   "rescue_promoted_p2": [],
+   "pass": true
+  },
+  "g09": {
+   "expected_hit_p1": [
+    "(재무) 법인카드 관리 지침"
+   ],
+   "expected_hit_p2": [
+    "(재무) 법인카드 관리 지침"
+   ],
+   "promoted_p1": [
+    "(공통) 신세계그룹 CREDO",
+    "(공통) 임직원 징계기준"
+   ],
+   "promoted_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p1": [
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "pass": true
+  },
+  "g13": {
+   "expected_hit_p1": [
+    "(영업) CSR경영방침"
+   ],
+   "expected_hit_p2": [
+    "(영업) CSR경영방침"
+   ],
+   "promoted_p1": [
+    "(공통) 신세계그룹 CREDO",
+    "(공통) 임직원 징계기준"
+   ],
+   "promoted_p2": [
+    "(공통) 신세계그룹 CREDO",
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p1": [
+    "(공통) 임직원 징계기준"
+   ],
+   "rescue_promoted_p2": [
+    "(공통) 임직원 징계기준"
+   ],
+   "pass": true
+  },
+  "pass": true
+ },
+ "b4": {
+  "routed_ids": [
+   "g10"
+  ],
+  "promoted_in_final": {
+   "g10": []
+  }
+ },
+ "b5": {
+  "skip_ids": [],
+  "detail": [],
+  "pass": true
+ },
+ "gate_b_pass": true
+}

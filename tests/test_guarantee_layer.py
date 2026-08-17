@@ -119,6 +119,57 @@ def test_chunk_cap():
     assert len(res["chunks"]) == 8
 
 
+def _rev_reranker(q, chunks):
+    """순서 검증용 fake — 호출되면 역순 반환 (스킵/수행 구분 계기)."""
+    return list(reversed(chunks))
+
+
+def test_p2prime_no_designation_skips_rerank():
+    # P2′ (010-r1): 라우터 무지목(저확신) → 리랭크 스킵, RRF 순서 그대로
+    sb = _FakeSb([_row(i, RULE_A, "dA") for i in range(6)])
+    router = _FakeRouter([RULE_B], confident=False, title_to_id={RULE_B: "dB"})
+    res = _retr(sb, top_k=3, router=router,
+                reranker=_rev_reranker).retrieve(_INTAKE, _ROUTE)
+    assert res["rank_trace"]["rerank_skipped"] is True
+    assert [c["chunk_id"] for c in res["chunks"]] == ["c0", "c1", "c2"]  # RRF 순서
+
+
+def test_p2prime_designation_keeps_rerank():
+    # P2′ (010-r1): 확신 지목 → 현행 리랭크 유지 (역순 fake 반영 확인)
+    sb = _FakeSb([_row(i, RULE_A, "dA") for i in range(6)])
+    router = _FakeRouter([RULE_A], confident=True, title_to_id={RULE_A: "dA"})
+    res = _retr(sb, top_k=3, router=router,
+                reranker=_rev_reranker).retrieve(_INTAKE, _ROUTE)
+    assert res["rank_trace"]["rerank_skipped"] is False
+    assert [c["chunk_id"] for c in res["chunks"]] == ["c5", "c4", "c3"]  # 리랭크 적용
+
+
+def test_p2prime_no_router_baseline_rerank_unchanged():
+    # P2′ (010-r1): 라우터 미구성 → 스킵 없음 (기존 동작 보존)
+    sb = _FakeSb([_row(i, RULE_A, "dA") for i in range(6)])
+    res = _retr(sb, top_k=3, reranker=_rev_reranker).retrieve(_INTAKE, _ROUTE)
+    assert res["rank_trace"]["rerank_skipped"] is False
+    assert [c["chunk_id"] for c in res["chunks"]] == ["c5", "c4", "c3"]
+
+
+def test_p2prime_skip_downstream_unchanged(monkeypatch):
+    # P2′ (010-r1): 스킵 시에도 하류(프록시 감점·쿼터·cap) 불변 동작
+    import compass_engine.proxies as _px
+    monkeypatch.setattr(_px, "PROXY_DOCS", frozenset({PROXY}))
+    rows = ([_row(i, PROXY, "dP") for i in range(3)]
+            + [_row(10 + i, RULE_A, "dA") for i in range(3)]
+            + [_row(20 + i, RULE_B, "dB") for i in range(6)])
+    sb = _FakeSb(rows)
+    router = _FakeRouter([], confident=False)
+    res = _retr(sb, top_k=4, router=router, reranker=_rev_reranker,
+                proxy_quota=1, chunk_cap=8).retrieve(_INTAKE, _ROUTE)
+    assert res["rank_trace"]["rerank_skipped"] is True
+    titles = [c["breadcrumb"].split(">")[0] for c in res["chunks"]]
+    assert titles.count(PROXY) <= 1        # 쿼터
+    assert titles[0] == RULE_A             # 감점 — 비프록시가 앞 (RRF 순서 유지)
+    assert len(res["chunks"]) <= 8         # cap
+
+
 def test_rank_trace_instrumentation():
     # P1 계장 (010): 관측 전용 — 반환 청크 무영향 + 3층 기록 구조 실재
     rows = [_row(i, RULE_A, f"d{i}") for i in range(6)]
